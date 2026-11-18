@@ -1,0 +1,32 @@
+/* Figma 272:19633: single-line glass composer beneath the opening copy. */
+body:has(#view-home.active){background:#fff}
+body:has(#view-home.active)::before{content:none}
+body:has(#view-home.active) #app{padding-top:0!important}
+.home-hero-scroll{position:relative;left:50%;width:100vw;margin-left:-50vw;height:calc(100svh + var(--home-scroll-range,80svh));--home-shrink:0}
+.home-hero-pin{position:sticky;top:0;height:100svh}
+#view-home .home-hero-pin .hero-break{position:absolute;left:calc(var(--home-inset-x,80px)*var(--home-shrink));top:calc(var(--home-inset-y,80px)*var(--home-shrink));right:calc(var(--home-inset-x,80px)*var(--home-shrink));width:auto;margin:0;height:calc(100svh - var(--home-height-change,160px)*var(--home-shrink));min-height:0;padding:0;border-radius:calc(40px*var(--home-shrink));overflow:hidden;background:radial-gradient(ellipse at 48% 8%,#fafafa 0%,#f3f3f4 24%,transparent 64%),radial-gradient(ellipse at 96% 72%,#d6d7da80 0%,transparent 62%),linear-gradient(155deg,#ececee 0%,#e6e6e8 46%,#dcdde0 100%)}
+#view-home .home-hero-pin .home-title{top:calc(clamp(124px,17svh,180px) - 44px*var(--home-shrink));height:auto;left:24px;right:24px;justify-content:flex-start;pointer-events:none}
+#view-home .home-hero-pin .hero-search{position:relative;inset:auto;transform:none;left:auto;bottom:auto;width:min(800px,100%);max-width:100%;margin:28px auto 0;padding:0;pointer-events:auto}
+#view-home .hero-search .composer{display:flex;align-items:center;gap:6px;padding:10px;border:1px solid #ffffffd9;border-radius:24px;background:#ffffffcc;backdrop-filter:blur(32px);-webkit-backdrop-filter:blur(32px);box-shadow:0 12px 42px #22263212,inset 0 1px #fff;text-align:left}
+#view-home .hero-search .composer textarea{flex:1;min-width:0;display:block;width:100%;height:48px!important;min-height:48px;max-height:48px;padding:10px;margin:0;border:0;border-radius:0;background:transparent;font:400 16px/28px Figtree,"PingFang SC",sans-serif;color:#606266;resize:none;white-space:pre;overflow:hidden;box-shadow:none}
+#view-home .hero-search .composer textarea::placeholder{color:#606266;opacity:1}
+#view-home .hero-search .composer-row,#view-home .hero-search .home-compose-actions{display:flex;align-items:center;gap:0;padding:0;margin:0;flex:none;min-height:32px}
+#view-home .hero-search .switch,#view-home .hero-search .home-add-content,#view-home #home-attachments{display:none}
+#view-home .hero-search .round-send{width:32px;height:32px;min-height:32px;min-width:32px;padding:4px;border:0;border-radius:12px;background:#020617;color:#fff}
+.home-send-icon{display:block;position:relative;width:24px;height:24px}
+.home-send-icon img{position:absolute;left:6px;top:7px;display:block;max-width:none}
+#view-home .home-hero-pin .shelf-stage{top:calc(clamp(350px,50svh,500px) - 40px*var(--home-shrink))}
+#view-home .home-hero-pin .hero-break:after{height:80px}
+@media(max-width:760px){#view-home .home-hero-pin .home-title{top:calc(164px - 40px*var(--home-shrink));left:20px;right:20px}#view-home .home-hero-pin .hero-search{margin-top:24px}#view-home .hero-search .composer textarea{font-size:16px}#view-home .home-hero-pin .shelf-stage{top:calc(380px - 64px*var(--home-shrink))}#view-home .home-hero-pin .hero-break{border-radius:calc(24px*var(--home-shrink))}}
+@media(prefers-reduced-motion:reduce){.home-hero-scroll{height:100svh}.home-hero-pin{position:relative}}
+
+/* Updated Figma 272:19633: pill surface and a 48px circular send button. */
+#view-home .hero-search .composer{border-radius:100px}
+#view-home .hero-search .round-send{width:48px;height:48px;min-width:48px;min-height:48px;flex-basis:48px;padding:12px;border-radius:100px}
+#view-home .home-hero-pin .shelf-stage{top:var(--home-shelf-top,360px)}
+#view-home .home-hero-pin .shelf-cover{height:92svh}
+#view-home .home-shelf-locked .hero-shelf{pointer-events:none;cursor:default}
+
+/* Keep printed faces at a stable layout size while the shelf contracts. */
+#view-home .home-hero-pin .shelf-stage{left:50%;right:auto;width:100vw;margin-left:-50vw}
+#view-home .home-shelf-locked .shelf-cover{will-change:transform}

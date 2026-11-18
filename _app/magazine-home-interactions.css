@@ -1,0 +1,17 @@
+/* Same left-hinged turn and timing used by shared magazine cards. */
+.magazine-home :is(.mh-issue,.mh-latest-cover) .hinged-cover{position:relative;display:block;perspective:900px;isolation:isolate;width:100%}
+.magazine-home :is(.mh-issue,.mh-latest-cover) .hinged-cover>img{position:relative;z-index:1;transform-origin:left center;backface-visibility:hidden;transition:transform 450ms cubic-bezier(.2,.8,.2,1),box-shadow 450ms cubic-bezier(.2,.8,.2,1)}
+@media(hover:hover) and (pointer:fine){
+ .magazine-home .mh-issue:is(:hover,:focus-visible) .hinged-cover>img{transform:rotateY(-18deg);box-shadow:8px 8px 16px #2121211a}
+}
+
+/* Match the reading-club article list: zoom within a stationary image frame. */
+.magazine-home .mh-pick-frame{display:block;align-self:start;overflow:hidden;border-radius:4px}
+.magazine-home #picks .mh-pick-frame>img{display:block;max-width:100%;border-radius:0;transition:transform 420ms cubic-bezier(.2,.8,.2,1)}
+@media(hover:hover) and (pointer:fine){
+ .magazine-home #picks .mh-pick:hover .mh-pick-frame>img{transform:scale(1.06)}
+}
+.magazine-home #picks .mh-pick:focus-visible .mh-pick-frame>img{transform:scale(1.06)}
+@media(prefers-reduced-motion:reduce){
+ .magazine-home #picks .mh-pick-frame>img,.magazine-home .hinged-cover>img{transition:none;transform:none!important}
+}

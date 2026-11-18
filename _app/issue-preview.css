@@ -1,0 +1,135 @@
+/* Issue browsing keeps the selected historical directory and guide surfaces. */
+body.portal-body>.site-header{left:0!important;right:0!important;width:100%!important;justify-content:center!important;margin:0!important;z-index:110;transition:none!important}
+body.issue-preview-page .portal-reading-progress,body.issue-preview-page .portal-reader-tools,body.issue-preview-page .portal-reader-next,body.issue-preview-page .portal-article-notes{display:none!important}
+body.issue-preview-page .issue-preview-reader{align-items:start}
+body.issue-preview-page .issue-preview-stream{padding-right:40px}
+.issue-preview-article{padding:0 0 44px;margin-bottom:52px;border-bottom:1px solid #dcdfe6;scroll-margin-top:110px;min-width:0}
+.issue-preview-article:last-child{margin-bottom:0}
+.issue-preview-article .portal-article-head{padding-bottom:24px}
+body.issue-preview-page .issue-preview-article .portal-article-head h1{font-size:32px;line-height:1.5;margin:12px 0 20px}
+.issue-preview-excerpt{max-height:clamp(240px,calc(100dvh - 320px),680px);overflow:hidden;max-width:720px!important;padding-top:28px;min-width:0;font-size:16px!important;line-height:28px!important;overflow-wrap:anywhere}
+.issue-preview-excerpt p{margin-bottom:24px}
+.issue-preview-excerpt h2{font-size:24px;line-height:36px;margin:28px 0 20px}
+.issue-preview-excerpt figure{margin:28px auto;text-align:center}
+.issue-preview-excerpt figure img{display:block;width:auto;max-width:100%;height:auto;max-height:440px;object-fit:contain;margin:0 auto;border-radius:4px}
+.issue-preview-excerpt figcaption{font:12px/20px Figtree,"PingFang SC",sans-serif;color:#909399;margin-top:8px}
+.issue-preview-bottom{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:24px}
+.issue-preview-bottom>span{font-size:12px;line-height:20px;color:#909399}
+.issue-preview-bottom>.button{display:flex;align-items:center;gap:12px;border-radius:100px;padding:12px 20px;font-size:14px;line-height:24px;white-space:nowrap;background:#131921;color:white;text-decoration:none}
+.issue-preview-bottom .iconfont{font-size:20px}
+body.issue-preview-page .portal-toc{max-height:calc(100dvh - 130px);overflow:auto}
+body.issue-full-page .portal-reader.is-standalone{display:block;max-width:720px;margin-inline:auto}
+body.issue-full-page .portal-reader-content{padding-right:64px}
+body.issue-full-page .portal-prose figure>img{display:block;width:auto;max-width:100%;height:auto;max-height:none;margin-inline:auto}
+/* Full-height guide; the message list scrolls and the composer remains visible. */
+body.portal-body .demo-reading-widget .pe-chat{top:0!important;right:0!important;bottom:0!important;height:100dvh!important;max-height:100dvh!important;border-radius:0!important;border-top:0;border-bottom:0;border-right:0;display:flex!important;transform:none!important;opacity:1!important}
+body.portal-body:not(.issue-full-page) .demo-reading-widget .pe-chat-toggle,body.portal-body:not(.issue-full-page) .demo-reading-widget .pe-chat-reopen{display:none!important}
+body.portal-body .demo-reading-widget .pe-guide-heading{padding-right:16px}
+body.portal-body .demo-reading-widget .pe-chat-messages{min-height:0;flex:1;overflow:auto}
+body.portal-body .demo-reading-widget .pe-chat-form-wrap{flex:none;padding-bottom:max(12px,env(safe-area-inset-bottom))}
+
+@media(max-width:1250px) and (min-width:761px){.site-header .nav-shell>.brand{margin-right:20px}.site-header .nav-shell>nav{margin-right:20px;gap:12px}.site-header .nav-shell>.login{padding-left:20px}}
+@media(max-width:760px){
+ body.issue-preview-page .issue-preview-stream{padding-right:0}
+ body.issue-preview-page .issue-preview-article .portal-article-head h1{font-size:24px;line-height:36px}
+ .issue-preview-article{padding-bottom:32px;margin-bottom:36px;scroll-margin-top:142px}
+ .issue-preview-excerpt{max-height:clamp(220px,calc(100dvh - 340px),520px)}
+ body.portal-body .demo-reading-widget .pe-chat{position:relative;top:auto!important;right:auto!important;bottom:auto!important;width:100%;max-width:none;height:100dvh!important;margin-top:40px;border-radius:0!important}
+ body.portal-body .demo-reading-widget{position:static}
+ body.issue-full-page .portal-reader-content{padding-right:0}
+}
+
+body.portal-body .demo-reading-widget .ai-maximize{display:none!important}
+
+/* Confirmed 2026-11-17: middle article content is at most 720px wide. */
+body.issue-preview-page .issue-preview-article{width:100%;max-width:720px;margin-inline:auto;box-sizing:border-box}
+body.issue-full-page .portal-reader.is-standalone .portal-reader-content{width:100%;max-width:720px;margin-inline:auto;padding-inline:0;box-sizing:border-box}
+
+.issue-trial-notice{font:14px/24px Figtree,"PingFang SC",sans-serif!important;color:#909399;padding:16px;background:#f5f7fa;border-radius:12px}.issue-trial-notice a{text-decoration:underline}
+
+/* Full-height directory occupies its original grid column; content keeps its width. */
+@media(min-width:761px){
+ .issue-toc-slot{min-width:0;align-self:stretch}
+ body.issue-preview-page .issue-toc-slot>.portal-toc{position:fixed;left:var(--toc-left);width:var(--toc-width);top:0;bottom:0;height:100dvh;max-height:100dvh;padding-block:24px;box-sizing:border-box;overflow-y:auto;background:#fafafa;z-index:20}
+ .issue-preview-excerpt{max-height:clamp(400px,calc(100dvh - 240px),960px)}
+}
+.issue-preview-bottom{justify-content:flex-end}
+@media(max-width:760px){.issue-preview-excerpt{max-height:clamp(360px,calc(100dvh - 250px),720px)}}
+
+/* 420px tray, 10px viewport inset and 20px content separation. */
+@media(min-width:761px){
+ body.portal-body:is(.issue-preview-page,.issue-full-page) .demo-reading-widget .pe-chat{width:420px!important;max-width:420px!important;top:10px!important;right:10px!important;bottom:10px!important;height:calc(100dvh - 20px)!important;max-height:calc(100dvh - 20px)!important;border:1px solid #ffffffd9;border-radius:24px!important;box-shadow:0 8px 32px #13192114,0 2px 6px #1319210a;overflow:hidden;box-sizing:border-box}
+
+
+}
+
+/* Full article uses the V3 editorial treatment, always in one reading column. */
+body.issue-full-page .portal-reader.is-editorial{display:block;max-width:720px;margin-inline:auto}
+body.issue-full-page .portal-reader.is-editorial .er-prose{max-width:720px}
+body.issue-full-page .portal-reader.is-editorial .er-column-group{column-count:1!important;column-rule:none!important}
+body.issue-full-page .portal-reader.is-editorial .er-editorial-pair{display:block;grid-template-columns:1fr}
+body.issue-full-page [data-er-toggle]{display:none!important}
+
+/* Full details have no guide and reserve no space for it. */
+
+body.portal-body.issue-full-page.guide-layout-push.reading-guide-open #portal-main,body.portal-body.issue-full-page #portal-main[data-page=article]{margin-inline:auto;width:calc(100% - 128px);max-width:1360px}
+body.portal-body.issue-full-page.guide-layout-push.reading-guide-open>.club-site-footer{margin-right:0}
+@media(max-width:760px){body.portal-body.issue-full-page #portal-main[data-page=article]{width:calc(100% - 48px)}}
+
+/* The V3 toolbar uses local font icons; override the legacy SVG-only hiding rule. */
+html body.issue-full-page .portal-reader-tools .club-local-icon{display:inline-flex!important;align-items:center;justify-content:center;flex:none;width:24px;height:24px;min-width:24px;min-height:24px;font-family:"font_family"!important;font-size:24px!important;line-height:1;font-weight:400;font-style:normal;color:inherit;-webkit-font-smoothing:antialiased}
+html body.issue-full-page .portal-reader-tools .club-local-icon::before{font-size:inherit;line-height:1}
+html body.issue-full-page .reader-tool-group .reader-arrow-up{display:grid;place-items:center;width:24px;height:24px;transform:none}
+html body.issue-full-page .reader-tool-group .reader-arrow-down{display:grid;place-items:center;width:24px;height:24px;transform:rotate(180deg)}
+
+@media(min-width:761px){
+ body.issue-full-page .portal-reader-content{display:flow-root}
+ body.issue-full-page .portal-reader-content>.portal-reader-tools{position:sticky!important;float:right!important;top:max(110px,calc(50dvh - 130px))!important;inset-inline:auto!important;bottom:auto!important;transform:none!important;width:58px;margin:0 -80px 0 22px!important}
+}
+@media(max-width:760px){
+ html body.issue-full-page .reader-tool-group .reader-arrow-up{transform:rotate(-90deg)}
+ html body.issue-full-page .reader-tool-group .reader-arrow-down{transform:rotate(90deg)}
+}
+
+/* Reuse the reference directory dialog without restoring a left sidebar. */
+body.issue-full-page .portal-reader.is-editorial.reader-has-directory{max-width:720px}
+body.issue-full-page .reader-directory-dialog .iconfont{font-family:"font_family"!important;font-style:normal;font-weight:400;display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;color:inherit}
+
+/* Header rhythm uses one gap, avoiding stacked flex gaps and title margins. */
+body.issue-preview-page .issue-preview-article .portal-article-head{gap:12px}
+body.issue-preview-page .issue-preview-article .portal-article-head>.club-overline{margin:0}
+body.issue-preview-page .issue-preview-article .portal-article-head h1{margin:0}
+body.issue-full-page .portal-reader .portal-article-head{gap:16px}
+body.issue-full-page .portal-reader .portal-article-head>.club-overline{margin:0}
+body.issue-full-page .portal-reader .portal-article-head h1{margin:0}
+
+/* Quieter preview: directory is navigation; each article has a distinct pause. */
+body.issue-preview-page .issue-preview-article{padding-bottom:36px;margin-bottom:88px;border-bottom:0}
+body.issue-preview-page .issue-preview-article:last-child{margin-bottom:0}
+body.issue-preview-page .portal-toc .reader-toc-article{padding-block:14px;border-bottom-color:#e4e7ed}
+body.issue-preview-page .portal-toc .reader-toc-article strong{font-weight:500;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+body.issue-preview-page .portal-toc .reader-toc-article[aria-current] strong{font-weight:700}
+body.issue-preview-page .portal-toc .portal-toc-group{margin-top:32px;margin-bottom:12px;color:#909399}
+body.issue-preview-page .portal-toc .portal-toc-group:first-child{margin-top:0}
+@media(max-width:760px){body.issue-preview-page .issue-preview-article{padding-bottom:24px;margin-bottom:56px}}
+
+/* Book-page directory: quiet type and space rather than numbered rows. */
+@media(min-width:761px){
+ body.issue-preview-page .issue-preview-reader{grid-template-columns:210px minmax(0,1fr)}
+ body.issue-preview-page .issue-toc-slot>.portal-toc{padding-inline:16px 24px}
+}
+body.issue-preview-page .portal-toc>.reader-resource{padding-bottom:20px;margin-bottom:20px;border:0;gap:0}
+body.issue-preview-page .portal-toc>.reader-resource strong{font-size:14px;line-height:24px;font-weight:500}
+body.issue-preview-page .portal-toc>.reader-resource small{font-size:12px;line-height:20px;color:#a8abb2}
+body.issue-preview-page .portal-toc .portal-toc-group{font-size:11px;line-height:18px;color:#a8abb2;gap:0;margin-top:28px;margin-bottom:8px}
+body.issue-preview-page .portal-toc .portal-toc-group>span:first-child{display:none}
+body.issue-preview-page .portal-toc nav .reader-toc-article{position:relative;display:block;padding:8px 0 8px 12px;border:0!important;border-radius:0;background:transparent;gap:0;color:#909399;transition:color 160ms ease}
+body.issue-preview-page .portal-toc .reader-toc-article>span:first-child{display:none}
+body.issue-preview-page .portal-toc .reader-toc-article>span:last-child{display:block;min-width:0}
+body.issue-preview-page .portal-toc .reader-toc-article strong{display:block;font-size:14px;line-height:24px;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;-webkit-line-clamp:unset}
+body.issue-preview-page .portal-toc .reader-toc-article:hover{color:#303133}
+body.issue-preview-page .portal-toc nav .reader-toc-article[aria-current]{color:#131921;background:transparent}
+body.issue-preview-page .portal-toc .reader-toc-article[aria-current] strong{font-weight:500}
+body.issue-preview-page .portal-toc .reader-toc-article[aria-current]::before{content:"";position:absolute;left:0;top:13px;width:2px;height:14px;border-radius:2px;background:#131921}
+@media(prefers-reduced-motion:reduce){body.issue-preview-page .portal-toc .reader-toc-article{transition:none}}
+

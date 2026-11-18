@@ -1,0 +1,72 @@
+/* Figma 636:4287 — symmetric outer lanes, centered reading column. */
+@media(min-width:1560px){
+ body.portal-body.issue-preview-page.guide-layout-push #portal-main[data-page=article]{width:calc(100% - 20px);max-width:none;margin:0 10px;padding:100px 0;box-sizing:border-box;transition:none}
+ body.issue-preview-page .issue-preview-reader{display:grid;width:100%;grid-template-columns:420px minmax(0,1fr) 420px;gap:0;align-items:start}
+ body.issue-preview-page .issue-toc-slot{position:relative;grid-column:1;grid-row:1;width:100%;height:auto;align-self:stretch}
+ body.issue-preview-page .issue-toc-slot>.portal-toc{display:block;position:fixed;left:10px;top:100px;bottom:10px;width:420px;height:calc(100dvh - 110px);max-height:calc(100dvh - 110px);padding:0 10px;box-sizing:border-box;background:transparent;overflow-y:auto;scrollbar-width:none;box-shadow:none;border-radius:0}
+ body.issue-preview-page .issue-preview-stream{grid-column:2;grid-row:1;width:100%;min-width:0;padding:0 40px;box-sizing:border-box}
+ body.issue-preview-page .issue-directory-toggle{display:none}
+ body.portal-body.issue-preview-page .demo-reading-widget .pe-chat{position:fixed!important;left:auto!important;right:10px!important;top:112px!important;bottom:10px!important;width:420px!important;max-width:420px!important;height:calc(100dvh - 122px)!important;max-height:calc(100dvh - 122px)!important;border:1px solid #ffffffd9;border-radius:24px!important;box-shadow:0 8px 32px #13192114,0 2px 6px #1319210a;overflow:hidden}
+}
+@media(min-width:761px){
+ /* The complete header group (back + navigation) is centered on the viewport. */
+ body.portal-body.issue-preview-page>.site-header{position:fixed;left:0!important;right:0!important;top:0;width:100%!important;display:flex;justify-content:center!important;align-items:flex-start;align-content:normal;gap:20px;padding:10px 20px;height:74px;box-sizing:border-box;grid-template-columns:none}
+ body.portal-body.issue-preview-page>.site-header>.portal-back{position:static;left:auto;top:auto;transform:none;width:54px;height:54px;min-width:54px;margin:0}
+ body.portal-body.issue-preview-page>.site-header>.nav-shell{flex:none;width:720px;max-width:calc(100% - 74px);min-width:0;margin:0;padding:10px;box-sizing:border-box;column-gap:0}
+ body.issue-preview-page .site-header .nav-shell>.brand{margin-right:24px}
+ body.issue-preview-page .site-header .nav-shell>.brand img{width:146px;height:32px;object-fit:contain}
+ body.issue-preview-page .site-header .nav-shell>nav{flex:1;min-width:0;gap:16px;margin:0 20px 0 0;overflow-x:auto;scrollbar-width:none}
+ body.issue-preview-page .site-header .nav-shell>.login{padding:0 10px 0 20px}
+ body.issue-preview-page .issue-preview-article{width:100%;max-width:720px;margin-inline:auto}
+ body.issue-preview-page .issue-preview-article .portal-article-head{gap:12px;padding-bottom:24px}
+ body.issue-preview-page .issue-preview-article .portal-article-head h1{margin:0;font-size:32px;line-height:48px}
+ body.issue-preview-page .issue-preview-excerpt{padding-top:28px;font-size:16px!important;line-height:28px!important}
+ body.issue-preview-page .issue-preview-excerpt p{margin:0 0 16px!important;text-indent:0}
+ body.issue-preview-page .portal-toc>.reader-resource{display:none}
+ body.issue-preview-page .portal-toc nav{gap:0;text-align:right}
+ body.issue-preview-page .portal-toc nav .portal-toc-group{display:flex;justify-content:flex-end;align-items:center;gap:4px;text-align:right;padding:0;margin:20px 0 10px;color:#909399;font:400 12px/16px Figtree,"PingFang SC",sans-serif}
+ body.issue-preview-page .portal-toc nav .portal-toc-group:first-child{margin-top:2px}
+ body.issue-preview-page .portal-toc nav .portal-toc-group>span:first-child{display:inline}
+ body.issue-preview-page .portal-toc nav .reader-toc-article{padding:0;margin:0 0 10px;border:0!important;border-radius:0;min-height:20px;text-align:right;color:#606266}
+ body.issue-preview-page .portal-toc nav .reader-toc-article strong{font-size:14px;line-height:20px;font-weight:400;text-align:right}
+ body.issue-preview-page .portal-toc nav .reader-toc-article[aria-current]{color:#131921}
+ body.issue-preview-page .portal-toc nav .reader-toc-article[aria-current] strong{font-weight:500}
+ body.issue-preview-page .portal-toc nav .reader-toc-article[aria-current]::before{display:none}
+ body.issue-preview-page .portal-toc nav .reader-toc-article:hover{color:#131921}
+ body.issue-preview-page .pe-chat[data-issue-guide] .pe-chat-messages{padding:24px 10px 20px}
+ body.issue-preview-page .pe-chat[data-issue-guide] .pe-chat-form-wrap{padding-inline:10px}
+ body.portal-body.issue-preview-page.guide-layout-push.reading-guide-open>.club-site-footer{margin-right:0}
+}
+/* At narrower widths, protect the reading measure rather than squeeze three lanes. */
+@media(min-width:761px) and (max-width:1559px){
+ body.portal-body.issue-preview-page.guide-layout-push #portal-main[data-page=article]{width:calc(100% - 48px);max-width:800px;margin:0 auto;padding:100px 0 40px;box-sizing:border-box;transition:none}
+ body.issue-preview-page .issue-preview-reader{display:grid;grid-template-columns:minmax(0,1fr);gap:0}
+ body.issue-preview-page .issue-preview-stream{grid-column:1;grid-row:1;width:100%;padding:0 40px}
+ body.issue-preview-page .issue-toc-slot{position:absolute;width:0;height:0}
+ body.issue-preview-page .issue-toc-slot>.portal-toc{display:none}
+ body.issue-preview-page .issue-toc-slot.is-open>.portal-toc{display:block;position:fixed;left:24px;top:130px;bottom:16px;width:280px;height:auto;max-height:calc(100dvh - 146px);padding:24px;border-radius:24px;background:white;box-shadow:0 8px 32px #1319211a;z-index:95}
+ body.issue-preview-page .issue-directory-toggle{display:flex;position:fixed;top:80px;left:24px;z-index:90;align-items:center;gap:16px;padding:10px 16px;border:0;border-radius:100px;background:white;color:#606266;font:500 12px/20px Figtree,"PingFang SC",sans-serif;box-shadow:0 2px 6px #1319210a;cursor:pointer}
+ body.portal-body.issue-preview-page .demo-reading-widget{position:static;display:flex;justify-content:center;width:calc(100% - 48px);max-width:720px;margin:0 auto 40px}
+ body.portal-body.issue-preview-page .demo-reading-widget .pe-chat{position:relative!important;inset:auto!important;width:100%!important;max-width:720px!important;height:800px!important;max-height:calc(100dvh - 20px)!important;margin:0;border-radius:24px!important}
+}
+/* The island hugs its actual controls; no empty flex track before the divider. */
+@media(min-width:761px){
+ body.portal-body.issue-preview-page>.site-header>.nav-shell{width:max-content;max-width:calc(100% - 74px);padding:10px;column-gap:24px}
+ body.issue-preview-page .site-header .nav-shell>.brand{flex:none;width:auto;margin:0;padding:0}
+ body.issue-preview-page .site-header .nav-shell>.brand img{display:block;width:125px;height:32px;object-fit:contain}
+ body.issue-preview-page .site-header .nav-shell>nav{flex:0 1 auto;width:auto;margin:0;padding:0;gap:16px}
+ body.issue-preview-page .site-header .nav-shell>.login{flex:none;margin:0;padding:0 10px 0 20px}
+}
+/* Fade directory text at its scroll boundaries instead of clipping it abruptly. */
+@media(min-width:761px){
+ body.issue-preview-page .issue-toc-slot>.portal-toc{--toc-fade:24px;padding-top:var(--toc-fade);padding-bottom:var(--toc-fade);-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 var(--toc-fade),#000 calc(100% - var(--toc-fade)),transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 var(--toc-fade),#000 calc(100% - var(--toc-fade)),transparent 100%)}
+}
+body.issue-preview-page .portal-toc nav .reader-toc-article[aria-current] strong{font-weight:700;color:#131921}
+/* Center short directories; long directories retain a fully reachable scroll range. */
+@media(min-width:1560px){
+ body.issue-preview-page .issue-toc-slot>.portal-toc{display:flex;flex-direction:column;top:90px;bottom:24px;height:calc(100dvh - 114px);max-height:calc(100dvh - 114px);padding-top:32px;padding-bottom:48px;scroll-padding-block:32px 48px;--toc-fade:24px}
+ body.issue-preview-page .issue-toc-slot>.portal-toc>nav{flex:none;width:100%;margin-block:auto}
+}
+@media(min-width:761px) and (max-width:1559px){
+ body.issue-preview-page .issue-toc-slot.is-open>.portal-toc{padding-top:32px;padding-bottom:48px;scroll-padding-block:32px 48px}
+}

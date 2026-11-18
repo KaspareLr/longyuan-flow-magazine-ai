@@ -1,0 +1,51 @@
+/* Scope shared improvements to resource surfaces; the network home stays unchanged. */
+body.portal-body .brand img{width:146px;height:32px;object-fit:contain}
+body.portal-body #portal-main,body.portal-body>.site-header,body.portal-body>.club-site-footer{transition:margin-right 600ms cubic-bezier(.22,1,.36,1),width 600ms cubic-bezier(.22,1,.36,1)}
+@media(min-width:1000px){body.portal-body.guide-layout-push.reading-guide-open #portal-main{margin-left:24px;margin-right:400px;width:auto}body.portal-body.guide-layout-push.reading-guide-open>.site-header{right:400px}body.portal-body.guide-layout-push.reading-guide-open>.club-site-footer{margin-right:400px}body.portal-body.guide-layout-push.reading-guide-open .book-reader-dock{left:calc((100% - 400px)/2);max-width:calc(100vw - 440px)}}
+.catalog-reading-guide{display:none}.catalog-reading-guide[hidden]{display:none!important}
+body.catalog-guide-visible .catalog-reading-guide{display:block}
+body.catalog-guide-visible .catalog-reading-guide .pe-chat{position:fixed;right:10px;top:88px;width:380px;height:calc(100dvh - 98px);z-index:65;display:flex;flex-direction:column}
+body.catalog-guide-visible .catalog-reading-guide.pe-chat-collapsed .pe-chat{display:none}
+.catalog-reading-guide .pe-chat-reopen{display:none}
+body.catalog-guide-visible .catalog-reading-guide.pe-chat-collapsed .pe-chat-reopen{display:inline-flex;position:fixed;right:24px;top:24px;bottom:auto;z-index:70;border-radius:50%;background:transparent}
+body:not(.portal-body) .pe-chat-reopen.guide-nudge-ready>img{border-radius:50%}
+@media(prefers-reduced-motion:reduce){body.portal-body #portal-main,body.portal-body>.site-header,body.portal-body>.club-site-footer{transition:none}}
+
+.catalog-reading-guide .iconfont{font-family:reading-guide-icons!important;font-size:24px;line-height:24px;font-style:normal;font-weight:400;-webkit-font-smoothing:antialiased}
+.catalog-reading-guide .icon-Arrow_Forward-2:before{content:"\e751"}.catalog-reading-guide .icon-Slider:before{content:"\e6ec"}.catalog-reading-guide .icon-Link:before{content:"\e6d6"}
+.catalog-reading-guide .pe-chat{position:fixed;display:flex;flex-direction:column;width:360px;max-width:calc(100vw - 20px);top:88px;right:10px;bottom:10px;height:calc(100dvh - 98px);padding:0;gap:0;border-radius:24px;background:#ffffffd1;border:1px solid #ffffffd9;box-shadow:0 2px 6px #0000001a;backdrop-filter:blur(30px);overflow:hidden;color:#131921;transform-origin:right top;z-index:90}
+.catalog-reading-guide .pe-chat[hidden]{display:none}
+.catalog-reading-guide .pe-guide-heading{display:flex;align-items:center;gap:14px;padding:10px;height:64px;min-height:64px;flex:none;width:100%;background:#ffffff80;box-shadow:0 2px 6px #0000001a;position:relative}
+.catalog-reading-guide .pe-guide-avatar{width:44px;height:44px;min-width:44px;border-radius:24px;object-fit:cover;flex:none}
+.catalog-reading-guide .pe-guide-heading>div{flex:1;min-width:0}
+.catalog-reading-guide .pe-guide-heading h2{font-size:16px;line-height:28px;font-weight:700}
+.catalog-reading-guide .pe-guide-heading p{font-size:12px;line-height:16px;color:#909399;white-space:nowrap}
+.catalog-reading-guide .pe-chat-toggle{flex:none;display:inline-flex;align-items:center;justify-content:center;padding:4px;width:32px;height:32px;min-width:32px;border:0;border-radius:12px;background:#ffffff1a;color:#303133;position:relative}
+.catalog-reading-guide .pe-chat-messages{flex:1 1 0;min-height:0;padding:40px 10px 0;overflow:auto;font-size:14px;line-height:24px}
+.catalog-reading-guide .pe-guide-welcome h3{font-size:24px;line-height:32px;font-weight:400}
+.catalog-reading-guide .pe-guide-welcome>p{font-size:16px;line-height:28px;color:#909399;margin-bottom:20px}
+.catalog-reading-guide .pe-guide-prompt{width:100%;height:70px;padding:12px;margin-bottom:10px;display:flex;align-items:flex-end;justify-content:space-between;gap:12px;border-radius:14px;border:1px solid #ddd;background:#ffffffb3;text-align:left}
+.catalog-reading-guide .pe-guide-prompt:last-child{margin-bottom:0}
+.catalog-reading-guide .pe-guide-prompt strong{display:block;font-size:16px;line-height:28px;font-weight:700}
+.catalog-reading-guide .pe-guide-prompt small{display:block;font-size:12px;line-height:16px;color:#909399}
+.catalog-reading-guide .pe-chat-messages>p{margin:16px 0}
+.catalog-reading-guide .pe-user-message{padding:12px 16px;background:#edf0f4;border-radius:16px;white-space:pre-wrap;overflow-wrap:anywhere}
+.catalog-reading-guide .pe-chat-form-wrap{padding:10px;flex:none;width:100%}
+.catalog-reading-guide .pe-chat-form{padding:10px;height:130px;width:100%;border:1px solid #ffffffd9;border-radius:24px;background:#ffffffcc;backdrop-filter:blur(32px);box-shadow:0 12px 42px #22263212,inset 0 1px #fff}
+.catalog-reading-guide textarea{display:block;height:76px;min-height:76px;max-height:76px;width:100%;padding:10px;margin:0;font:400 16px/28px Figtree,"PingFang SC",sans-serif;color:#606266;resize:none;background:transparent;border:0}
+.catalog-reading-guide textarea::placeholder{color:#606266;opacity:1}
+.catalog-reading-guide .pe-chat-tools{height:32px;display:flex;justify-content:flex-end;gap:10px}
+.catalog-reading-guide .pe-chat-tools :is(button,.pe-chat-attach){flex:none;display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;padding:4px;border:0;border-radius:12px;cursor:pointer;background:#ffffff1a;color:#303133}
+.catalog-reading-guide .pe-chat-tools button{background:#020617;color:#fff}
+.catalog-reading-guide .pe-chat-reopen{display:none;position:fixed;top:17px;right:20px;width:44px;height:44px;padding:0;border:0;border-radius:24px;box-shadow:0 4px 10px #0003;z-index:95;background:transparent}
+.catalog-reading-guide.pe-chat-collapsed .pe-chat-reopen{display:inline-flex}
+.catalog-reading-guide .pe-chat-reopen img{width:44px;height:44px;border-radius:24px}
+.catalog-reading-guide .pe-tooltip{display:none;position:absolute;right:0;top:calc(100% + 8px);padding:6px 10px;border-radius:6px;background:#131921;color:white;font:400 12px/16px Figtree,"PingFang SC",sans-serif;white-space:nowrap;pointer-events:none}
+.catalog-reading-guide .pe-icon-button:is(:hover,:focus-visible) .pe-tooltip{display:block}
+@media(max-width:900px){.catalog-reading-guide .pe-chat{top:136px;height:calc(100dvh - 146px)}.catalog-reading-guide .pe-chat-reopen{top:41px}}
+
+.catalog-reading-guide .pe-chat{width:380px!important;background:#ffffffd1;border:1px solid #ffffffd9;border-radius:24px;overflow:hidden;box-shadow:0 2px 6px #0000001a;backdrop-filter:blur(30px)}
+html.club-motion-boot body>main:has(#view-home.active){opacity:1}
+body.catalog-guide-visible .catalog-reading-guide.pe-chat-collapsed .pe-chat-reopen{z-index:150}
+@font-face{font-family:reading-guide-icons;src:url('assets/reading-guide-icons.woff') format('woff');font-display:block}
+.pe-source:empty,.oc-source:empty,.portal-source-note:empty,.rd-note:empty{display:none}

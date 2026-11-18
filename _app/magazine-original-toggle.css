@@ -1,0 +1,29 @@
+/* The original magazine/detail styles stay authoritative. Only mode content is new. */
+.native-original-toggle[aria-pressed=true]{background:#131921!important;color:#fff!important;border-color:transparent!important}
+.native-original-toggle .pe-tooltip{display:none}
+.native-original-mode>:not(.native-original-view):not(.portal-reader-tools){display:none!important}
+.native-original-view[hidden]{display:none!important}
+.native-original-view{min-width:0;max-width:100%;color:#131921}
+.native-original-heading{margin-bottom:24px}.native-original-heading h2{font-size:24px;line-height:36px;margin:8px 0}.native-original-heading p{font-size:12px;line-height:20px;color:#909399;margin:0}
+.native-original-controls{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border-radius:100px;background:#ffffffde;backdrop-filter:blur(16px);box-shadow:0 2px 6px #1319210a;margin-bottom:24px;position:sticky;top:100px;z-index:4}
+.native-original-controls button{border:0;display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:#f5f7fa;color:#131921;cursor:pointer}.native-original-controls button:disabled{opacity:.3;cursor:default}.native-original-controls [data-native-prev] .iconfont{transform:rotate(180deg)}
+.native-original-controls label{display:flex;align-items:center;gap:8px;font-size:14px}.native-original-controls select{font:inherit;padding:6px;border:0;border-radius:8px;background:#f5f7fa;color:#131921}
+.native-original-pages figure{margin:0 0 36px;scroll-margin-top:180px}.native-original-tiles{display:grid;gap:0;width:100%;background:#fff;line-height:0;box-shadow:0 6px 20px #13192112}.native-original-tiles img{width:100%;height:100%;display:block;min-width:0;max-width:none;object-fit:fill;margin:0;padding:0;border-radius:0}.native-original-pages figcaption{margin-top:12px;font:12px/20px Figtree,"PingFang SC",sans-serif;color:#909399;text-align:center}
+.native-original-end{font-size:12px;line-height:24px;color:#909399;text-align:center;margin:24px 0}.native-original-end a{text-decoration:underline}
+.native-original-controls :focus-visible{outline:2px solid #a8afb9;outline-offset:2px}
+@media(max-width:760px){.native-original-controls{top:100px;padding:6px 8px;margin-bottom:20px}.native-original-heading h2{font-size:22px;line-height:32px}.native-original-controls select{font-size:16px}.native-original-pages figure{scroll-margin-top:172px}}
+@media(prefers-reduced-motion:reduce){.native-original-view *{scroll-behavior:auto}}
+
+/* One complete page per viewport. Tiles keep the exact source geometry. */
+.native-original-view{height:calc(100dvh - var(--native-top,120px) - 16px);min-height:240px;display:flex;flex-direction:column;gap:10px}
+.native-original-heading{flex:none;margin:0;display:flex;align-items:center;min-height:36px}
+.native-original-heading>div{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}.native-original-heading .pe-kicker{display:none}.native-original-heading h2{font-size:20px;line-height:28px;margin:0}.native-original-heading p{font-size:12px;line-height:20px}
+.native-original-controls{flex:none;position:static;margin:0;padding:6px 10px;min-height:48px}
+.native-original-pages{flex:1;min-height:0;min-width:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.native-original-pages figure{margin:0;min-height:0;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;max-width:100%;max-height:100%}
+.native-original-pages figure[hidden]{display:none!important}
+.native-original-tiles{flex:none;max-width:100%;min-height:0;min-width:0}
+.native-original-tiles img{min-height:0!important;max-height:none!important;aspect-ratio:auto!important;object-fit:fill!important}
+.native-original-pages figcaption{flex:none;margin:8px 0 0;line-height:20px}
+.native-original-end{display:none}
+@media(max-width:760px){.native-original-view{gap:8px;height:calc(100dvh - var(--native-top,108px) - 12px)}.native-original-heading h2{font-size:18px;line-height:26px}.native-original-heading p{font-size:12px}.native-original-controls{padding:4px 8px;min-height:44px}.native-original-controls button{width:36px;height:36px}}

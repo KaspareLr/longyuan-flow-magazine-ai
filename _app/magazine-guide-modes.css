@@ -1,0 +1,30 @@
+/* Keep the reading-guide frame, avatar, typography and composer from the existing detail. */
+.issue-guide-tabs{display:flex;gap:4px;flex:none;margin:0 16px;padding:4px;background:#eef0f4;border-radius:100px}
+.issue-guide-tabs button{flex:1;border:0;border-radius:100px;background:none;color:#909399;padding:8px 10px;font:500 14px/24px Figtree,"PingFang SC",sans-serif;cursor:pointer}.issue-guide-tabs button[aria-pressed=true]{background:white;color:#131921;box-shadow:0 2px 3px #0000000a}
+.pe-chat[data-issue-guide] .pe-chat-messages{padding-top:24px}.pe-chat[data-issue-guide] [hidden]{display:none!important}.issue-engine{font-size:12px;line-height:20px;color:#909399;margin-bottom:12px}.pe-chat[data-issue-guide] .pe-guide-welcome h3{font-size:22px;line-height:32px}.pe-chat[data-issue-guide] .pe-guide-welcome>p{font-size:14px;line-height:24px;margin-bottom:20px}
+.pe-chat[data-issue-guide] fieldset{border:0;padding:0;margin:20px 0;min-width:0}.pe-chat[data-issue-guide] legend,.issue-topic-label{font-size:14px;line-height:24px;font-weight:500;margin-bottom:10px;color:#131921}.issue-guide-chips{display:flex;flex-wrap:wrap;gap:8px}.issue-guide-chips button{border:0;background:#f1f3f6;color:#606266;padding:7px 12px;border-radius:100px;font:400 12px/20px Figtree,"PingFang SC",sans-serif;cursor:pointer}.issue-guide-chips button[aria-pressed=true]{background:#131921;color:white}
+.issue-topic-label{display:block}.issue-topic-label select{display:block;width:100%;margin-top:10px;border:0;background:#f1f3f6;padding:10px 12px;font:400 14px/24px Figtree,"PingFang SC",sans-serif;color:#131921;border-radius:12px}.issue-filter-results{margin-top:24px}.issue-results-count{font-size:12px;line-height:20px;color:#909399;margin-bottom:12px}.issue-result{display:flex!important;align-items:center;justify-content:space-between;text-decoration:none;gap:10px;width:100%}.issue-result>span{min-width:0;flex:1}.issue-result strong{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.issue-result small{display:block;margin-top:6px}.issue-guide-note,.issue-empty{font-size:12px;line-height:20px;color:#909399;margin:16px 0}.issue-theme{padding:20px 0;border-bottom:1px solid #e4e7ed}.issue-theme>span{font-size:12px;color:#909399;letter-spacing:1px}.issue-theme h4{font-size:18px;line-height:28px;font-weight:600;margin:8px 0 12px}.issue-theme>p{font-size:14px;line-height:24px;color:#606266;margin:0}.issue-theme-sources{display:flex;flex-direction:column;gap:8px;margin-top:16px}.issue-theme-sources a{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:12px;background:#f1f3f6;font-size:12px;line-height:20px;color:#131921}.issue-theme-sources a>span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-width:0}.issue-theme-sources .iconfont{font-size:18px!important;flex:none}.issue-guide-conversation{margin-top:20px}.issue-guide-reply{font-size:14px;line-height:24px;border-radius:14px;background:#f5f7fa;padding:16px;margin:12px 0}.issue-guide-reply a{display:block;margin-top:10px;text-decoration:underline}.issue-guide-reply p{margin:8px 0}.issue-guide-reply small{font-size:12px;color:#909399}.issue-guide-tabs :focus-visible,.issue-guide-chips :focus-visible{outline:2px solid #a8afb9;outline-offset:2px}
+@media(max-width:760px){.issue-topic-label select{font-size:16px}.issue-guide-chips button{min-height:40px}}
+
+/* Figma 623:2607: avatar, identity and compact engine switch share a 64px header. */
+.pe-chat[data-issue-guide]>.pe-guide-heading{display:none!important}
+.issue-guide-heading{display:flex;align-items:center;gap:14px;flex:none;min-height:64px;padding:10px;box-sizing:border-box;background:#ffffff80;box-shadow:0 2px 6px #0000001a;position:relative;z-index:1}
+.issue-guide-heading>.issue-guide-avatar{display:block;flex:0 0 44px;width:44px;height:44px;object-fit:cover;border-radius:24px}
+.issue-guide-identity{flex:1;min-width:0}
+.issue-guide-heading .issue-guide-identity>h2{font:700 16px/28px Figtree,"PingFang SC",sans-serif;color:#131921;margin:0}
+.issue-guide-heading .issue-guide-identity>p{font:400 12px/16px Figtree,"PingFang SC",sans-serif;color:#909399;margin:0;white-space:nowrap}
+.issue-guide-heading>.issue-guide-tabs{order:0;align-items:center;gap:4px;margin:0;padding:4px;flex:0 0 auto;background:#eef0f4;border-radius:100px}
+.issue-guide-heading>.issue-guide-tabs>button{flex:none;min-width:0;min-height:0;padding:4px 16px;margin:0;font:500 12px/16px Figtree,"PingFang SC",sans-serif;color:#909399;white-space:nowrap;background:none;border:0;border-radius:100px}
+.issue-guide-heading>.issue-guide-tabs>button[aria-pressed=true]{background:#fff;color:#131921;box-shadow:0 2px 3px #0000000a}
+.pe-chat[data-issue-guide] .pe-chat-messages{padding-top:24px}
+
+/* Keep the tray, replace nested result cards with a calm list. */
+body.issue-preview-page .pe-chat[data-issue-guide] .issue-engine{display:none}
+body.issue-preview-page .pe-chat[data-issue-guide] .pe-guide-welcome>p{margin-bottom:24px}
+body.issue-preview-page .pe-chat[data-issue-guide] fieldset{margin-block:24px}
+body.issue-preview-page .pe-chat[data-issue-guide] .issue-filter-results{margin-top:32px}
+body.issue-preview-page .pe-chat[data-issue-guide] .issue-result{height:auto;min-height:0;padding:18px 0;margin:0;border:0;border-bottom:1px solid #ebeef5;border-radius:0;background:transparent;box-shadow:none;align-items:center;gap:20px}
+body.issue-preview-page .pe-chat[data-issue-guide] .issue-result:last-child{border-bottom:0}
+body.issue-preview-page .pe-chat[data-issue-guide] .issue-result strong{font-size:16px;line-height:26px;font-weight:600}
+body.issue-preview-page .pe-chat[data-issue-guide] .issue-result small{font-size:12px;line-height:20px;color:#909399;margin-top:8px}
+body.issue-preview-page .pe-chat[data-issue-guide] .issue-result:hover{background:#f5f7fa}

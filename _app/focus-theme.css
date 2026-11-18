@@ -1,0 +1,5 @@
+/* One shared focus indicator across the network and reader. */
+:root{--longyuan-focus-ring:rgba(255,255,255,.5)}
+:focus-visible{outline:2px solid var(--longyuan-focus-ring)!important;outline-offset:3px}
+:focus,:focus-within{outline-color:var(--longyuan-focus-ring)!important}
+@media(forced-colors:active){:focus-visible{outline-color:Highlight!important}}

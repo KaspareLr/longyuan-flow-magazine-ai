@@ -1,0 +1,155 @@
+/* WIRED's first-screen collage: thumbnail rail / headline-led feature / independent reading rail. */
+body:has(.frontpage-wired.active),body:has(#view-frontpage.active .frontpage-wired){background:#fff}
+.frontpage-wired{padding-top:112px;--fp-paper:#fff}
+.wired-firstscreen{position:relative;left:auto;transform:none;width:100%;padding:0;margin-bottom:64px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr) minmax(0,1fr);grid-template-areas:"heading heading railheading" "left main rail";column-gap:32px;row-gap:16px;color:#131921;font-family:Figtree,"PingFang SC","Microsoft YaHei",sans-serif}
+.wired-firstscreen h3{font-family:inherit;font-weight:700;letter-spacing:-.025em;transition:color .2s}
+.wired-firstscreen a:hover h3{color:#131921;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px}
+.wired-picks-heading{grid-area:heading;display:flex;align-items:baseline;gap:16px;border-top:2px solid #131921;padding-top:12px}
+.wired-picks-heading h2,.wired-rail-heading h2{font-family:inherit;font-size:22px;line-height:28px;font-weight:700;letter-spacing:-.02em}
+.wired-picks-heading>span{font-family:ui-monospace,SFMono-Regular,monospace;font-size:10px;line-height:16px;color:#909399;letter-spacing:.02em}
+.wired-rail-heading{grid-area:railheading;border-top:2px solid #131921;padding-top:12px}
+.wired-main{grid-area:main;min-width:0}
+.wired-lead{display:flex;flex-direction:column;gap:16px}
+.wired-kicker{display:block;font-family:ui-monospace,SFMono-Regular,"PingFang SC",monospace;font-size:11px;line-height:16px;font-weight:500;letter-spacing:.035em}
+.wired-lead h3{font-size:48px;line-height:1.12;font-weight:700;letter-spacing:-.045em;text-wrap:pretty}
+.wired-lead>p{font-size:15px;line-height:25px;color:#606266;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.wired-byline{display:block;font-family:ui-monospace,SFMono-Regular,"PingFang SC",monospace;font-size:10px;line-height:17px;color:#909399}
+.wired-main-picture{display:block;overflow:hidden;aspect-ratio:3/2;background:#f5f7fa;margin-top:0}
+.wired-main-picture img,.wired-photo img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+.wired-lead:hover .wired-main-picture img,.wired-small-story:hover img{transform:scale(1.025)}
+.wired-main-bottom{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px;padding-top:20px;border-top:1px solid #e4e7ed}
+.wired-text-story{min-width:0;display:flex;flex-direction:column;gap:8px}.wired-text-story+ .wired-text-story{padding-left:16px;border-left:1px solid #e4e7ed}
+.wired-text-story h3{font-size:24px;line-height:1.25}.wired-text-story p{font-size:13px;line-height:21px;color:#606266;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.wired-left{grid-area:left;min-width:0;position:relative}.wired-left:after{content:"";position:absolute;right:-16px;top:0;bottom:0;width:1px;background:#e4e7ed}
+.wired-small-story{display:grid;grid-template-columns:96px minmax(0,1fr);align-items:start;gap:16px;padding:16px 0;border-bottom:1px solid #e4e7ed}.wired-small-story:first-child{padding-top:0}.wired-small-story:last-child{border-bottom:0}
+.wired-small-story>div{display:flex;flex-direction:column;gap:8px;min-width:0}.wired-small-story h3{font-size:21px;line-height:1.28}.wired-photo{display:block;overflow:hidden;aspect-ratio:1;background:#f5f7fa}.wired-small-story .wired-photo{margin-top:0}
+.wired-rail{grid-area:rail;min-width:0;position:relative}.wired-rail:before{content:"";position:absolute;left:-16px;top:-56px;bottom:0;width:1px;background:#e4e7ed}
+.wired-rail-list>a{display:flex;flex-direction:column;gap:8px;padding:16px 0;border-bottom:1px solid #e4e7ed}.wired-rail-list>a:first-child{padding-top:0}.wired-rail-list h3{font-size:22px;line-height:1.3}
+.wired-interview{display:block;margin-top:24px;background:#fff;color:var(--fp-ink)!important}.wired-interview .wired-photo{aspect-ratio:4/3;background:#fff}.wired-interview>div{padding:16px;display:flex;flex-direction:column;gap:10px}.wired-interview h3{font-size:26px;line-height:1.2;color:var(--fp-ink)!important}.wired-interview .wired-byline{color:#909399}
+@media(min-width:1440px){.wired-small-story{grid-template-columns:128px minmax(0,1fr)}.wired-small-story h3{font-size:24px}.wired-firstscreen{padding-inline:0}}
+@media(min-width:761px) and (max-width:1279px){.wired-firstscreen{grid-template-columns:minmax(0,1fr) minmax(0,2fr);grid-template-areas:"heading heading" "left main" "railheading railheading" "rail rail";column-gap:32px;row-gap:20px}.wired-rail:before{display:none}.wired-rail{display:grid;grid-template-columns:3fr 1fr;gap:24px}.wired-rail-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 24px}.wired-rail-list>a{padding-top:0}.wired-interview{margin-top:0}.wired-lead h3{font-size:44px}.wired-firstscreen{padding-inline:0}.wired-rail-heading{margin-top:24px}}
+@media(max-width:760px){.frontpage-wired{padding-top:164px}.wired-firstscreen{display:flex;flex-direction:column;width:100%;padding-inline:0;gap:24px;margin-bottom:40px}.wired-picks-heading{order:0}.wired-main{order:1}.wired-left{order:2;border-top:1px solid #e4e7ed;padding-top:20px}.wired-rail-heading{order:3;margin-top:12px}.wired-rail{order:4}.wired-left:after,.wired-rail:before{display:none}.wired-lead h3{font-size:36px;line-height:1.15;letter-spacing:-.035em}.wired-main-bottom{gap:16px}.wired-text-story h3{font-size:22px}.wired-small-story{grid-template-columns:minmax(0,1fr) 112px;padding:16px 0}.wired-small-story>.wired-photo{grid-column:2;grid-row:1}.wired-small-story>div{grid-column:1;grid-row:1}.wired-small-story h3{font-size:23px}.wired-small-story .wired-photo{aspect-ratio:4/3}.wired-rail-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.wired-rail-list h3{font-size:20px}.wired-rail-list>a:nth-child(2){padding-top:0}.wired-interview{display:grid;grid-template-columns:1fr 1fr;align-items:center}.wired-interview .wired-photo{aspect-ratio:1}.wired-interview h3{font-size:24px}}
+@media(prefers-reduced-motion:reduce){.wired-firstscreen img,.wired-firstscreen h3{transition:none!important}.wired-firstscreen a:hover img{transform:none!important}}
+/* Editorial titles and magazine metadata share the requested reading typography. */
+.wired-firstscreen h2,.wired-firstscreen h3{font-family:"Noto Serif CJK SC","Noto Serif SC","Songti SC",STSong,SimSun,serif;font-weight:700}
+.wired-firstscreen .wired-byline{font-family:Figtree,"PingFang SC",sans-serif;font-size:12px;line-height:16px;color:#909399}
+.wired-firstscreen .wired-main-picture,.wired-firstscreen .wired-photo{aspect-ratio:auto;height:auto;background:transparent}
+.wired-firstscreen .wired-main-picture img,.wired-firstscreen .wired-photo img{width:100%;height:auto;max-width:100%;object-fit:contain;transform:none}
+.wired-firstscreen a:hover .wired-main-picture img,.wired-firstscreen a:hover .wired-photo img{transform:none}
+
+/* Shared editorial heading and category badge from the homepage design. */
+.wired-picks-heading,.wired-rail-heading{display:flex;flex-direction:column;align-items:flex-start;gap:0;padding:10px 0;border-top:2px solid #131921}
+.wired-picks-heading>span,.wired-rail-heading>span{font-family:Figtree,"PingFang SC",sans-serif;font-size:12px;font-weight:400;line-height:16px;letter-spacing:0;text-transform:uppercase;color:#909399}
+.wired-firstscreen .wired-picks-heading h2,.wired-firstscreen .wired-rail-heading h2{font-family:Figtree,"PingFang SC","Microsoft YaHei",sans-serif;font-size:16px;font-weight:700;line-height:24px;letter-spacing:0;color:#131921}
+.wired-kicker{align-self:flex-start;display:inline-flex;width:fit-content;max-width:100%;padding:2px 5px;border-radius:4px;background:#131921;color:#fff;font-family:"PingFang SC","Microsoft YaHei",sans-serif;font-size:10px;font-weight:600;line-height:14px;letter-spacing:0}
+
+.wired-main-bottom .wired-text-story:nth-child(odd){padding-left:0;border-left:0}
+.wired-main-bottom .wired-text-story:nth-child(n+3){border-top:1px solid #e4e7ed;padding-top:20px;margin-top:4px}
+
+/* Match the site's picture zoom and hinged publication covers. Keep full artwork visible. */
+.frontpage .frontpage-story .frontpage-picture,.wired-firstscreen .wired-main-picture,.wired-firstscreen .wired-photo{overflow:hidden}
+.frontpage .frontpage-story .frontpage-picture img,.wired-firstscreen .wired-main-picture img,.wired-firstscreen .wired-photo img{transition:transform 420ms cubic-bezier(.2,.8,.2,1);transform-origin:center}
+.frontpage-feature-picture img{transition:transform 500ms cubic-bezier(.2,.8,.2,1);transform-origin:center}
+.frontpage-cover-slide .books-library-volume{position:relative;display:block;width:100%;height:auto;perspective:900px;aspect-ratio:14/19}
+.frontpage-cover-slide .books-library-cover{width:100%;height:auto;object-fit:contain;border-radius:4px;box-shadow:0 8px 16px #21212112;transform-origin:0 50%;transform:rotateY(0deg);backface-visibility:hidden;transition:transform 450ms cubic-bezier(.2,.8,.2,1),box-shadow 450ms cubic-bezier(.2,.8,.2,1)}
+.frontpage-cover-slide .books-library-paper{background:repeating-linear-gradient(90deg,#fff 0 1px,#e4e7ed 1px 2px);border-color:#e4e7ed}
+.frontpage-cover-window{padding:12px 0;margin:-12px 0}
+@media(hover:hover) and (pointer:fine){
+ .frontpage .frontpage-story:hover .frontpage-picture img,.wired-firstscreen a:hover .wired-main-picture img,.wired-firstscreen a:hover .wired-photo img{transform:scale(1.06)}
+ .frontpage-feature-picture:hover img{transform:scale(1.045)}
+ .frontpage-cover-slide:hover .books-library-cover{transform:rotateY(-18deg);box-shadow:8px 8px 16px #2121211a}
+}
+.frontpage-cover-slide:focus-visible .books-library-cover{transform:rotateY(-18deg)}
+@media(prefers-reduced-motion:reduce){
+ .frontpage .frontpage-story .frontpage-picture img,.wired-firstscreen .wired-main-picture img,.wired-firstscreen .wired-photo img,.frontpage-feature-picture img,.frontpage-cover-slide .books-library-cover{transition:none!important;transform:none!important}
+}
+
+/* Native horizontal scrolling also supports touchpads, touch, and mouse dragging. */
+.frontpage-cover-window{overflow-x:auto;overflow-y:hidden;scroll-snap-type:x proximity;scrollbar-width:none;cursor:grab;overscroll-behavior-x:contain}
+.frontpage-cover-window::-webkit-scrollbar{display:none}
+.frontpage-cover-track{position:relative;transform:none;transition:none;margin:0;padding:0}
+.frontpage-cover-slide{flex-basis:50%;scroll-snap-align:start}
+.frontpage-cover-window.is-dragging{cursor:grabbing;scroll-snap-type:none;user-select:none}
+@media(max-width:760px){.frontpage-cover-track{margin:0;padding:0;transform:none}.frontpage-cover-slide{flex-basis:100%}}
+
+.frontpage-shared-topic.oc-publication{--oc-chat:0px;padding:0;margin:0 0 40px;background:#fff;width:100%;min-height:0}
+.frontpage-shared-topic .oc-feature{margin:0}
+.frontpage .frontpage-cover-heading{justify-content:center}
+
+.frontpage-shared-topic .oc-feature[data-topic-static]{height:auto;min-height:0;aspect-ratio:16/9}
+
+/* Section titles follow the shared magazine and book page heading system. */
+.frontpage .frontpage-section-heading,.frontpage .frontpage-cover-heading{justify-content:space-between;align-items:flex-end;border:0;padding:0;margin-bottom:20px}
+.frontpage-module-title{display:flex;flex-direction:column;gap:10px;min-width:0}
+.frontpage-module-title>span{font:400 12px/16px Figtree,"PingFang SC",sans-serif;color:#909399}
+.frontpage .frontpage-module-title h2{margin:0;text-align:left;font:700 32px/40px Figtree,"PingFang SC",sans-serif;color:#131921}
+.frontpage .frontpage-cover-layout{padding-top:0}
+
+.frontpage .frontpage-more{margin:20px auto 0;font-family:Figtree,"PingFang SC",sans-serif}
+
+/* Homepage rhythm: one spacing scale and editorial type hierarchy. */
+.frontpage-wired{display:flex;flex-direction:column;gap:80px}
+.frontpage-wired>section{margin:0;padding-block:0;min-width:0}
+.frontpage .frontpage-section-heading,.frontpage .frontpage-cover-heading{margin-bottom:24px}
+.frontpage .frontpage-people-grid,.frontpage .frontpage-text-row{gap:24px}
+.frontpage .frontpage-ideas .frontpage-text-row{margin:0}
+.frontpage .frontpage-more{margin-top:32px}
+.frontpage .frontpage-byline{font:400 12px/16px Figtree,"PingFang SC",sans-serif;color:#909399;margin-top:12px}
+.frontpage .frontpage-people h3,.frontpage .frontpage-text-row h3{font-size:24px;line-height:32px;font-weight:700}
+.frontpage .frontpage-cover-copy h3{font-size:32px;line-height:40px}
+.frontpage .frontpage-cover-copy p{font-size:16px;line-height:26px;color:#606266}
+.frontpage-category-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,4.5fr) minmax(0,3fr);gap:24px;align-items:start}
+.frontpage-category-list,.frontpage-category-side{border-left:1px solid #e4e7ed;padding-left:24px;min-width:0}
+.frontpage-category-list>a{display:block;padding:20px 0;border-bottom:1px solid #e4e7ed}
+.frontpage-category-list>a:first-child{padding-top:0}
+.frontpage-category-list>a:last-child{padding-bottom:0;border-bottom:0}
+.frontpage-category-list h3{font-size:24px;line-height:32px}
+.frontpage-category-lead .frontpage-story h3{font-size:32px;line-height:40px}
+.frontpage-category-side .frontpage-story h3{font-size:24px;line-height:32px}
+.frontpage-category-summary{font-size:14px;line-height:24px;color:#606266;margin-top:20px!important;padding-top:20px;border-top:1px solid #e4e7ed}
+@media(max-width:1100px) and (min-width:761px){
+ .frontpage-category-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+ .frontpage-category-side{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:24px;border-left:0;padding-left:0;border-top:1px solid #e4e7ed;padding-top:24px}
+ .frontpage-category-summary{margin-top:0!important;padding:0;border:0}
+}
+@media(max-width:760px){
+ .frontpage-wired{gap:60px}
+ .frontpage .frontpage-section-heading,.frontpage .frontpage-cover-heading{margin-bottom:20px}
+ .frontpage-category-grid{grid-template-columns:1fr;gap:24px}
+ .frontpage-category-list,.frontpage-category-side{padding-left:0;border-left:0;padding-top:24px;border-top:1px solid #e4e7ed}
+ .frontpage-category-lead .frontpage-story h3{font-size:28px;line-height:36px}
+ .frontpage-category-list h3,.frontpage-category-side .frontpage-story h3,.frontpage .frontpage-people h3,.frontpage .frontpage-text-row h3{font-size:22px;line-height:30px}
+}
+
+.frontpage-category-extra{margin-top:24px;border-top:1px solid #e4e7ed}
+.frontpage-category-extra>a{display:block;padding:20px 0;border-bottom:1px solid #e4e7ed}
+.frontpage-category-extra>a:last-child{padding-bottom:0;border-bottom:0}
+.frontpage-category-extra h3{font-size:24px;line-height:32px}
+@media(max-width:1100px) and (min-width:761px){.frontpage-category-side .frontpage-category-extra{margin-top:0;border-top:0}.frontpage-category-side .frontpage-category-extra>a:first-child{padding-top:0}}
+@media(max-width:760px){.frontpage-category-extra h3{font-size:22px;line-height:30px}}
+
+/* Figma 306:1889 — compact editorial grid, headings above bottom rules. */
+.wired-firstscreen{column-gap:20px;row-gap:20px}
+.wired-picks-heading,.wired-rail-heading{gap:10px;padding:0 0 10px;border-top:0;border-bottom:2px solid #131921}
+.wired-firstscreen .wired-picks-heading h2,.wired-firstscreen .wired-rail-heading h2{font-size:32px;line-height:40px}
+.wired-lead h3{font-size:44px;line-height:56px;letter-spacing:0}
+.wired-lead>p{font-size:16px;line-height:28px;-webkit-line-clamp:2}
+.wired-firstscreen .wired-small-story h3,.wired-firstscreen .wired-text-story h3,.wired-firstscreen .wired-rail-list h3,.wired-firstscreen .wired-interview h3{font-size:20px;line-height:28px;letter-spacing:0}
+.wired-small-story{grid-template-columns:minmax(0,120px) minmax(0,1fr);gap:16px;padding:16px 0}
+.wired-small-story>div{padding:10px 0}
+.wired-left{border-right:1px solid #e4e7ed;padding-right:20px}
+.wired-left:after,.wired-rail:before{display:none}
+.wired-main-bottom{gap:20px;margin-top:20px;padding-top:20px}
+.wired-text-story+.wired-text-story{padding-left:20px}
+.wired-text-story p{font-size:14px;line-height:20px}
+.wired-rail-list>a{padding:20px 0}
+.wired-interview{margin-top:20px}
+@media(min-width:761px) and (max-width:1279px){.wired-rail{gap:20px}.wired-rail-list{gap:20px}.wired-rail-list>a{padding-top:0}.wired-interview{margin-top:0}}
+@media(max-width:760px){
+ .wired-firstscreen{gap:20px}
+ .wired-lead h3{font-size:32px;line-height:42px}
+ .wired-left{padding-right:0;border-right:0}
+ .wired-small-story{grid-template-columns:minmax(0,1fr) 112px}
+ .wired-main-bottom{gap:20px}
+ .wired-rail-list{gap:20px}
+}

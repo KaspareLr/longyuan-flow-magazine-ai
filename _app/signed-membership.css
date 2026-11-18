@@ -1,0 +1,16 @@
+.signed-membership-content{font-family:Figtree,"PingFang SC",sans-serif;color:#131921;line-height:1.5;min-width:0}
+.signed-membership-content h2,.signed-membership-content h3,.signed-membership-content p{margin:0}
+.signed-membership-content .portal-heading>div>:is(h1,h2){font-size:56px;line-height:1.12;letter-spacing:-.03em;margin-top:12px;font-weight:700}
+.signed-membership-content .portal-heading em{font-family:"Noto Serif SC","Songti SC",serif;font-style:normal;font-weight:400}
+.signed-membership-content .button,.signed-member-dialog .button,.club-account-dialog .button{display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:14px 32px;border:0;border-radius:12px;background:#fff;color:#131921;font-size:14px;line-height:20px;box-shadow:0 2px 3px #0000001a;text-decoration:none;cursor:pointer}
+.signed-membership-content .button.dark,.signed-member-dialog .button.dark,.club-account-dialog .button.dark{background:#131921;color:#fff}
+.signed-membership-content .portal-plan{min-width:0}.signed-membership-content .portal-plan li:before{content:none}.signed-membership-content .portal-plan h2{font-size:24px}.signed-membership-content .portal-plan h2 i{font-size:24px;margin-right:8px}.signed-membership-content .portal-plan .price{white-space:nowrap}.signed-membership-content .portal-plan li{display:flex;gap:8px;align-items:flex-start}
+.signed-membership-content .portal-member-intro h2{font-size:22px;margin-bottom:8px}.signed-membership-content .portal-section-heading h2{font-size:32px;line-height:40px;margin-top:8px}
+.signed-membership-content input{padding:14px 16px;border:1px solid #dcdfe6;border-radius:12px;font:inherit;background:#fafafa;max-width:100%;box-sizing:border-box}
+.signed-member-dialog{border:0;border-radius:28px;padding:40px;width:min(560px,calc(100vw - 40px));box-sizing:border-box;box-shadow:0 24px 80px #0002;color:#131921}.signed-member-dialog::backdrop{background:#13192155;backdrop-filter:blur(5px)}.signed-member-dialog h2{font-size:28px;margin:0 0 20px}.signed-member-dialog p{line-height:1.8;margin:16px 0}.signed-dialog-close{position:absolute;right:20px;top:16px;border:0;background:none;font-size:24px;cursor:pointer}
+@media(max-width:1100px){.signed-membership-content .portal-plan-grid{grid-template-columns:1fr}.signed-membership-content .portal-benefit-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){.signed-membership-content .portal-heading>div>:is(h1,h2){font-size:40px}.signed-membership-content .portal-redeem,.signed-membership-content .portal-redeem form{flex-direction:column;align-items:stretch}.signed-membership-content .portal-redeem input{width:100%}.signed-membership-content .portal-member-intro{flex-direction:column;align-items:flex-start}.signed-membership-content .portal-benefit-grid{grid-template-columns:1fr}.signed-membership-content .portal-plan{padding:24px}}
+
+.signed-membership-content .portal-faq summary{list-style:none;display:flex;align-items:center;justify-content:space-between}.signed-membership-content .portal-faq summary::-webkit-details-marker{display:none}
+
+#oc-membership.oc-membership{background:transparent;color:#131921;padding:0;border-radius:0}

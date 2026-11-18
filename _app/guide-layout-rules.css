@@ -1,0 +1,9 @@
+/* Overlay surfaces keep their normal width; detail surfaces keep the push interaction. */
+body.guide-layout-overlay .rd-periodical{--pe-reserved-chat:0px!important;--oc-chat:0px!important}
+body.guide-layout-overlay #view-books,body.guide-layout-overlay #view-magazines{margin-right:0!important}
+body.guide-layout-overlay>.topbar{width:100%!important}
+body.guide-layout-overlay .signed-people-home>.oc-main{width:100%}
+body.guide-layout-overlay .oc-dock{left:50%}
+@media(min-width:1000px){
+ body.portal-body.guide-layout-push.reading-guide-open:has(#portal-main[data-page="book"]) #portal-main{margin-left:clamp(64px,6.6667vw,104px);margin-right:calc(400px + clamp(24px,3vw,48px));width:auto}
+}

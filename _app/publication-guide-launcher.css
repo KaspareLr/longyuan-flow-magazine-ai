@@ -1,0 +1,8 @@
+
+body:is(.issue-full-page,.magazine-home) .demo-reading-widget .pe-chat-reopen{display:none}
+body:is(.issue-full-page,.magazine-home) .demo-reading-widget.pe-chat-collapsed .pe-chat-reopen{
+ display:grid;place-items:center;position:fixed;top:17px;right:20px;bottom:auto;left:auto;
+ width:44px;height:44px;padding:0;border:0;border-radius:50%;background:transparent;z-index:120
+}
+body:is(.issue-full-page,.magazine-home) .demo-reading-widget .pe-chat-reopen img{width:44px;height:44px;border-radius:50%}
+body:is(.issue-full-page,.magazine-home) .demo-reading-widget .pe-chat[hidden]{display:none!important}

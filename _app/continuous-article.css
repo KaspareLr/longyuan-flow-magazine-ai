@@ -1,0 +1,9 @@
+/* The progress strip lives directly on body, above header and progressive blur. */
+body.issue-full-page>.portal-reading-progress{position:fixed;top:0;left:0;width:100%;height:3px;z-index:300!important;pointer-events:none;transform-origin:left center;transition:none;background:#131921}
+body.issue-full-page:has(.portal-reader.night)>.portal-reading-progress{background:#b0b8c3}
+body.issue-full-page .issue-continuation{margin-top:100px!important;padding-top:40px;border-top:1px solid #dcdfe6;animation:continuous-arrive 280ms ease-out both}
+body.issue-full-page .issue-continuation .portal-reader-content{padding:0!important}
+body.issue-full-page .portal-reader:not(.issue-continuation) .portal-reader-content>.portal-reader-tools{position:fixed!important;float:none!important;top:50%!important;right:max(16px,calc((100vw - 720px)/2 - 80px))!important;left:auto!important;bottom:auto!important;transform:translateY(-50%)!important;margin:0!important}
+@keyframes continuous-arrive{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@media(max-width:760px){body.issue-full-page .issue-continuation{margin-top:64px!important;padding-top:28px}body.issue-full-page .portal-reader:not(.issue-continuation) .portal-reader-content>.portal-reader-tools{top:auto!important;right:20px!important;bottom:calc(20px + env(safe-area-inset-bottom))!important;transform:none!important}body.issue-full-page .portal-reader:not(.issue-continuation) .portal-reader-content>.portal-reader-tools.reader-tools-open{right:50%!important;transform:translateX(50%)!important}}
+@media(prefers-reduced-motion:reduce){body.issue-full-page .issue-continuation{animation:none}}

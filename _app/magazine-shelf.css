@@ -1,0 +1,77 @@
+.magazine-home .mh-hero{display:flex;flex-direction:column;gap:20px;min-height:0;padding:130px 0 24px;align-items:center;overflow:hidden}
+.magazine-home .mh-identity{width:100%;text-align:center}
+.magazine-home .mh-identity h1{font-size:40px;line-height:52px;margin:8px 0}
+.magazine-home .mh-tagline{font-size:16px;line-height:28px;margin:0;color:#606266}
+.magazine-home .mh-description,.magazine-home .mh-meta,.magazine-home .mh-about-link{display:none}
+.magazine-home .mh-actions{justify-content:center;margin-top:18px}
+.magazine-home .mh-actions>[data-latest]{display:none}
+.magazine-home .mh-actions .mh-button{min-height:40px;padding:8px 20px}
+.magazine-home .mh-share{width:40px;height:40px}
+.magazine-home .mh-shelf{position:relative;width:100vw;max-width:100vw;height:clamp(440px,60svh,600px);isolation:isolate;user-select:none;touch-action:pan-y;cursor:grab;overflow:hidden;mask-image:linear-gradient(to bottom,#000 0%,#000 90%,transparent 100%);-webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 90%,transparent 100%)}
+.mh-shelf.is-dragging{cursor:grabbing}
+.mh-shelf .shelf-stage{position:absolute;inset:48px 0 0;perspective:1600px;perspective-origin:50% 0;transform-style:preserve-3d}
+.mh-shelf .shelf-cover{position:absolute;top:0;left:50%;height:clamp(420px,68svh,680px);width:auto;aspect-ratio:980/1321;padding:0;border:0;border-radius:1px;background:transparent;transform-origin:50% 50%;transform-style:preserve-3d;--book-thickness:12px;--half-thickness:6px;cursor:pointer}
+.mh-shelf .shelf-cover img{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;border-radius:1px;pointer-events:none;backface-visibility:hidden;box-shadow:0 12px 26px #29456613}
+.mh-shelf .shelf-front{transform:translateZ(var(--half-thickness));mask-image:linear-gradient(to right,#000 0%,#000 28%,#000d 48%,#0007 70%,#0002 88%,transparent 100%);-webkit-mask-image:linear-gradient(to right,#000 0%,#000 28%,#000d 48%,#0007 70%,#0002 88%,transparent 100%)}
+.mh-shelf .shelf-back{transform:rotateY(180deg) translateZ(var(--half-thickness));mask-image:linear-gradient(to left,#000 0%,#000 28%,#000d 48%,#0007 70%,#0002 88%,transparent 100%);-webkit-mask-image:linear-gradient(to left,#000 0%,#000 28%,#000d 48%,#0007 70%,#0002 88%,transparent 100%)}
+.mh-shelf .shelf-cover:after{content:'';position:absolute;inset:0 auto 0 0;width:var(--book-thickness);height:100%;background-image:linear-gradient(90deg,#0002,transparent 35%,#ffffff30 55%,#0002),var(--cover-art);background-size:100% 100%,auto 100%;background-position:center,left center;background-repeat:no-repeat;transform-origin:left center;transform:translateZ(var(--half-thickness)) rotateY(90deg);filter:brightness(.72);backface-visibility:visible}
+.mh-shelf .shelf-contact-shadow{position:absolute;inset:-56px;pointer-events:none;backface-visibility:hidden;mask-image:linear-gradient(to right,#000,#000 38%,#0008 65%,transparent 94%);-webkit-mask-image:linear-gradient(to right,#000,#000 38%,#0008 65%,transparent 94%)}
+.mh-shelf .shelf-contact-shadow:before{content:'';position:absolute;inset:56px;box-shadow:5px 2px 12px #171a202b,14px 6px 28px #171a2017,1px 0 3px #10131838;border-radius:1px}
+.mh-shelf .shelf-contact-front{transform:translateZ(calc(var(--half-thickness) - 1px))}.mh-shelf .shelf-contact-back{transform:rotateY(180deg) translateZ(calc(var(--half-thickness) - 1px))}
+.mh-shelf .shelf-cover:focus-visible{outline:2px solid #606266;outline-offset:5px}
+.mh-shelf .shelf-cover.is-opening :is(.shelf-front,.shelf-back){mask-image:none;-webkit-mask-image:none}
+.mh-shelf-controls{display:flex;align-items:center;justify-content:center;gap:20px;font-size:12px;line-height:20px;color:#909399;margin-top:-8px;z-index:2}
+.mh-shelf-controls>button{display:grid;place-items:center;width:40px;height:40px;border:0;border-radius:50%;background:#fff;color:#131921;font-size:18px}
+.mh-shelf-controls>a{display:inline-flex;align-items:center;justify-content:center;padding:10px 20px;border-radius:100px;background:#131921;color:#fff;min-height:40px;font-weight:500;font-size:14px}
+@media(max-width:760px){.magazine-home .mh-hero{padding:112px 0 24px;gap:14px}.magazine-home .mh-identity h1{font-size:32px;line-height:44px}.magazine-home .mh-tagline{font-size:14px;line-height:24px}.magazine-home .mh-actions{margin-top:14px}.magazine-home .mh-shelf{height:394px}.mh-shelf .shelf-stage{top:44px}.mh-shelf .shelf-cover{height:440px;--book-thickness:9px;--half-thickness:4.5px}.mh-shelf-controls{gap:10px;flex-wrap:wrap}.mh-shelf-controls>a{padding-inline:14px;font-size:12px}}
+@media(prefers-reduced-motion:reduce){.magazine-home .mh-hero{animation:none}}
+/* Full-bleed shelf; the content modules below keep their original reading width. */
+.magazine-home .mh-main{display:block}
+.magazine-home .mh-hero{position:relative;width:100vw;max-width:none;margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);gap:52px;padding-bottom:24px;overflow:hidden}
+.magazine-home .mh-identity{max-width:1380px;padding-inline:24px}
+.magazine-home .mh-identity>.mh-eyebrow{font-size:14px;line-height:22px}
+.magazine-home .mh-identity h1{font-size:48px;line-height:60px;margin:12px 0}
+.magazine-home .mh-tagline{font-size:20px;line-height:32px}
+.magazine-home .mh-shelf{width:100%;max-width:none}
+.magazine-home .mh-shelf .shelf-stage{top:80px}
+.mh-shelf-issue-tip{position:absolute;z-index:3000;transform:translate(-50%,6px);font:500 12px/20px Figtree,"PingFang SC",sans-serif;color:#606266;background:#ffffffed;border:1px solid #ffffffc9;border-radius:100px;box-shadow:0 2px 8px #1319210a;padding:4px 12px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity 160ms ease,transform 160ms ease}
+.mh-shelf-issue-tip.is-visible{opacity:1;transform:translate(-50%,0)}
+@media(max-width:760px){.magazine-home .mh-hero{gap:32px}.magazine-home .mh-identity h1{font-size:38px;line-height:50px}.magazine-home .mh-tagline{font-size:16px;line-height:26px}.magazine-home .mh-identity>.mh-eyebrow{font-size:12px;line-height:20px}.magazine-home .mh-shelf .shelf-stage{top:72px}}
+@media(prefers-reduced-motion:reduce){.mh-shelf-issue-tip{transition:none}}
+.magazine-home{overflow-x:clip}
+/* Flat issue labels follow the visible cover edge and stay above its top. */
+.mh-shelf-issue-tip{padding:0;border:0;border-radius:0;background:none;box-shadow:none;backdrop-filter:none;transform:none;font-size:12px;line-height:20px;color:#606266;transition:opacity 160ms ease}
+.mh-shelf-issue-tip.is-visible{transform:none}
+.mh-shelf-issue-tip[data-align=left]{text-align:left;transform:none}
+.mh-shelf-issue-tip[data-align=center]{text-align:center;transform:translateX(-50%)}
+.mh-shelf-issue-tip[data-align=right]{text-align:right;transform:translateX(-100%)}
+.magazine-home .mh-shelf .shelf-stage{top:112px}
+@media(max-width:760px){.magazine-home .mh-shelf .shelf-stage{top:96px}}
+
+/* Give the shelf a quiet transition into the latest issue. */
+.magazine-home #latest{padding-top:140px}
+@media(max-width:760px){.magazine-home #latest{padding-top:80px}}
+
+/* Figma 644:2666: publication identity, 960px centered text area. */
+.magazine-home .mh-identity{max-width:1008px}
+.magazine-home .mh-identity h1{
+ font-family:"Noto Serif CJK SC","Songti SC","Noto Serif SC",serif;
+ font-size:80px;font-weight:700;line-height:96px;margin:0
+}
+.magazine-home .mh-identity>.mh-eyebrow{font-size:12px;line-height:16px}
+.magazine-home .mh-tagline{display:none}
+.magazine-home .mh-description{display:block;font-size:16px;line-height:28px;font-weight:500;color:#606266;margin:20px auto 0;max-width:960px}
+.magazine-home .mh-actions{margin-top:24px;gap:20px;align-items:center}
+.magazine-home .mh-actions #mh-follow{
+ width:108px;height:48px;padding:0;justify-content:center;border:0;
+ border-radius:999px;background:#131921;color:#fff;font-size:14px;font-weight:500;line-height:20px
+}
+.magazine-home .mh-actions #mh-share{
+ box-sizing:border-box;width:48px;height:48px;border:1px solid #131921;
+ border-radius:50%;background:transparent;box-shadow:none
+}
+.magazine-home .mh-actions #mh-share .iconfont{font-size:20px}
+@media(max-width:760px){
+ .magazine-home .mh-identity h1{font-size:44px;line-height:60px}
+ .magazine-home .mh-description{font-size:14px;line-height:24px}
+}

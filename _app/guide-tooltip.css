@@ -1,0 +1,4 @@
+/* Render guide tooltips outside the translucent, clipped chat panel. */
+.pe-icon-button .pe-tooltip,.pe-chat .pe-tooltip{display:none!important}
+.guide-floating-tooltip{position:fixed;z-index:2147483000;box-sizing:border-box;width:max-content;max-width:calc(100vw - 16px);padding:7px 10px;border-radius:7px;background:#131921;color:#fff;font:400 12px/18px Figtree,"PingFang SC",sans-serif;white-space:normal;overflow-wrap:anywhere;pointer-events:none;box-shadow:0 3px 10px #1319211a;isolation:isolate}
+.guide-floating-tooltip[hidden]{display:none}

@@ -1,0 +1,51 @@
+body:has(#view-search.active){overflow:hidden;background:#fff}body:has(#view-search.active)>#app{max-width:none;width:100%;padding:0}body:has(#view-search.active)>.site-footer{display:none}
+.ai-workspace{position:fixed;inset:88px 0 0;display:flex;background:#fff;color:#202123;font:14px/1.6 Figtree,"PingFang SC",sans-serif;z-index:10}.ai-workspace *{box-sizing:border-box}.ai-workspace button,.ai-maximize{font:inherit;cursor:pointer}.ai-workspace button{border:0;background:none;color:inherit}.ai-workspace button:focus-visible,.ai-workspace a:focus-visible{outline:2px solid rgba(255,255,255,.5);outline-offset:3px}.ai-history{width:260px;background:#f9f9f9;display:flex;flex-direction:column;padding:16px 12px;flex:none;overflow:hidden;transition:width 220ms,padding 220ms}.ai-history header{display:flex;align-items:center;justify-content:space-between;padding:2px 8px 20px;white-space:nowrap}.ai-history header button,.ai-main-header button{width:36px;height:36px;border-radius:8px}.ai-new{display:flex;align-items:center;gap:12px;padding:10px!important;border-radius:10px;text-align:left;white-space:nowrap}.ai-new i{font-size:20px}.ai-history-search{display:flex;gap:10px;align-items:center;padding:10px;margin:8px 0 20px;border-bottom:1px solid #e8e8e8}.ai-history-search input{min-width:0;width:100%;border:0;background:none;outline:0;font:inherit}.ai-history-label{font-size:12px;color:#8b8b8b;padding:0 10px 8px}.ai-history-list{flex:1;overflow:auto}.ai-history-item{display:flex;border-radius:8px;align-items:center;margin-bottom:3px}.ai-history-item>button:first-child{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:10px;text-align:left}.ai-history-item>button:last-child{width:30px;opacity:0;flex:none}.ai-history-item:hover>button:last-child,.ai-history-item:focus-within>button:last-child{opacity:1}.ai-history-item.selected{background:#eaeaea}.ai-history footer{font-size:11px;color:#999;padding:16px 10px 0;white-space:nowrap}.ai-history-empty{padding:10px;color:#999;font-size:12px}.ai-main{min-width:0;flex:1;display:flex;flex-direction:column}.ai-main-header{height:60px;flex:none;display:flex;align-items:center;gap:10px;padding:10px 24px;font-size:18px;font-weight:600}.ai-main-header small{font-size:12px;font-weight:400;color:#999;margin-left:12px}.ai-main-header>[data-ai-restore]{margin-left:auto}.ai-scroll{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain}.ai-thread{max-width:800px;margin:0 auto;padding:28px 28px 64px}.ai-message{margin-bottom:28px;font-size:16px;line-height:1.9}.ai-message-body{overflow-wrap:anywhere;white-space:normal}.ai-user{display:flex;flex-direction:column;align-items:flex-end}.ai-user .ai-message-body{background:#f4f4f4;border-radius:24px;padding:10px 20px;max-width:85%}.ai-message-actions{display:flex;gap:4px;margin-top:8px}.ai-message-actions button{border:0;background:none;width:30px;height:30px;border-radius:7px;cursor:pointer;color:#888}.ai-user .ai-message-actions{opacity:0}.ai-user:hover .ai-message-actions,.ai-user:focus-within .ai-message-actions{opacity:1}.ai-workspace button:hover,.ai-message-actions button:hover{background:#ececec}.ai-welcome{text-align:center;padding:clamp(40px,12vh,160px) 0 20px}.ai-welcome h1{font-size:30px;line-height:1.4;margin:0 0 12px;font-weight:600;letter-spacing:-.025em}.ai-welcome p{color:#888;margin:0 0 32px}.ai-welcome>div{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}.ai-welcome button{border:1px solid #e6e6e6;border-radius:14px;padding:12px 14px;font-size:13px;color:#666;display:flex;align-items:center;gap:10px}.ai-composer-area{max-width:800px;width:100%;margin:0 auto;padding:0 28px 12px;flex:none}.ai-composer{background:#f4f4f4;border-radius:26px;padding:16px 18px 12px;border:1px solid transparent}.ai-composer:focus-within{border-color:#ddd}.ai-composer textarea{border:0;outline:0;background:none;width:100%;resize:none;min-height:28px;max-height:200px;font-family:inherit;font-size:16px;line-height:26px;color:#202123}.ai-composer-tools{display:flex;align-items:center;justify-content:space-between;margin-top:12px}.ai-composer-tools>span{font-size:12px;color:#999}.ai-workspace .ai-send{background:#202123;color:#fff;border-radius:100px;width:36px;height:36px;font-size:20px}.ai-workspace .ai-send:hover{background:#444}.ai-composer-hint{text-align:center;font-size:11px;color:#999;margin:8px 0 0}.ai-context{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#777;font-size:12px;padding:8px 12px;text-decoration:none}.ai-context[hidden],.ai-main-header button[hidden]{display:none}.ai-sidebar-collapsed .ai-history{width:0;padding-left:0;padding-right:0;visibility:hidden}.ai-cursor{display:inline-block;width:7px;height:16px;background:#555;margin-left:4px;vertical-align:middle}.pe-chat .ai-message{font-size:14px;line-height:1.8;margin:16px 0}.pe-chat .ai-user .ai-message-body{padding:8px 14px}.pe-chat .ai-message-actions{margin-top:4px}.pe-guide-heading{gap:8px}.pe-guide-heading>div{flex:1;min-width:0}.ai-maximize{width:32px!important;min-width:32px;height:32px!important;background:none;border:0;border-radius:8px;font-size:20px;color:inherit}.ai-maximize:hover{background:#00000008}
+@media(max-width:800px){.ai-history{width:220px}.ai-workspace{inset:130px 0 0}.ai-history{position:absolute;inset:0 auto 0 0;z-index:2;box-shadow:12px 0 40px #0001}.ai-sidebar-collapsed .ai-history{box-shadow:none}.ai-main-header{padding:8px 16px}.ai-main-header small{display:none}.ai-thread{padding:20px 20px 40px}.ai-composer-area{padding:0 16px 12px}.ai-welcome h1{font-size:26px}.ai-welcome>div{flex-direction:column}.ai-message{font-size:15px}.ai-user .ai-message-actions{opacity:1}}
+@media(prefers-reduced-motion:reduce){.ai-workspace *{transition:none!important}}
+/* The global navigation floats over the conversation workspace. */
+.ai-workspace{inset:0}
+@media(max-width:800px){.ai-workspace{inset:0}}
+/* Initial offset belongs to the scrollable thread, not the workspace. */
+.ai-main{position:relative}
+.ai-main-header{position:absolute;inset:16px 18px auto 12px;height:36px;padding:0;z-index:2;pointer-events:none}
+.ai-main-header>button{pointer-events:auto;background:#ffffffd9}
+.ai-main-header>[data-ai-sidebar]{display:none}
+.ai-sidebar-collapsed .ai-main-header>[data-ai-sidebar]{display:block}
+.ai-main-header>[data-ai-restore]{width:36px;height:36px;display:flex;align-items:center;justify-content:center;padding:6px;font-size:24px;font-weight:400;color:#777}
+.ai-main-header>[data-ai-restore] .iconfont{font-family:font_family!important;font-size:24px;line-height:24px}
+.ai-main-header>[data-ai-restore][hidden]{display:none}
+.ai-thread{padding-top:108px}
+@media(max-width:800px){.ai-thread{padding-top:156px}.ai-main-header{top:146px;left:12px;right:12px}.ai-thread:has(.ai-welcome){padding-top:156px}}
+@media(max-width:800px){.ai-thread,.ai-thread:has(.ai-welcome){padding-top:200px}}
+/* Align the full workspace with the reading guide's welcome and composer. */
+.ai-history{padding-top:96px}
+.ai-main-header{top:96px}
+.ai-thread{padding-top:148px}
+.ai-workspace .ai-new{background:#131921;color:#fff;justify-content:center;min-height:44px;margin:0 8px 28px;font-weight:500}
+.ai-workspace .ai-new:hover{background:#303640}
+.ai-welcome{text-align:left;max-width:600px;margin:auto;padding:40px 0 32px}
+.ai-welcome h1{font:400 24px/32px Figtree,"PingFang SC",sans-serif;margin:0;color:#131921}
+.ai-welcome>p{font:400 16px/28px Figtree,"PingFang SC",sans-serif;color:#909399;margin:0 0 20px}
+.ai-welcome>.ai-guide-choices{display:flex;flex-direction:column;gap:10px}
+.ai-welcome .pe-guide-prompt{width:100%;height:70px;display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:12px;border:1px solid #ddd;border-radius:14px;background:#ffffffb3;color:#131921;text-align:left}
+.ai-welcome .pe-guide-prompt>span{display:flex;flex-direction:column;min-width:0}
+.ai-welcome .pe-guide-prompt strong{font-size:16px;line-height:28px;font-weight:700}
+.ai-welcome .pe-guide-prompt small{font-size:12px;line-height:16px;color:#909399}
+.ai-welcome .pe-guide-prompt i{font-size:24px;line-height:24px}
+.ai-composer{height:130px;padding:10px;border:1px solid #ffffffd9;border-radius:24px;background:#ffffffcc;backdrop-filter:blur(32px);box-shadow:0 12px 42px #22263212,inset 0 1px #fff}
+.ai-composer textarea{display:block;height:76px!important;min-height:76px;max-height:76px;padding:10px;margin:0;font:400 16px/28px Figtree,"PingFang SC",sans-serif;color:#606266;background:transparent;resize:none}
+.ai-composer-tools{height:32px;margin:0;justify-content:flex-end}
+.ai-workspace .ai-send{width:32px;height:32px;padding:4px;border-radius:12px;background:#020617;color:#fff;font-size:24px;line-height:24px}
+.ai-composer-hint{display:none}
+.ai-composer-area{padding-bottom:20px}
+@media(max-width:800px){.ai-history{padding-top:156px}.ai-main-header{top:146px}.ai-thread{padding-top:200px}.ai-welcome{padding-top:0}.ai-welcome .pe-guide-prompt{height:auto;min-height:70px}.ai-welcome .pe-guide-prompt small{white-space:normal}.ai-composer-area{padding-bottom:16px}}
+.ai-welcome .pe-guide-prompt{margin:0}
+/* Shared guide controls: maximize, then collapse. Use the supplied iconfont glyphs. */
+.pe-guide-heading .ai-maximize .iconfont,.pe-guide-heading .pe-chat-toggle .iconfont{font-family:font_family!important;font-size:24px;line-height:24px;font-style:normal;font-weight:400}
+.pe-guide-heading .ai-maximize .icon-Zoom-1:before{content:"\e69b"}
+.pe-guide-heading .pe-chat-toggle .icon-a-4:before{content:"\e76b"}
+/* Highlight the whole history row, including its delete control. */
+.ai-history-item{padding-right:4px;overflow:hidden}
+.ai-history-item:hover,.ai-history-item:focus-within{background:#ececec}
+.ai-history-item.selected:hover,.ai-history-item.selected:focus-within{background:#eaeaea}
+.ai-workspace .ai-history-item>button:hover{background:transparent}

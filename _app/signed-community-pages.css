@@ -1,0 +1,91 @@
+/* The signed publication reuses the new people hero and event listing. */
+.signed-people-home>.oc-main{width:100%;max-width:none;padding:0;margin:0}
+.signed-people-home .people-guide-sections{padding-bottom:80px}
+.signed-people-home .oc-source{display:none}
+.signed-activities-home{color:#131921}.signed-activities-home .portal-heading em{font-style:normal;font-family:"Noto Serif SC","Songti SC",serif}.signed-activities-home .portal-heading{margin-bottom:40px}.signed-activities-home .portal-events{margin-top:32px}
+.signed-activities-home .button{display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:14px 32px;border-radius:12px;background:#fff;text-decoration:none;color:#131921;font-size:14px;line-height:20px;box-shadow:0 2px 3px #0000001a}.signed-activities-home .button.dark{background:#131921;color:#fff}
+#view-magazine .signed-issue-sidebar .oc-guided-sidebar{padding:0;gap:24px;position:static;max-width:100%}
+#view-magazine .signed-issue-sidebar .oc-book-stage{width:min(240px,80%);height:auto;aspect-ratio:14/19;margin:8px auto 20px}
+#view-magazine .signed-issue-sidebar .oc-guided-title h1{font-size:32px;line-height:40px;margin:0}
+#view-magazine .signed-issue-sidebar .oc-guided-title p{font-size:16px;line-height:24px;margin-top:10px}
+#view-magazine .signed-issue-sidebar .oc-guided-join{width:100%;box-sizing:border-box;margin:0;padding:20px;gap:16px}
+#view-magazine .signed-issue-sidebar .oc-guided-join .oc-button{padding:14px 24px;white-space:nowrap;border-radius:100px}
+#view-magazine .signed-issue-sidebar .pe-sidebar-actions{margin-top:24px}
+@media(max-width:760px){.signed-people-home .people-guide-hero{padding:130px 24px 100px}.signed-activities-home .portal-heading h1{font-size:40px}.signed-activities-home .portal-benefit-grid{grid-template-columns:1fr}}
+
+.signed-activities-home .activity{background:#fffbf3;padding:40px;border-radius:40px;display:grid;grid-template-columns:4fr 6fr;gap:40px;align-items:center}
+.signed-activities-home .activity-copy{display:flex;flex-direction:column;gap:20px}
+.signed-activities-home .activity h3{font-size:20px;line-height:28px;margin:10px 0 4px}
+.signed-activities-home .activity-copy>div>p{font-size:14px;line-height:24px;color:#606266}
+.signed-activities-home .activity-meta{display:flex;flex-direction:column;gap:4px}
+.signed-activities-home .activity-meta p{display:flex;align-items:center;gap:4px;font-size:14px;line-height:20px;color:#606266}
+.signed-activities-home .activity-meta img{flex:none}
+.signed-activities-home .activity-bottom{display:flex;justify-content:space-between;align-items:center}
+.signed-activities-home .activity-bottom>span{font-size:16px;line-height:28px;color:#909399}
+.signed-activities-home .activity-bottom strong{color:#131921}
+.signed-activities-home .activity-image{width:100%;aspect-ratio:768/432;object-fit:cover;border-radius:12px}
+.signed-activities-home
+.activity-image-frame{width:100%;aspect-ratio:768/432;border-radius:12px;overflow:hidden}
+.signed-activities-home
+.activity-image-frame>.activity-image{height:100%;transition:transform 420ms cubic-bezier(.2,.8,.2,1)}
+.signed-activities-home .badge{display:inline-block;background:#d4380d;color:white;border-radius:4px;font-size:10px;padding:2px 6px;line-height:16px}
+@media(max-width:1000px){.signed-activities-home .activity{grid-template-columns:1fr}}
+#view-magazine .signed-people-home{padding:0;margin-top:0}
+.signed-people-home>.oc-main{width:calc(100% - var(--oc-chat));margin:0}
+.signed-people-home .people-guide-sections{padding-inline:40px}
+@media(max-width:900px){.signed-people-home>.oc-main{width:100%}.signed-people-home .people-guide-sections{padding-inline:20px}}
+@media(max-width:760px){body:has(.signed-people-home) .oc-dock,body:has(.signed-activities-home) .oc-dock{overflow-x:auto;overflow-y:hidden;scrollbar-width:none;max-width:calc(100vw - 20px);box-sizing:border-box}body:has(.signed-people-home) .oc-dock::-webkit-scrollbar,body:has(.signed-activities-home) .oc-dock::-webkit-scrollbar{display:none}.signed-people-home{overflow-x:clip}}
+
+/* Figma 41:584: outlined facsimile and solid reading buttons, 48px high. */
+#view-magazine .signed-issue-sidebar .oc-book-stage{margin:8px 0 20px;align-self:flex-start}
+.signed-issue-actions{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap}
+#view-magazine .signed-issue-sidebar .signed-issue-actions>a{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;padding:13px 40px;border:1px solid #c0c4cc;border-radius:12px;background:#fff;color:#131921;font-size:14px;font-weight:500;line-height:20px;text-decoration:none;white-space:nowrap;min-height:48px}
+#view-magazine .signed-issue-sidebar .signed-issue-actions>.signed-issue-start{background:#131921;border-color:#131921;color:#fff}
+
+/* Figma 251:13103; keep the existing interactive 3D magazine in the cover slot. */
+#view-magazine .rd-periodical .signed-issue-sidebar{display:flex;flex-direction:column;align-items:flex-start;gap:80px;padding:0;min-height:960px;height:calc(100dvh - 100px)}
+.signed-issue-category{padding:40px 0;width:100%;font-size:12px;line-height:16px;color:#909399}
+#view-magazine .signed-issue-sidebar .oc-guided-sidebar{width:100%;box-sizing:border-box;padding:0 60px;gap:20px}
+#view-magazine .signed-issue-sidebar .oc-book-stage{width:280px;max-width:100%;height:auto;aspect-ratio:14/19;margin:0;align-self:flex-start}
+#view-magazine .signed-issue-sidebar .oc-guided-title{display:flex;flex-direction:column;gap:0;width:100%}
+#view-magazine .signed-issue-sidebar .oc-guided-title p{margin:0;font-size:16px;font-weight:700;line-height:24px;color:#606266}
+.signed-issue-guide-slot{display:flex;align-items:flex-end;flex:1;width:100%;padding:0 60px;box-sizing:border-box}
+#view-magazine .signed-issue-guide-slot .oc-guided-guide{display:flex;align-items:center;justify-content:flex-start;gap:10px;min-width:200px;width:200px;padding:10px;border-radius:12px;box-sizing:border-box;background:transparent;box-shadow:none}
+#view-magazine .signed-issue-guide-slot .oc-guided-guide img{width:40px;height:40px;object-fit:cover;border-radius:100px;flex:none}
+.signed-issue-guide-name{display:flex;gap:4px;align-items:center}
+#view-magazine .signed-issue-guide-name strong{font-size:16px;font-weight:700;line-height:28px;color:#131921}
+#view-magazine .signed-issue-guide-name .signed-issue-guide-badge{padding:2px 4px;border-radius:4px;background:#d4380d;color:#fff;font-size:8px;font-weight:700;line-height:12px;white-space:nowrap}
+@media(max-width:1100px){#view-magazine .signed-issue-sidebar .oc-guided-sidebar,.signed-issue-guide-slot{padding-inline:24px}}
+@media(max-width:900px){#view-magazine .rd-periodical .signed-issue-sidebar{height:auto;min-height:0;gap:40px}.signed-issue-category{padding:20px 0}#view-magazine .signed-issue-sidebar .oc-guided-sidebar,.signed-issue-guide-slot{padding-inline:0}.signed-issue-guide-slot{flex:none}#view-magazine .signed-issue-sidebar .oc-book-stage{width:280px;max-width:100%}}
+/* Keep the identity rail inside the visible viewport, with its guide pinned to its foot. */
+@media(min-width:901px){
+ #view-magazine .rd-periodical .signed-issue-sidebar{height:calc(100dvh - var(--pe-sticky-top,88px) - 20px);min-height:0;gap:0;overflow:visible}
+ #view-magazine .signed-issue-sidebar .signed-issue-category{padding:16px 0;flex:none}
+ #view-magazine .signed-issue-sidebar .oc-guided-sidebar{gap:20px;flex:none}
+ #view-magazine .signed-issue-sidebar .oc-book-stage{width:min(280px,calc((100dvh - 430px) * 14 / 19));min-width:100px;max-width:100%;height:auto;margin:12px 0 0}
+ #view-magazine .signed-issue-sidebar .signed-issue-guide-slot{margin-top:auto;flex:none;padding-top:24px}
+ #view-magazine .signed-issue-guide-slot .oc-guided-guide{margin:0;gap:10px;padding:10px;border:0;min-height:60px}
+}
+
+.signed-issue-bottom{box-sizing:border-box;color:#131921}
+.signed-issue-bottom .oc-reading-notes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px;align-items:stretch}
+.signed-issue-bottom .oc-reading-notes article{height:auto;min-width:0;display:flex;flex-direction:column}.signed-issue-bottom .oc-reading-notes article footer{margin-top:auto;padding-top:24px}
+
+.signed-issue-related{margin-top:80px}.signed-issue-related .pe-cover-grid>a{display:flex;flex-direction:column;gap:8px;text-decoration:none;color:inherit}.signed-issue-related .pe-cover-grid img{width:100%;height:auto;aspect-ratio:210/285;object-fit:cover}.signed-issue-related .pe-cover-grid span{font-size:12px;color:#909399}
+@media(max-width:900px){.signed-issue-bottom .oc-reading-notes{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.signed-issue-bottom .oc-reading-notes{grid-template-columns:1fr}.signed-issue-related .pe-cover-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Figma 252:13553 replaces the old viewport-fit rule now that the guide is removed. */
+@media(min-width:901px){
+ #view-magazine .rd-periodical .signed-issue-sidebar{height:auto;min-height:0;gap:80px}
+ #view-magazine .signed-issue-sidebar .signed-issue-category{padding:40px 0}
+ #view-magazine .signed-issue-sidebar .oc-book-stage{width:280px;min-width:0;max-width:100%;margin:0;aspect-ratio:14/19}
+}
+#view-magazine .signed-issue-bottom{padding-bottom:0}
+/* Let the global navigation float over the leaders' full-height banner. */
+body:has(#view-magazine.active .signed-people-home)>#app{padding-top:0}
+#view-magazine.active:has(.signed-people-home){padding-top:0;margin-top:0}
+#view-magazine .signed-people-home{padding-top:0;margin-top:0}
+/* Keep white hero buttons readable despite the publication's inherited link color. */
+#view-magazine .signed-people-home .people-home-link,
+#view-magazine .signed-people-home .people-home-link:is(:link,:visited,:hover,:focus,:active){background:#fff;color:#131921;text-decoration:none}
