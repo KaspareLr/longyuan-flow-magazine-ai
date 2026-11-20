@@ -90,32 +90,3 @@ body > :is(.site-header,.topbar) > .qikan-nav .is-signed-in {
 }
 
 body.portal-body:has(.portal-reader.night) > .site-header > .qikan-nav { background:#292f36ed; }
-
-body > :is(.site-header,.topbar) > .qikan-nav {
-  grid-template-columns:125px minmax(0,1fr) auto auto;
-  column-gap:12px;
-}
-body > :is(.site-header,.topbar) > .qikan-nav :is(.login,.nav-login) {
-  grid-column:4;
-}
-.qikan-nav-search {
-  grid-column:3;
-  grid-row:1;
-  width:36px;
-  height:36px;
-  display:grid;
-  place-items:center;
-  border-radius:50%;
-  color:inherit;
-}
-.qikan-nav-search .iconfont { font-size:21px; }
-.qikan-nav-search:is(:hover,[aria-current=page]) { background:#f0f2f5; color:#131921; }
-@media(max-width:760px) {
-  body > :is(.site-header,.topbar) > .qikan-nav {
-    grid-template-columns:minmax(0,1fr) auto auto;
-    column-gap:6px;
-  }
-  body > :is(.site-header,.topbar) > .qikan-nav :is(.login,.nav-login) { grid-column:3; }
-  .qikan-nav-search { grid-column:2; width:36px; }
-  .qikan-nav-search .iconfont { font-size:20px; }
-}
