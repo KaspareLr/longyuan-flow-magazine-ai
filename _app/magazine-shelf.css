@@ -62,8 +62,8 @@
 .magazine-home .mh-tagline{display:none}
 .magazine-home .mh-description{display:block;font-size:16px;line-height:28px;font-weight:500;color:#606266;margin:20px auto 0;max-width:960px}
 .magazine-home .mh-actions{margin-top:24px;gap:20px;align-items:center}
-.magazine-home .mh-actions #mh-follow{
- width:108px;height:48px;padding:0;justify-content:center;border:0;
+.magazine-home .mh-actions .mh-button.mh-account-action{
+ flex:0 0 108px;width:108px;height:48px;min-height:48px;padding:0;justify-content:center;border:0;
  border-radius:999px;background:#131921;color:#fff;font-size:14px;font-weight:500;line-height:20px
 }
 .magazine-home .mh-actions #mh-share{
@@ -74,4 +74,10 @@
 @media(max-width:760px){
  .magazine-home .mh-identity h1{font-size:44px;line-height:60px}
  .magazine-home .mh-description{font-size:14px;line-height:24px}
+}
+
+.magazine-home .mh-actions .mh-button.mh-account-action:hover{background:#303943}
+@media(max-width:400px){
+ .magazine-home .mh-actions{gap:8px}
+ .magazine-home .mh-actions .mh-button.mh-account-action{flex-basis:80px;width:80px}
 }

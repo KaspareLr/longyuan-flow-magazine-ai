@@ -8,4 +8,3 @@
 
 .magazine-home #mh-subscribe-dialog strong{font-size:24px;color:#131921}
 .magazine-home .mh-actions{flex-wrap:wrap}
-@media(max-width:360px){.magazine-home .mh-actions>#mh-subscribe{flex-basis:auto}}

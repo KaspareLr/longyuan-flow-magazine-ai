@@ -115,3 +115,5 @@ html body .cs-page .cs-facet-button:focus-visible{outline:none;box-shadow:0 2px 
 
 #view-find{width:calc(100% - 32px);margin-inline:auto;padding-bottom:64px}
 .cf-modal-open{overflow:hidden}
+
+body:has(#view-find.active) > .club-site-footer { display: none; }
