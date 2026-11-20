@@ -15,8 +15,8 @@
 
 #oc-membership.oc-membership{background:transparent;color:#131921;padding:0;border-radius:0}
 
-#view-magazine .oc-publication .qikan-publication-membership { gap: 0; }
-.qikan-publication-membership > .oc-button { align-self: flex-start; }
+#view-magazine .oc-publication .qikan-publication-membership { gap: clamp(32px, 5vw, 72px); }
+.qikan-publication-membership > .oc-button { align-self: flex-start; margin-bottom: calc(-1 * clamp(16px, 3vw, 44px)); }
 .qikan-publication-membership .signed-membership-content .portal-heading {
   margin: 20px 0 24px;
   padding: 0;

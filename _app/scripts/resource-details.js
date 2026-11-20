@@ -32,7 +32,7 @@
   if(m.title==='第一财经'){m={...m,issues:window.periodicalReference.archive.map(a=>({src:a.cover,label:a.issue}))};}
   const claimed=q.has('claimed')?q.get('claimed')==='1':publicationState(m).claimed;const index=Math.min(m.issues.length-1,Math.max(0,Math.floor(Number(q.get('issue'))||0)));const issue=m.issues[index];context={type:'magazine',m,issue,claimed};
   if(m.title==='第一财经'&&q.get('page')==='membership'){
-   return window.renderPublicationMembershipPage({publication:m.title,homeHref:'magazine-home.html'});
+   return window.renderPublicationMembershipPage({publication:m.title,homeHref:'magazine-home.html',magazine:m});
   }
   if(m.title==='南风窗'&&(q.get('club')==='1'||(claimed&&q.has('issue')&&!q.has('page')))){context.claimed=true;return window.renderOctoberClaimedIssue(m,issue);}
   if(!claimed)return window.renderOrdinaryPeriodical(m,issue);

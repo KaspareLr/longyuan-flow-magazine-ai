@@ -1,9 +1,10 @@
-window.renderPublicationMembershipPage=function({publication='',homeHref=''}={}){
+window.renderPublicationMembershipPage=function({publication='',homeHref='',magazine}={}){
  const example=Boolean(publication);
  return `<div class="rd-periodical pe-figma-detail oc-publication">
   <main class="oc-main${example?' qikan-publication-membership':''}"${example?' aria-label="第一财经会员"':''}>
    ${example?`<a class="oc-button" href="${homeHref}">返回《第一财经》</a>`:''}
-   ${renderSignedMembership(true,publication)}
+   ${magazine?renderClaimedPublication(magazine,{sectionsOnly:true}):''}
+   <section class="oc-membership" id="oc-membership">${renderSignedMembership(true,publication)}</section>
   </main>
   ${example?'':renderOctoberDock('membership')}
   ${renderResourceChat()}
