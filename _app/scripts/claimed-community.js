@@ -1,5 +1,17 @@
+window.renderPublicationMembershipPage=function({publication='',homeHref=''}={}){
+ const example=Boolean(publication);
+ return `<div class="rd-periodical pe-figma-detail oc-publication">
+  <main class="oc-main${example?' qikan-publication-membership':''}"${example?' aria-label="第一财经会员"':''}>
+   ${example?`<a class="oc-button" href="${homeHref}">返回《第一财经》</a>`:''}
+   ${renderSignedMembership(true,publication)}
+  </main>
+  ${example?'':renderOctoberDock('membership')}
+  ${renderResourceChat()}
+ </div>`;
+};
 window.octoberCommunityRoute=(page,id='')=>'#/magazine/'+encodeURIComponent('南风窗')+'?claimed=1&page='+page+(id?'&id='+encodeURIComponent(id):'');
 window.renderOctoberCommunity=function(page,id){
+ if(page==='membership')return window.renderPublicationMembershipPage();
  const d=octoberClubData,e=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),route=octoberCommunityRoute;
  const icon=n=>`<i class="iconfont icon-${n}" aria-hidden="true"></i>`;
  const profiles=d.lecturers.profiles,activities=d.activities.list;
@@ -9,7 +21,6 @@ window.renderOctoberCommunity=function(page,id){
  const person=p=>`<a class="oc-person-card" href="${route('lecturer',p.id)}"><img src="${p.avatar}" alt="${e(p.name)}"><div><h2>${e(p.name)}</h2><span>${e(p.role)}</span><p>${e(p.slogan||p.bio)}</p></div>${icon('Arrow_Forward-2')}</a>`;
  const activity=a=>`<a class="oc-activity-card" href="${route('activity',a.id)}"><img src="${a.cover}" alt="${e(a.title)}"><div><span class="oc-status">${e(a.statusLabel)}</span><h2>${e(a.title)}</h2><p>${e(a.summary)}</p><small>${date(a.startTime)} · ${e(a.location)}</small></div>${icon('Arrow_Forward-2')}</a>`;
  let body='';
- if(page==='membership')body=renderSignedMembership(true);
  if(page==='lecturers')body=clubPeoplePage.render(octoberCommunityRoute);
  if(page==='activities')body=renderSignedActivities();
  if(page==='lecturer'){
@@ -24,7 +35,7 @@ window.renderOctoberCommunity=function(page,id){
   const a=activities.find(a=>a.id===id);if(!a)return '<p>未找到这场活动。</p>';
   body=heading('ACTIVITY · 共读活动',a.title)+`<section class="oc-event-hero"><img src="${a.cover}" alt="${e(a.title)}"><aside><span class="oc-status">${e(a.statusLabel)}</span><dl><dt>活动时间</dt><dd>${date(a.startTime)}</dd><dt>活动地点</dt><dd>${e(a.location)}</dd><dt>报名截止</dt><dd>${date(a.registrationDeadline)}</dd><dt>活动名额</dt><dd>${a.capacity}人 · 已报名${a.registered}人</dd><dt>参与方式</dt><dd>${a.memberOnly?'会员活动':'公开活动'}</dd></dl><a class="oc-button oc-dark" href="https://readclub.qikan.cn/shiyue#/activities/${encodeURIComponent(a.id)}" target="_blank" rel="noopener">${a.registrationOpen?'查看报名信息':'查看活动状态'}${icon('Arrow_Forward-2')}</a></aside></section><section class="oc-section"><header class="oc-heading"><span>ABOUT THE EVENT</span><h2>关于活动</h2></header><p class="oc-event-summary">${e(a.summary)}</p>${(a.sections||[]).map(s=>`<article class="oc-event-section"><h3>${e(s.heading||'活动安排与参与须知')}</h3><p>${e(s.body)}</p></article>`).join('')}</section><section class="oc-section"><header class="oc-heading"><span>WITH THE LECTURERS</span><h2>领读人与嘉宾</h2></header><div class="oc-people-grid">${[...(a.leaders||[]),...(a.guests||[])].map(x=>profiles.find(p=>p.id===x.id)).filter(Boolean).map(person).join('')}</div></section>`;
  }
- return `<div class="rd-periodical pe-figma-detail oc-publication ${page==='lecturer'?'oc-lecturer-profile':page==='reading'?'oc-guided-page':page==='lecturers'?'signed-people-home':''}"><main class="oc-main">${body}${['reading','membership'].includes(page)?'':'<footer class="oc-source"></footer>'}</main>${renderOctoberDock(page,id)}${renderResourceChat()}</div>`;
+ return `<div class="rd-periodical pe-figma-detail oc-publication ${page==='lecturer'?'oc-lecturer-profile':page==='reading'?'oc-guided-page':page==='lecturers'?'signed-people-home':''}"><main class="oc-main">${body}${page==='reading'?'':'<footer class="oc-source"></footer>'}</main>${renderOctoberDock(page,id)}${renderResourceChat()}</div>`;
 };
 document.addEventListener('click',event=>{const b=event.target.closest('[data-oc-activity-filter]');if(!b)return;const root=b.closest('.oc-publication');root.querySelectorAll('[data-oc-activity-filter]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));let count=0;root.querySelectorAll('[data-oc-activity-status]').forEach(x=>{x.hidden=b.dataset.ocActivityFilter!=='ALL'&&x.dataset.ocActivityStatus!==b.dataset.ocActivityFilter;if(!x.hidden)count++});root.querySelector('.oc-activities-empty').hidden=count>0;});
 
