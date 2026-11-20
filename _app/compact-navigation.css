@@ -1,0 +1,121 @@
+/* The three periodical entry points share the same navigation island. */
+body > :is(.site-header,.topbar) > .qikan-nav {
+  box-sizing:border-box;
+  background:rgba(255,255,255,.9);
+  backdrop-filter:blur(100px);
+  -webkit-backdrop-filter:blur(100px);
+  display:grid;
+  grid-template-columns:125px minmax(0,1fr) auto;
+  align-items:center;
+  flex:none;
+  width:min(620px,calc(100vw - 124px));
+  max-width:none;
+  min-width:0;
+  min-height:54px;
+  margin:0;
+  padding:10px 12px;
+  gap:0 20px;
+}
+body > :is(.site-header,.topbar) > .qikan-nav > .brand {
+  width:auto;
+  min-width:0;
+  margin:0;
+  padding:0;
+}
+body > :is(.site-header,.topbar) > .qikan-nav > .brand img {
+  display:block;
+  width:125px;
+  height:32px;
+  object-fit:contain;
+  object-position:left center;
+}
+.qikan-nav > .nav-links-group { display:contents; }
+body > :is(.site-header,.topbar) > .qikan-nav nav {
+  grid-column:2;
+  grid-row:1;
+  display:flex;
+  flex-wrap:nowrap;
+  justify-content:safe center;
+  width:auto;
+  min-width:0;
+  margin:0;
+  padding:0;
+  gap:16px;
+  overflow-x:auto;
+  scrollbar-width:none;
+}
+body > :is(.site-header,.topbar) > .qikan-nav nav a { flex:none; min-width:0; white-space:nowrap; }
+body > :is(.site-header,.topbar) > .qikan-nav :is(.login,.nav-login) {
+  grid-column:3;
+  grid-row:1;
+  position:static;
+  justify-self:end;
+  width:auto;
+  max-width:100%;
+  margin:0;
+  padding:0 0 0 14px;
+  white-space:nowrap;
+}
+@media(max-width:760px) {
+  body > :is(.site-header,.topbar) > .qikan-nav {
+    width:min(620px,calc(100vw - 96px));
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:6px 12px;
+    padding:8px 10px;
+    min-height:0;
+    border-radius:18px;
+  }
+  body > :is(.site-header,.topbar) > .qikan-nav > .brand img { width:min(100%,110px); height:28px; }
+  body > :is(.site-header,.topbar) > .qikan-nav nav {
+    grid-column:1/-1;
+    grid-row:2;
+    gap:12px;
+    justify-content:flex-start;
+  }
+  body > :is(.site-header,.topbar) > .qikan-nav :is(.login,.nav-login) {
+    grid-column:2;
+    padding-left:10px;
+  }
+}
+body > :is(.site-header,.topbar) > .qikan-nav .is-signed-in {
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  height:32px;
+}
+.qikan-nav .club-account-avatar { flex:none; width:28px; height:28px; object-fit:cover; border-radius:50%; }
+.qikan-nav .club-account-name { max-width:64px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+@media(max-width:760px) {
+  .qikan-nav .club-account-avatar { width:24px; height:24px; }
+}
+
+body.portal-body:has(.portal-reader.night) > .site-header > .qikan-nav { background:#292f36ed; }
+
+body > :is(.site-header,.topbar) > .qikan-nav {
+  grid-template-columns:125px minmax(0,1fr) auto auto;
+  column-gap:12px;
+}
+body > :is(.site-header,.topbar) > .qikan-nav :is(.login,.nav-login) {
+  grid-column:4;
+}
+.qikan-nav-search {
+  grid-column:3;
+  grid-row:1;
+  width:36px;
+  height:36px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  color:inherit;
+}
+.qikan-nav-search .iconfont { font-size:21px; }
+.qikan-nav-search:is(:hover,[aria-current=page]) { background:#f0f2f5; color:#131921; }
+@media(max-width:760px) {
+  body > :is(.site-header,.topbar) > .qikan-nav {
+    grid-template-columns:minmax(0,1fr) auto auto;
+    column-gap:6px;
+  }
+  body > :is(.site-header,.topbar) > .qikan-nav :is(.login,.nav-login) { grid-column:3; }
+  .qikan-nav-search { grid-column:2; width:36px; }
+  .qikan-nav-search .iconfont { font-size:20px; }
+}

@@ -1,7 +1,13 @@
 (()=>{
  const e=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const icon=name=>`<i class="iconfont icon-${name}" aria-hidden="true"></i>`;
- document.querySelector('.portal-back')?.addEventListener('click',()=>location.href='index.html#/magazines');
+ const back=document.querySelector('.portal-back');
+ clubNavigation.setBack(back,true);
+ back?.addEventListener('click',async()=>{
+  const destination='index.html#/magazines';
+  await clubNavigation.exitTo(destination);
+  location.href=destination;
+ });
  document.querySelector('.club-account-dialog .club-dialog-close')?.replaceChildren(Object.assign(document.createElement('i'),{className:'iconfont icon-Close'}));
  const issue='portal.html#/article/0?context=magazine&resource='+encodeURIComponent('第一财经');
  const list=window.periodicalReference.groups.flatMap(g=>g.articles.map(a=>({...a,group:g.title})));
@@ -46,6 +52,9 @@
  const follow=document.querySelector('#mh-follow');function syncFollow(){follow.setAttribute('aria-pressed',String(following));follow.textContent=following?'已关注':'关注';}syncFollow();
  let timer;function toast(text){const t=document.querySelector('.mh-toast');t.textContent=text;t.classList.add('visible');clearTimeout(timer);timer=setTimeout(()=>t.classList.remove('visible'),2200);}
  follow.addEventListener('click',()=>{following=!following;try{localStorage.setItem('magazine-home:follow:yimagazine',String(following));}catch{}syncFollow();toast(following?'已关注《第一财经》':'已取消关注');});
+ const subscription=document.querySelector('#mh-subscribe-dialog');
+ document.querySelector('#mh-subscribe-source').href=window.periodicalReference.source;
+ document.querySelector('#mh-subscribe').addEventListener('click',()=>subscription.showModal());
  const dialog=document.querySelector('#mh-share-dialog'),input=document.querySelector('#mh-share-url');document.querySelector('#mh-share').addEventListener('click',async()=>{if(matchMedia('(max-width:760px)').matches&&navigator.share){try{await navigator.share({title:'第一财经 · 探索一个明亮的商业世界',url:location.href});return;}catch(error){if(error.name==='AbortError')return;}}input.value=location.href.split('#')[0];dialog.showModal();});
  document.querySelector('#mh-close-share').addEventListener('click',()=>dialog.close());document.querySelector('#mh-copy').addEventListener('click',async()=>{input.select();try{await navigator.clipboard.writeText(input.value);toast('链接已复制');}catch{toast('请复制已选中的链接');}});
 })();

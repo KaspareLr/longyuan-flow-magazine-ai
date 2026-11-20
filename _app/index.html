@@ -98,26 +98,29 @@ main{max-width:1440px;margin:0 auto;padding:0 28px 64px}
 <link rel="stylesheet" href="styles/books-home.css?v=20261015-book-category-36">
 <link rel="stylesheet" href="styles/magazines-home.css?v=20261019-editorial">
 <link rel="stylesheet" href="styles/desktop-comfort.css?v=20261015-1440">
-<link rel="stylesheet" href="reading-guide-nudge.css?v=20261019"><link rel="stylesheet" href="migration.css?v=20261020-guide"><link rel="stylesheet" href="page-motion.css?v=20261019"><link rel="stylesheet" href="portal.css?v=20261019-member"><link rel="stylesheet" href="signed-membership.css?v=20261019-home-short"><link rel="stylesheet" href="people-home.css?v=20261019"><link rel="stylesheet" href="portal-events-icons.css?v=20261019"><link rel="stylesheet" href="signed-community-pages.css?v=20261020-button-color"><link rel="stylesheet" href="styles/academic-home.css?v=20261020-hover"><link rel="stylesheet" href="styles/topics-home.css?v=20261020-rail2"><link rel="stylesheet" href="styles/topic-story.css?v=1"><link rel="stylesheet" href="styles/nature-story.css?v=5"><link rel="stylesheet" href="styles/detail-navigation-back.css?v=1"><link rel="stylesheet" href="styles/home-hero-scroll.css?v=4"><link rel="stylesheet" href="reading-list-cards.css?v=1"><link rel="stylesheet" href="styles/home-guide-journey.css?v=23"><link rel="stylesheet" href="styles/home-discovery-sections.css?v=2"><link rel="stylesheet" href="styles/frontpage.css?v=10"><link rel="stylesheet" href="styles/frontpage-wired.css?v=20"><script src="magazine-home-entry.js?v=1"></script></head>
+<link rel="stylesheet" href="reading-guide-nudge.css?v=20261019"><link rel="stylesheet" href="migration.css?v=20261120-magazine-sections"><link rel="stylesheet" href="page-motion.css?v=20261019"><link rel="stylesheet" href="portal.css?v=20261019-member"><link rel="stylesheet" href="signed-membership.css?v=20261019-home-short"><link rel="stylesheet" href="people-home.css?v=20261019"><link rel="stylesheet" href="portal-events-icons.css?v=20261019"><link rel="stylesheet" href="signed-community-pages.css?v=20261020-button-color"><link rel="stylesheet" href="styles/academic-home.css?v=20261020-hover"><link rel="stylesheet" href="styles/topics-home.css?v=20261020-rail2"><link rel="stylesheet" href="styles/topic-story.css?v=1"><link rel="stylesheet" href="styles/nature-story.css?v=5"><link rel="stylesheet" href="styles/detail-navigation-back.css?v=1"><link rel="stylesheet" href="styles/home-hero-scroll.css?v=4"><link rel="stylesheet" href="reading-list-cards.css?v=1"><link rel="stylesheet" href="styles/home-guide-journey.css?v=23"><link rel="stylesheet" href="styles/home-discovery-sections.css?v=2"><link rel="stylesheet" href="styles/frontpage.css?v=10"><link rel="stylesheet" href="styles/frontpage-wired.css?v=20"><script src="magazine-home-entry.js?v=1"></script><link rel="stylesheet" href="dsu-account.css"><link rel="stylesheet" href="compact-navigation.css?v=20261120-search"><script src="page-motion.js?v=20261019"></script><link rel="stylesheet" href="navigation-progressive-blur.css?v=20261117-reuse"><link rel="stylesheet" href="club-search.css?v=20261120-pagination">
+<link rel="stylesheet" href="kexin-home.css?v=20261120-centered">
+</head>
 <body>
 <header class="topbar">
-  <div class="nav-island">
+  <div class="nav-island qikan-nav">
   <a class="brand" href="#/frontpage" aria-label="龙源期刊网首页"><img decoding="async" class="brand-logo" src="assets/longyuan-home/longyuan-logo-v2.png" alt="龙源期刊网 qikan.com"></a>
   <div class="nav-links-group">
   <nav class="nav" aria-label="主导航">
     <a href="#/frontpage" data-route="frontpage">首页</a>
-    <a href="#/home" data-route="home">发现</a>
-    <a href="#/search" data-route="search">AI 对话</a>
+    
+    <a href="#/kexin" data-route="kexin">可信</a>
     <a href="#/magazines" data-route="magazines">期刊</a>
     <a href="#/academic" data-route="academic">学术</a>
     <a href="#/books" data-route="books">图书</a>
     <a href="#/topics" data-route="topics">专题</a>
-  </nav>
+  </nav><a class="qikan-nav-search" href="#/find" data-route="find" aria-label="搜索" title="搜索"><i class="iconfont icon-Search" aria-hidden="true"></i></a>
   <button class="nav-login" type="button" data-home-login>登录</button>
   </div>
   </div>
 
 </header>
+<script src="navigation-progressive-blur.js?v=20261117-reuse"></script>
 <main id="app">
 <!-- ===== Home ===== -->
 <section id="view-frontpage" class="view" data-view="frontpage"></section>
@@ -156,6 +159,47 @@ main{max-width:1440px;margin:0 auto;padding:0 28px 64px}
 </div></div>
 </section>
 <!-- ===== AI Search ===== -->
+<section id="view-kexin" class="view kx-home" data-view="kexin">
+  <header class="kx-intro">
+    <h1>每一个答案<br>都有来源</h1>
+    <p>今天想研究什么？</p>
+  </header>
+  <form id="kexin-question-form" class="kx-composer">
+    <label class="sr-only" for="kexin-q">研究问题</label>
+    <textarea id="kexin-q" name="q" rows="2" maxlength="1000" placeholder="想深入了解什么？从期刊文章中查找资料、比较观点，找到有出处的答案。"></textarea>
+    <div class="kx-composer-actions">
+      <label class="kx-periodicals">
+        <input name="periodicals" type="checkbox" role="switch" checked title="优先查找可引用的期刊文章">
+        <span class="kx-switch-track" aria-hidden="true"></span><span>期刊资源</span>
+      </label>
+      <div class="kx-composer-buttons">
+        <button type="button" class="kx-add-link" data-kexin-link aria-label="添加内容" aria-haspopup="dialog"><img alt="" width="24" height="24" src="assets/kexin-link.svg"></button>
+        <button type="submit" class="kx-send" aria-label="前往可信研究" title="前往可信研究"><span><img alt="" src="assets/kexin-send.svg"></span></button>
+      </div>
+    </div>
+  </form>
+  <p class="kx-status" role="status" data-kexin-status></p>
+  <dialog class="kx-settings" aria-labelledby="kexin-link-heading" data-kexin-link-dialog>
+    <h2 id="kexin-link-heading">添加链接</h2>
+    <form method="dialog">
+      <label for="kexin-link">参考链接</label>
+      <input id="kexin-link" type="url" placeholder="https://" pattern="https?://.+" required>
+      <div class="kx-link-actions"><button type="button" class="btn btn-outline" data-kexin-link-cancel>取消</button><button class="btn btn-dark">添加</button></div>
+    </form>
+  </dialog>
+  <section class="kx-research" aria-labelledby="kexin-research-heading">
+    <h2 id="kexin-research-heading">可信可以帮你研究</h2>
+    <div class="kx-scenes" role="group" aria-label="研究场景">
+      <button type="button" data-kexin-scene>投资研究</button>
+      <button type="button" data-kexin-scene>政策解读</button>
+      <button type="button" data-kexin-scene>法律分析</button>
+      <button type="button" data-kexin-scene>医学理解</button>
+      <button type="button" data-kexin-scene>学术研究</button>
+    </div>
+    <div class="kx-panel" data-kexin-panel></div>
+  </section>
+</section>
+<section id="view-find" class="view" data-view="find"></section>
 <section id="view-search" class="view" data-view="search">
 <div class="conversation-shell"><aside class="conversation-nav"><a class="btn btn-outline" href="#/search" id="new-conversation"><i class="iconfont icon-Add" aria-hidden="true"></i> 开启新对话</a><span class="eyeline">从好奇开始</span><button data-search-query="AI如何改变我们的阅读方式？">阅读与人工智能</button><button data-search-query="城市更新如何改变日常生活？">城市与日常生活</button><button data-search-query="如何培养孩子的阅读习惯？">孩子的阅读习惯</button><div class="conversation-note"><i class="iconfont icon-Paper2" aria-hidden="true"></i><b>答案之外，还有原文</b><p>点击回答里的引用，在这里展开文章，读完接着聊。</p></div></aside><div class="conversation-main"><header class="conversation-heading"><span><i class="iconfont icon-AI" aria-hidden="true"></i> 龙源 AI</span><small>聊问题，也读原文</small></header><div id="conversation-messages" role="log" aria-label="对话记录" aria-live="polite"></div><form class="composer" id="search-page-form"><textarea id="search-page-input" name="q" aria-label="继续对话" placeholder="继续追问，或说说你想了解的方面…" required maxlength="500"></textarea><div class="composer-row"><button type="button" class="switch" role="switch" aria-checked="true" data-deep-search><span class="switch-track" aria-hidden="true"></span><span>期刊资源</span></button><button class="round-send" type="submit" aria-label="发送问题"><i class="iconfont icon-Arrow_Forward-2" aria-hidden="true"></i></button></div></form></div><aside id="conversation-reader" class="conversation-reader" aria-label="关联文章阅读" hidden tabindex="-1"></aside></div>
 </section>
@@ -346,8 +390,9 @@ main{max-width:1440px;margin:0 auto;padding:0 28px 64px}
   <section class="content">
     <div class="generate-state">
       <div class="kicker">实时专题生成</div>
-      <h1 style="">正在整理“<span data-bind="topic-query">一个新主题</span>”</h1>
-      <div id="generate-steps">
+      <h1 style="">整理“<span data-bind="topic-query">一个新主题</span>”</h1>
+      <button class="dsu-button dsu-primary" type="button" id="generate-dsu">生成专题 · 3 DSU</button>
+      <div id="generate-steps" hidden>
         <div class="step" data-step><span class="step-dot">1</span><div><b>解析主题</b><p style="margin:3px 0 0;color:#8a94a0;font-size:12px">识别关键词、时间范围和内容边界。</p></div></div>
         <div class="step" data-step><span class="step-dot">2</span><div><b>匹配期刊文章</b><p style="margin:3px 0 0;color:#8a94a0;font-size:12px">从本地期刊资源中查找相关报道与研究。</p></div></div>
         <div class="step" data-step><span class="step-dot">3</span><div><b>检查证据充分性</b><p style="margin:3px 0 0;color:#8a94a0;font-size:12px">检查来源数量、重复度、敏感内容和观点覆盖。</p></div></div>
@@ -422,7 +467,7 @@ main{max-width:1440px;margin:0 auto;padding:0 28px 64px}
 <!-- MORE_VIEWS -->
 <section id="view-club" class="view" data-view="club"></section>
 </main>
-<footer class="site-footer"><span>龙源 LONGYUAN · 让阅读，连接新的可能</span></footer>
+<footer class="site-footer"><span>龙源 LONGYUAN · 让阅读，连接新的可能</span> · <a href="articles/index.html">文章目录</a></footer>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script>
 const $ = (s, root=document) => root.querySelector(s);
@@ -454,9 +499,25 @@ function updateSearch(q){
   if(window.longyuanConversation) window.longyuanConversation.open(q);
 }
 
+let topicRun = 0;
 function startTopicGeneration(q){
+  const run = ++topicRun;
   q = (q || '一个新主题').trim();
   $('[data-bind="topic-query"]').textContent = q;
+  const trigger = $('#generate-dsu');
+  const stepList = $('#generate-steps');
+  stepList.hidden = true;
+  $('#topic-ready-link').hidden = true;
+  $('#generate-note').textContent = '确认后开始匹配相关资料。';
+  trigger.hidden = false;
+  trigger.onclick = async () => {
+    if(!await qikanDSU.confirmAI(q) || run !== topicRun) return;
+    trigger.hidden = true;
+    stepList.hidden = false;
+    runTopicGeneration(run);
+  };
+}
+function runTopicGeneration(run){
   const steps = $$('#generate-steps .step');
   const note = $('#generate-note');
   const readyLink = $('#topic-ready-link');
@@ -472,6 +533,7 @@ function startTopicGeneration(q){
   }
   let i = 0;
   function runNext(){
+    if(run !== topicRun) return;
     if(i > 0){
       steps[i - 1].classList.add('done');
       steps[i - 1].classList.remove('active');
@@ -519,8 +581,8 @@ document.addEventListener('submit', event => {
   }
   if(form.id === 'book-ai-form'){
     event.preventDefault();
-    showToast('已收到你的问题');
-    form.reset();
+    const question = form.q.value.trim();
+    if(question) location.hash = '#/search?q='+encodeURIComponent(question);
   }
 });
 
@@ -602,7 +664,7 @@ document.addEventListener('click', event => {
 <script src="scripts/nanfc-reference.js?v=20261019-clean-copy"></script>
 <script src="scripts/podcast-cover-palette.js?v=20261019-clean-copy"></script>
 <script src="scripts/podcast-cover-colors.js?v=20261019-clean-copy"></script>
-<script src="signed-session.js?v=20261019-clean-copy"></script><script src="signed-membership.js?v=20261019-clean-copy"></script><script src="scripts/claimed-october.js?v=20261019-issue-bottom"></script>
+<script src="account-avatar.js"></script><script src="signed-session.js?v=20261019-clean-copy"></script><script src="signed-membership.js?v=20261019-clean-copy"></script><script src="scripts/claimed-october.js?v=20261019-issue-bottom"></script>
 <script src="scripts/claimed-guided-reading.js?v=20261019-notes-fix"></script>
 <script src="scripts/claimed-community.js?v=20261019-clean-copy"></script>
 <script src="scripts/reading-opinions.js?v=20261019-clean-copy"></script>
@@ -618,5 +680,7 @@ document.addEventListener('click', event => {
 <script src="scripts/books-home.js?v=20261019-clean-copy"></script>
 <script src="scripts/books-library.js?v=20261019-clean-copy"></script>
 <script src="scripts/magazines-home.js?v=20261019-clean-copy"></script>
-<script src="page-motion.js?v=20261019"></script><script src="reading-guide-nudge.js?v=20261019"></script><script src="book-opening.js?v=20261019"></script><link rel="stylesheet" href="book-opening.css?v=20261019"><script src="migration-catalog.js?v=20261021-frontpage"></script><script src="signed-membership-actions.js?v=20261019-clean-copy"></script><script src="scripts/academic-home.js?v=20261020-detail"></script><script src="nature-topic-data.js?v=1"></script><script src="scripts/topics-home.js?v=20261020-rail"></script><script src="academic-journal-data.js"></script><script src="scripts/topic-story.js?v=1"></script><script src="scripts/nature-story.js?v=4"></script><link rel="stylesheet" href="ai-conversation.css?v=10"><script src="ai-conversation.js?v=9"></script><link rel="stylesheet" href="focus-theme.css?v=20261020"><link rel="stylesheet" href="guide-layout-rules.css?v=20261020"><script src="guide-layout-rules.js?v=20261020"></script><link rel="stylesheet" href="guide-tooltip.css?v=20261020"><script src="guide-tooltip.js?v=20261020"></script><link rel="stylesheet" href="guide-unified.css?v=20261020-2"><script src="shared-navigation.js?v=20261016-split"></script><script src="scripts/detail-navigation-back.js?v=2"></script><script src="scripts/home-hero-scroll.js?v=8"></script><script src="scripts/home-guide-journey.js?v=23"></script><script src="scripts/home-discovery-sections.js?v=1"></script><script src="article-image-sets.js?v=2"></script><script src="scripts/frontpage.js?v=23"></script></body>
+<script src="reading-guide-nudge.js?v=20261019"></script><script src="book-opening.js?v=20261019"></script><link rel="stylesheet" href="book-opening.css?v=20261019"><script src="migration-catalog.js?v=20261021-frontpage"></script><script src="signed-membership-actions.js?v=20261019-clean-copy"></script><script src="scripts/academic-home.js?v=20261020-detail"></script><script src="nature-topic-data.js?v=1"></script><script src="scripts/topics-home.js?v=20261020-rail"></script><script src="academic-journal-data.js"></script><script src="scripts/topic-story.js?v=1"></script><script src="scripts/nature-story.js?v=4"></script><link rel="stylesheet" href="ai-conversation.css?v=20261120-composer"><script src="dsu-account.js"></script><script src="ai-conversation.js?v=9"></script><link rel="stylesheet" href="focus-theme.css?v=20261020"><link rel="stylesheet" href="guide-layout-rules.css?v=20261020"><script src="guide-layout-rules.js?v=20261020"></script><link rel="stylesheet" href="guide-tooltip.css?v=20261020"><script src="guide-tooltip.js?v=20261020"></script><link rel="stylesheet" href="guide-unified.css?v=20261020-2"><script src="shared-navigation.js?v=20261120-kexin"></script><script src="scripts/detail-navigation-back.js?v=2"></script><script src="scripts/home-hero-scroll.js?v=8"></script><script src="scripts/home-guide-journey.js?v=23"></script><script src="scripts/home-discovery-sections.js?v=1"></script><script src="article-image-sets.js?v=2"></script><script src="scripts/frontpage.js?v=23"></script><script src="club-search.js?v=20261120-magazines"></script><script src="search-catalog.js"></script>
+<script src="kexin-home.js?v=20261120-research"></script>
+</body>
 </html>

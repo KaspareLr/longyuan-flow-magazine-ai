@@ -192,3 +192,6 @@ body:has(#view-magazines.active),#view-magazines{background:#fff}
 .magazines-editor-note>div>span{font-size:12px;line-height:16px;color:#909399}
 .magazines-editor-note p{font-size:14px;line-height:20px;color:#131921;font-weight:400}
 .magazines-editor-divider{width:24px;height:2px;background:#131921;flex:none}
+.magazines-all-card .books-library-volume { aspect-ratio:14/19; }
+.magazines-all-card .books-library-cover { aspect-ratio:14/19; object-fit:cover; }
+.magazines-all-card .magazines-card-info h3 { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; overflow-wrap:anywhere; }

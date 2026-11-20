@@ -1,14 +1,36 @@
 /* Shared local-only account state across the independent demo. */
 (()=>{
  const base=new URL('.',document.currentScript.src);window.clubRootURL=base.href;
- const avatarPool=["assets/default-avatars/author-1.png", "assets/default-avatars/author-2.png", "assets/default-avatars/author-3.png", "assets/default-avatars/author-4.png", "assets/default-avatars/call_7PweNBn5vkxrwUsG2nA01cD2.png", "assets/default-avatars/call_9G8tmFXUSq488NnKy6qQDQUg.png", "assets/default-avatars/call_BoUMGW0VsMdNAEWB3HBp6EiM.png", "assets/default-avatars/call_EeDwyLTBmtofOnY7o0uy68Ra.png", "assets/default-avatars/call_L26vyrRbEgCUZLAPBfYfhjj4.png", "assets/default-avatars/call_OgiavCgYXJGgkDCcW3039MFv.png", "assets/default-avatars/call_T4m9NoHP7lo2kGRubhxu5kva.png", "assets/default-avatars/call_bsA98T6GedRq1dMVTYDm77kF.png", "assets/default-avatars/call_d2LVFBYix0Gn6rv3XKLygKSd.png", "assets/default-avatars/call_eNbU08SV8Df2izJJKLtj5X70.png", "assets/default-avatars/call_oiWPtL1xhiIsZCa7S1dGNPfT.png", "assets/default-avatars/call_p7SJ7jUHe2q6KPGDR7190KVu.png", "assets/default-avatars/call_ztGyJ7Q15W6aqqQVmWAgoCGb.png"];
- const read=(key,fallback)=>{try{return JSON.parse(localStorage.getItem('club-demo:'+key))??fallback}catch{return fallback}};
- const write=(key,value)=>{try{localStorage.setItem('club-demo:'+key,JSON.stringify(value))}catch{}};
- const defaultAvatar=()=>{const saved=read('default-avatar',null);if(avatarPool.includes(saved))return saved;const selected=avatarPool[Math.floor(Math.random()*avatarPool.length)];write('default-avatar',selected);return selected};
- const needsDefault=avatar=>!avatar||avatar.startsWith('assets/account-avatars/');
- const state=window.clubSession={get profile(){return read('profile',null)},get membership(){return read('membership',null)},read,write,
-  update(profile){profile={...profile,avatar:needsDefault(profile.avatar)?defaultAvatar():profile.avatar};write('default-avatar',profile.avatar);write('profile',profile);try{localStorage.setItem('club-demo:nickname',profile.nickname)}catch{};refresh();window.dispatchEvent(new Event('club-session-change'))},
-  logout(){write('profile',null);try{localStorage.removeItem('club-demo:nickname')}catch{};refresh();window.dispatchEvent(new Event('club-session-change'))},
+ const personalPreview=location.pathname.endsWith('/portal.html')&&new URLSearchParams(location.search).get('personalPreview')==='filled';
+ const fixture=new Map();
+ if(personalPreview){
+  const articleRoute='#/article/0?context=magazine&resource='+encodeURIComponent('第一财经')+'&full=1';
+  const day=new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Shanghai'}).format(new Date());
+  fixture.set('profile',{nickname:'林间读者',dsuId:'personal-preview',avatar:'assets/account-avatars/avatar-04.png',
+   email:'reader@example.com',city:'上海',bio:'喜欢从一篇报道开始，读懂日常生活中的变化。',interests:['商业观察','文学','城市生活'],role:'reader'});
+  fixture.set('membership',{label:'年度读友',started:'2026-11-01',expires:'2027-11-01',price:198});
+  fixture.set('qikan-reading-history',[
+   {title:'你睡得好吗？', route:articleRoute, day},
+   {title:'大事件',route:articleRoute.replace('/article/0','/article/1'),day:'2026-11-18'},
+   {title:'趋势',route:articleRoute.replace('/article/0','/article/2'),day:'2026-11-16'}
+  ]);
+  fixture.set('savedBooks',(window.clubPortalData?.books||[]).slice(0,2).map(book=>book.id));
+  fixture.set('savedArticles',[{title:'你睡得好吗？',source:'第一财经 · 2026 年 09 期',route:articleRoute},
+   {title:'大事件',source:'第一财经 · 2026 年 09 期',route:articleRoute.replace('/article/0','/article/1')}]);
+  fixture.set('book-learning-notes',[{bookId:'rb-ob-01',text:'记录人物之间的关系和选择。',date:new Date().toISOString()}]);
+  for(const event of (window.clubPortalData?.events||[]).slice(0,2))fixture.set('event-'+event.id,true);
+ }
+ const read=(key,fallback)=>{
+  if(personalPreview)return fixture.get(key)??fallback;
+  try{return JSON.parse(localStorage.getItem('club-demo:'+key))??fallback}catch{return fallback}
+ };
+ const write=(key,value)=>{
+  if(personalPreview){fixture.set(key,value);return;}
+  try{localStorage.setItem('club-demo:'+key,JSON.stringify(value))}catch{}
+ };
+ const state=window.clubSession={personalPreview,get profile(){return qikanAccountAvatar(read('profile',null),read,write)},get membership(){return read('membership',null)},read,write,
+  update(profile){profile={...profile,dsuId:profile.dsuId||(profile.email?.trim().toLowerCase()||profile.nickname.trim().toLowerCase()),avatar:profile.avatar};profile=qikanAccountAvatar(profile,read,write);write('profile',profile);if(!personalPreview)try{localStorage.setItem('club-demo:nickname',profile.nickname)}catch{};refresh();window.dispatchEvent(new Event('club-session-change'))},
+  logout(){write('profile',null);if(!personalPreview)try{localStorage.removeItem('club-demo:nickname')}catch{};refresh();window.dispatchEvent(new Event('club-session-change'))},
   member(plan){write('membership',{...plan,expires:'2027-10-15',started:'2026-10-15'});window.dispatchEvent(new Event('club-session-change'))},
   login(){dialog.showModal();dialog.querySelector('input').focus()}
  };
@@ -16,7 +38,7 @@
  dialog.querySelector('#club-demo-login').addEventListener('submit',e=>{e.preventDefault();const f=e.target;state.update({nickname:f.nickname.value.trim(),email:f.email.value,bio:'读书，读人，也读世界。',city:'上海',interests:['文学','生活'],role:f.role.value});dialog.close();if(f.role.value==='leader'){const configured=read('club-configuration',null);clubPageMotion.navigate(new URL(configured?'index.html':'index.html?setup=1',base))}});
  const themes={共读:'reading',领读人:'people',活动:'events',会员:'membership'};
  function refresh(){
-  let profile=state.profile;if(profile&&needsDefault(profile.avatar)){profile={...profile,avatar:defaultAvatar()};write('default-avatar',profile.avatar);write('profile',profile)}
+  const profile=state.profile;
   document.querySelectorAll('.nav-shell nav a,.nav-shell nav button,.club-demo-topbar .nav a').forEach(el=>{
    const page=themes[el.textContent.trim()];if(!page)return;
    if(el.tagName==='BUTTON'){const a=document.createElement('a');a.href=new URL('portal.html#/'+page,base);a.textContent=el.textContent;el.replaceWith(a)}else el.href=new URL('portal.html#/'+page,base);

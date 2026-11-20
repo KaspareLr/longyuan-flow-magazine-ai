@@ -7,6 +7,7 @@
   tools.classList.toggle('reader-tools-open',open);
   const label=(open?'收起':'展开')+(media.matches?'阅读工具':'阅读设置');
   refs.toggle.setAttribute('aria-expanded',String(open));refs.toggle.setAttribute('aria-label',label);refs.toggle.title=label;refs.toggle.querySelector('i').className='iconfont club-local-icon '+(open?'icon-Close':'icon-a--2');
+  scheduleBoundary();
   refs.panel.inert=!open;refs.panel.setAttribute('aria-hidden',String(!open));
   if(focus)refs.toggle.focus({preventScroll:true});
  }
@@ -32,7 +33,27 @@
     [...tools.children].filter(el=>el.matches('.reader-tool-section')).forEach(el=>panel.append(el));
    }
   });
+  scheduleBoundary();
  }
+ let pendingBoundary=0;
+ function updateBoundary(){
+  pendingBoundary=0;
+  const tools=root.querySelector('.portal-reader-tools');
+  const contents=root.querySelectorAll('.portal-reader-content');
+  const article=contents[contents.length-1];
+  if(!tools||!article)return;
+  const previous=Number(tools.dataset.readerOffset)||0;
+  const bottom=tools.getBoundingClientRect().bottom-previous;
+  const offset=Math.min(0,article.getBoundingClientRect().bottom-12-bottom);
+  tools.dataset.readerOffset=String(offset);
+  tools.style.setProperty('--reader-tool-offset',offset+'px');
+ }
+ function scheduleBoundary(){
+  if(!pendingBoundary)pendingBoundary=requestAnimationFrame(updateBoundary);
+ }
+ addEventListener('scroll',scheduleBoundary,{passive:true});
+ addEventListener('resize',scheduleBoundary);
+ new ResizeObserver(scheduleBoundary).observe(root);
  document.addEventListener('pointerdown',event=>{root.querySelectorAll('.reader-tools-open').forEach(tools=>{if(!tools.contains(event.target))state(tools,false)});});
  document.addEventListener('keydown',event=>{if(event.key==='Escape')root.querySelectorAll('.reader-tools-open').forEach(tools=>{state(tools,false,true);event.preventDefault()})});
  media.addEventListener('change',()=>{sync();root.querySelectorAll('.reader-tools-collapsible').forEach(tools=>{const focus=mounted.get(tools).panel.contains(document.activeElement);state(tools,false,focus)});});

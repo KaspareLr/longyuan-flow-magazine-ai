@@ -7,7 +7,7 @@ body.issue-preview-page .issue-preview-stream{padding-right:40px}
 .issue-preview-article:last-child{margin-bottom:0}
 .issue-preview-article .portal-article-head{padding-bottom:24px}
 body.issue-preview-page .issue-preview-article .portal-article-head h1{font-size:32px;line-height:1.5;margin:12px 0 20px}
-.issue-preview-excerpt{max-height:clamp(240px,calc(100dvh - 320px),680px);overflow:hidden;max-width:720px!important;padding-top:28px;min-width:0;font-size:16px!important;line-height:28px!important;overflow-wrap:anywhere}
+.issue-preview-excerpt{max-width:720px!important;padding-top:28px;min-width:0;font-size:16px!important;line-height:28px!important;overflow-wrap:anywhere}
 .issue-preview-excerpt p{margin-bottom:24px}
 .issue-preview-excerpt h2{font-size:24px;line-height:36px;margin:28px 0 20px}
 .issue-preview-excerpt figure{margin:28px auto;text-align:center}
@@ -23,7 +23,7 @@ body.issue-full-page .portal-reader-content{padding-right:64px}
 body.issue-full-page .portal-prose figure>img{display:block;width:auto;max-width:100%;height:auto;max-height:none;margin-inline:auto}
 /* Full-height guide; the message list scrolls and the composer remains visible. */
 body.portal-body .demo-reading-widget .pe-chat{top:0!important;right:0!important;bottom:0!important;height:100dvh!important;max-height:100dvh!important;border-radius:0!important;border-top:0;border-bottom:0;border-right:0;display:flex!important;transform:none!important;opacity:1!important}
-body.portal-body:not(.issue-full-page) .demo-reading-widget .pe-chat-toggle,body.portal-body:not(.issue-full-page) .demo-reading-widget .pe-chat-reopen{display:none!important}
+body.portal-body.issue-preview-page .demo-reading-widget .pe-chat-toggle,body.portal-body.issue-preview-page .demo-reading-widget .pe-chat-reopen{display:none!important}
 body.portal-body .demo-reading-widget .pe-guide-heading{padding-right:16px}
 body.portal-body .demo-reading-widget .pe-chat-messages{min-height:0;flex:1;overflow:auto}
 body.portal-body .demo-reading-widget .pe-chat-form-wrap{flex:none;padding-bottom:max(12px,env(safe-area-inset-bottom))}
@@ -33,13 +33,12 @@ body.portal-body .demo-reading-widget .pe-chat-form-wrap{flex:none;padding-botto
  body.issue-preview-page .issue-preview-stream{padding-right:0}
  body.issue-preview-page .issue-preview-article .portal-article-head h1{font-size:24px;line-height:36px}
  .issue-preview-article{padding-bottom:32px;margin-bottom:36px;scroll-margin-top:142px}
- .issue-preview-excerpt{max-height:clamp(220px,calc(100dvh - 340px),520px)}
  body.portal-body .demo-reading-widget .pe-chat{position:relative;top:auto!important;right:auto!important;bottom:auto!important;width:100%;max-width:none;height:100dvh!important;margin-top:40px;border-radius:0!important}
  body.portal-body .demo-reading-widget{position:static}
  body.issue-full-page .portal-reader-content{padding-right:0}
 }
 
-body.portal-body .demo-reading-widget .ai-maximize{display:none!important}
+body.portal-body.issue-preview-page .demo-reading-widget .ai-maximize{display:none!important}
 
 /* Confirmed 2026-11-17: middle article content is at most 720px wide. */
 body.issue-preview-page .issue-preview-article{width:100%;max-width:720px;margin-inline:auto;box-sizing:border-box}
@@ -51,14 +50,12 @@ body.issue-full-page .portal-reader.is-standalone .portal-reader-content{width:1
 @media(min-width:761px){
  .issue-toc-slot{min-width:0;align-self:stretch}
  body.issue-preview-page .issue-toc-slot>.portal-toc{position:fixed;left:var(--toc-left);width:var(--toc-width);top:0;bottom:0;height:100dvh;max-height:100dvh;padding-block:24px;box-sizing:border-box;overflow-y:auto;background:#fafafa;z-index:20}
- .issue-preview-excerpt{max-height:clamp(400px,calc(100dvh - 240px),960px)}
 }
 .issue-preview-bottom{justify-content:flex-end}
-@media(max-width:760px){.issue-preview-excerpt{max-height:clamp(360px,calc(100dvh - 250px),720px)}}
 
 /* 420px tray, 10px viewport inset and 20px content separation. */
 @media(min-width:761px){
- body.portal-body:is(.issue-preview-page,.issue-full-page) .demo-reading-widget .pe-chat{width:420px!important;max-width:420px!important;top:10px!important;right:10px!important;bottom:10px!important;height:calc(100dvh - 20px)!important;max-height:calc(100dvh - 20px)!important;border:1px solid #ffffffd9;border-radius:24px!important;box-shadow:0 8px 32px #13192114,0 2px 6px #1319210a;overflow:hidden;box-sizing:border-box}
+ body.portal-body.issue-preview-page .demo-reading-widget .pe-chat{width:420px!important;max-width:420px!important;top:10px!important;right:10px!important;bottom:10px!important;height:calc(100dvh - 20px)!important;max-height:calc(100dvh - 20px)!important;border:1px solid #ffffffd9;border-radius:24px!important;box-shadow:0 8px 32px #13192114,0 2px 6px #1319210a;overflow:hidden;box-sizing:border-box}
 
 
 }
@@ -70,7 +67,7 @@ body.issue-full-page .portal-reader.is-editorial .er-column-group{column-count:1
 body.issue-full-page .portal-reader.is-editorial .er-editorial-pair{display:block;grid-template-columns:1fr}
 body.issue-full-page [data-er-toggle]{display:none!important}
 
-/* Full details have no guide and reserve no space for it. */
+/* The standard guide overlays full details without changing the reading column. */
 
 body.portal-body.issue-full-page.guide-layout-push.reading-guide-open #portal-main,body.portal-body.issue-full-page #portal-main[data-page=article]{margin-inline:auto;width:calc(100% - 128px);max-width:1360px}
 body.portal-body.issue-full-page.guide-layout-push.reading-guide-open>.club-site-footer{margin-right:0}
@@ -133,3 +130,38 @@ body.issue-preview-page .portal-toc .reader-toc-article[aria-current] strong{fon
 body.issue-preview-page .portal-toc .reader-toc-article[aria-current]::before{content:"";position:absolute;left:0;top:13px;width:2px;height:14px;border-radius:2px;background:#131921}
 @media(prefers-reduced-motion:reduce){body.issue-preview-page .portal-toc .reader-toc-article{transition:none}}
 
+
+.issue-purchase-entry {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #dcdfe6;
+  color: #606266;
+}
+.issue-purchase-entry .button, .issue-purchase-actions .button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 8px 16px;
+  border-radius: 12px;
+}
+.issue-purchase-entry .dark, .issue-purchase-actions .dark { background: #131921; color: #fff; }
+.issue-purchase-dialog {
+  box-sizing: border-box;
+  width: min(420px, calc(100% - 32px));
+  padding: 24px;
+  border: 0;
+  border-radius: 24px;
+  background: #fff;
+  color: #131921;
+}
+.issue-purchase-dialog::backdrop { background: #13192166; }
+.issue-purchase-dialog h2 { margin: 0; font-size: 22px; }
+.issue-purchase-dialog p { margin: 8px 0; color: #606266; }
+.issue-purchase-dialog strong { font-size: 24px; }
+.issue-purchase-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+.issue-purchase-actions form { margin: 0; }

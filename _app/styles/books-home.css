@@ -96,3 +96,8 @@ body:has(#view-books.active),#view-books{background:#fff}
 .books-library-heading>div:first-child{flex:none}
 .books-library-filters{flex:0 1 auto;min-width:0;max-width:100%;flex-wrap:nowrap;overflow:hidden;padding-block:8px;margin-block:-8px}
 .books-library-filters button{flex:none;white-space:nowrap}
+/* Catalogue book covers use a 2:3 face inside the existing display area. */
+.books-library-card .books-library-volume { width:auto; aspect-ratio:2/3; }
+.books-library-card .books-library-cover { width:100%; height:100%; object-fit:cover; }
+.books-library-info h3 { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; }
+.books-library-info p { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }

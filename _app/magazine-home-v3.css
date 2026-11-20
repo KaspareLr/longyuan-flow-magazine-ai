@@ -167,11 +167,6 @@ body.magazine-home{background:#f3f6fa}
 @media(min-width:961px){
  .magazine-home .mh-main{width:min(calc(100% - 96px),1360px)}
  .magazine-home .mh-featured-issue{min-height:min(600px,44.12vw)}
- .magazine-home .site-header>.nav-shell{width:680px;justify-content:space-between;padding-inline:12px}
- .magazine-home .site-header>.nav-shell>.brand{margin-right:20px}
- .magazine-home .site-header>.nav-shell>.brand img{width:100px;height:auto}
- .magazine-home .site-header>.nav-shell>nav{margin-right:0;gap:16px}
- .magazine-home .site-header>.nav-shell>.login{padding-inline:16px 4px}
 }
 @media(max-width:760px){
  .magazine-home #picks,.magazine-home #archive{padding-top:56px}
@@ -207,3 +202,5 @@ body.magazine-home{background:#f3f6fa}
 .magazine-home #picks :is(.mh-pick-1,.mh-pick-2) .mh-pick-excerpt{
  margin-block-end:24px
 }
+.magazine-home #archive .mh-issue .hinged-cover { aspect-ratio:14/19; }
+.magazine-home #archive .mh-issue img { width:100%; height:auto; aspect-ratio:14/19; object-fit:cover; }

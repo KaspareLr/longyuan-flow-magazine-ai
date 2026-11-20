@@ -1,0 +1,13 @@
+* { box-sizing:border-box; }
+body { margin:0; color:#17212d; background:#fcfcfb; font:1rem/1.6 system-ui,sans-serif; }
+a { color:#245496; text-underline-offset:3px; }
+a:focus-visible { outline:2px solid #2766bd; outline-offset:4px; }
+.article-site { display:flex; flex-wrap:wrap; gap:24px; border-bottom:1px solid #dce1e8; padding:14px max(20px,calc((100% - 760px)/2)); }
+.article-site a { padding-block:8px; }
+main { max-width:800px; margin:0 auto; padding:clamp(28px,7vw,80px) 20px; }
+h1 { font:700 clamp(1.9rem,5vw,3.2rem)/1.24 Georgia,"Songti SC",serif; margin:0 0 22px; overflow-wrap:anywhere; }
+.article-meta { color:#536070; margin:0 0 12px; }
+.article-summary { white-space:pre-line; margin:0 0 26px; max-width:62ch; }
+.article-index { padding-inline-start:24px; }
+.article-index li { margin-block:9px; }
+.article-index a { display:inline-block; padding-block:7px; }

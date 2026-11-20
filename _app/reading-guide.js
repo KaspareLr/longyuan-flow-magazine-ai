@@ -1,10 +1,11 @@
 /* Standalone copy of the existing demo's reading-guide component and behavior. */
 (()=>{
- let readingGuideCollapsed=document.body.matches('.magazine-home,.issue-full-page')||new URLSearchParams(location.hash.split('?')[1]).get('full')==='1';
- // This independent experiment starts expanded, regardless of previous demo preferences.
-window.renderResourceChat = function(kind="期刊"){const arrow='<i class="iconfont icon-Arrow_Forward-2" aria-hidden="true"></i>';return `<aside class="pe-chat" aria-label="阅读对话"><div class="pe-guide-heading"><img class="pe-guide-avatar" src="assets/reading-guide-avatar-v3.png" width="44" height="44" alt=""><div><h2>阅读向导</h2><p>找好文章，也帮你读得更舒服</p></div><button type="button" class="pe-chat-toggle pe-icon-button" data-pe-chat-toggle aria-label="收起对话" title="收起对话" aria-expanded="true"><i class="iconfont icon-a-4" aria-hidden="true"></i><span class="pe-tooltip">收起对话</span></button></div><div class="pe-chat-messages" aria-live="polite"><div class="pe-guide-welcome"><h3>此刻，想读点什么？</h3><p>说说你的想法，或从这里开始。</p>${[['帮我挑一篇','说说此刻的心情或兴趣，我按你的状态选'],['给自己十分钟','选一篇轻松、可读全文的短文'],['问一个主题','先告诉我想聊什么，答案带原文出处']].map(([title,desc])=>`<button class="pe-guide-prompt" data-pe-prompt="${title}"><span><strong>${title}</strong><small>${desc}</small></span>${arrow}</button>`).join('')}</div></div><div class="pe-chat-form-wrap"><form class="pe-chat-form"><textarea rows="2" aria-label="向本刊提问" placeholder="关于${kind==='期刊'?'这本刊':kind}，你想了解什么？&#10;例如：这期有哪些关于消费的文章？" required></textarea><div class="pe-chat-tools"><label class="pe-chat-attach" tabindex="0" role="button" title="添加内容" aria-label="添加内容"><i class="iconfont icon-Link" aria-hidden="true"></i><input type="file" hidden></label><button type="submit" aria-label="发送提问" title="发送提问">${arrow}</button></div></form></div></aside><button type="button" class="pe-chat-reopen pe-icon-button" data-pe-chat-toggle aria-label="展开阅读向导" title="展开阅读向导" aria-expanded="true"><img src="assets/reading-guide-avatar-v3.png" width="44" height="44" alt=""><span class="pe-tooltip">展开阅读向导</span></button>`;};
+ const preferenceKey='longyuan-reading-guide-collapsed';
+ let readingGuideCollapsed=true;
+ try{readingGuideCollapsed=(sessionStorage.getItem(preferenceKey)??sessionStorage.getItem('club-demo-reading-guide-collapsed'))!=='false';}catch{}
+window.renderResourceChat = function(kind="期刊"){const arrow='<i class="iconfont icon-Arrow_Forward-2" aria-hidden="true"></i>';return `<aside class="pe-chat" aria-label="阅读对话"><div class="pe-guide-heading"><img class="pe-guide-avatar" src="assets/reading-guide-avatar-v3.png" width="44" height="44" alt=""><div><h2>阅读向导</h2><p>找好文章，也帮你读得更舒服</p></div><button type="button" class="pe-chat-toggle pe-icon-button" data-pe-chat-toggle aria-label="收起对话" title="收起对话" aria-expanded="true"><i class="iconfont icon-a-4" aria-hidden="true"></i><span class="pe-tooltip">收起对话</span></button></div><div class="pe-chat-messages" aria-live="polite"><div class="pe-guide-welcome"><h3>此刻，想读点什么？</h3><p>说说你的想法，或从这里开始。</p>${[['帮我挑一篇','说说此刻的心情或兴趣，我按你的状态选'],['给自己十分钟','选一篇轻松、可读全文的短文'],['问一个主题','先告诉我想聊什么，答案带原文出处']].map(([title,desc])=>`<button class="pe-guide-prompt" data-pe-prompt="${title}"><span><strong>${title}</strong><small>${desc}</small></span>${arrow}</button>`).join('')}</div></div><div class="pe-chat-form-wrap"><form class="pe-chat-form"><textarea rows="2" aria-label="向阅读向导提问" placeholder="想读什么？也可以就正在阅读的内容提问。" required></textarea><div class="pe-chat-tools"><label class="pe-chat-attach" tabindex="0" role="button" title="添加内容" aria-label="添加内容"><i class="iconfont icon-Link" aria-hidden="true"></i><input type="file" hidden></label><button type="submit" aria-label="发送提问" title="发送提问">${arrow}</button></div></form></div></aside><button type="button" class="pe-chat-reopen pe-icon-button" data-pe-chat-toggle aria-label="展开阅读向导" title="展开阅读向导" aria-expanded="true"><img src="assets/reading-guide-avatar-v3.png" width="44" height="44" alt=""><span class="pe-tooltip">展开阅读向导</span></button>`;};
 
- const mount=document.createElement('div');mount.className='demo-reading-widget rd-periodical pe-figma-detail';mount.innerHTML=renderResourceChat();document.body.append(mount);
+ const mount=document.createElement('div');mount.className='reader-guide-widget demo-reading-widget rd-periodical pe-figma-detail';mount.innerHTML=renderResourceChat();document.body.append(mount);
 // A local, explicit directory lookup; no generated claims about article bodies.
 document.addEventListener('submit',event=>{
  const form=event.target.closest('.pe-chat-form');if(!form)return;event.preventDefault();
@@ -41,7 +42,7 @@ document.addEventListener('click',event=>{
  const root=button.closest('.rd-periodical');if(!root)return;
  const collapsed=!root.classList.contains('pe-chat-collapsed');
  readingGuideCollapsed=collapsed;
- try{sessionStorage.setItem('club-demo-reading-guide-collapsed',String(collapsed));}catch{}
+ try{sessionStorage.setItem(preferenceKey,String(collapsed));}catch{}
  root.classList.toggle('pe-chat-collapsed',collapsed);document.body.classList.toggle('reading-guide-open',!collapsed);
  document.querySelectorAll('.rd-periodical').forEach(other=>{if(other!==root)applyGuidePreference(other);});
  const chat=root.querySelector('.pe-chat'),reopen=root.querySelector('.pe-chat-reopen');
@@ -77,17 +78,32 @@ function animateGuide(chat,collapsed){
 }
 
 function usesGuideLauncher(){
- return document.body.matches('.issue-full-page,.magazine-home');
+ return !document.body.classList.contains('issue-preview-page');
 }
 function applyGuidePreference(root){
  root.hidden=false;root.inert=false;
  const chat=root.querySelector('.pe-chat');if(!chat)return;
  const motion=guideMotion.get(chat);if(motion){cancelAnimationFrame(motion.frame);guideMotion.delete(chat);}
- root.classList.toggle('pe-chat-collapsed',readingGuideCollapsed);document.body.classList.toggle('reading-guide-open',!readingGuideCollapsed);
- chat.hidden=readingGuideCollapsed;chat.inert=readingGuideCollapsed;
- chat.style.display=readingGuideCollapsed?'none':'';chat.style.transform='';chat.style.opacity='';chat.style.willChange='';
- root.querySelectorAll('[data-pe-chat-toggle]').forEach(button=>button.setAttribute('aria-expanded',String(!readingGuideCollapsed)));
+ const collapsed=usesGuideLauncher()&&readingGuideCollapsed;
+ root.classList.toggle('pe-chat-collapsed',collapsed);document.body.classList.toggle('reading-guide-open',!collapsed);
+ chat.hidden=collapsed;chat.inert=collapsed;
+ chat.style.display=collapsed?'none':'';chat.style.transform='';chat.style.opacity='';chat.style.willChange='';
+ root.querySelectorAll('[data-pe-chat-toggle]').forEach(button=>button.setAttribute('aria-expanded',String(!collapsed)));
 }
+let wasAccount=false;
+function syncGuideSurface(){
+ const portal=document.body.classList.contains('portal-body');
+ const account=portal&&document.querySelector('#portal-main')?.dataset.page==='me';
+ if(account&&!wasAccount)readingGuideCollapsed=true;
+ wasAccount=account;
+ const preview=portal&&document.body.classList.contains('issue-preview-page');
+ mount.classList.toggle('catalog-reading-guide',portal&&!preview);
+ mount.classList.toggle('demo-reading-widget',!portal||preview);
+ document.body.classList.toggle('catalog-guide-visible',portal&&!preview);
+ applyGuidePreference(mount);
+}
+window.syncReaderGuide=syncGuideSurface;
+syncGuideSurface();
 const initializedGuides=new WeakSet();
 function initializeGuides(){document.querySelectorAll('.rd-periodical .pe-chat').forEach(chat=>{if(initializedGuides.has(chat))return;const root=chat.closest('.rd-periodical');initializedGuides.add(chat);applyGuidePreference(root);});}
 // Runs before painting freshly mounted routed, article, and shelf details.

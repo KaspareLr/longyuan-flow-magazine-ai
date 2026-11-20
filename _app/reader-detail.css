@@ -1,0 +1,56 @@
+body.portal-body > .portal-reading-progress {
+  width:100%;
+  z-index:200;
+  transform:scaleX(0);
+  transform-origin:left center;
+  transition:none;
+  pointer-events:none;
+}
+.portal-reading-progress[hidden] { display:none; }
+html body .portal-reader-content > .portal-reader-tools.reader-tools-collapsible { translate:0 var(--reader-tool-offset,0px); }
+html body .portal-reader-tools .club-local-icon {
+  display:inline-grid!important;
+  place-items:center;
+  flex:none;
+  width:24px;
+  height:24px;
+  font-family:"font_family"!important;
+  font-size:24px;
+  line-height:24px;
+}
+.portal-reader-tools button:disabled { opacity:.45; }
+html body.portal-body .portal-reader-tools .reader-tool-group :is(.reader-arrow-up,.reader-arrow-down) {
+  display:grid;
+  place-items:center;
+  width:24px;
+  height:24px;
+  transform:none;
+}
+.portal-reader-tools :is(.reader-arrow-up,.reader-arrow-down)::before {
+  content:'';
+  width:7px;
+  height:7px;
+  border:solid currentColor;
+  border-width:0 2px 2px 0;
+}
+.portal-reader-tools .reader-arrow-up::before { transform:translateY(2px) rotate(225deg); }
+.portal-reader-tools .reader-arrow-down::before { transform:translateY(-2px) rotate(45deg); }
+@media(max-width:760px) {
+  .portal-reader-tools [data-reader-article] .reader-arrow-up::before { transform:translateX(1px) rotate(135deg); }
+  .portal-reader-tools [data-reader-article] .reader-arrow-down::before { transform:translateX(-1px) rotate(-45deg); }
+}
+.portal-demo-article > :is(p,h2,blockquote) { margin:20px 0 0; }
+.portal-demo-article .portal-demo-label { font:500 13px/20px Figtree,"PingFang SC",sans-serif; color:#606266; }
+.portal-reader.night .portal-demo-label { color:#c0c4cc; }
+@media(min-width:761px){
+  html body:not(.issue-full-page) .portal-reader-content > .portal-reader-tools.reader-tools-collapsible {
+    position:fixed;
+    float:none;
+    margin:0;
+    top:50%;
+    right:max(16px,calc((100vw - 1040px)/2 - 80px));
+    left:auto;
+    bottom:auto;
+    transform:translateY(-50%);
+  }
+}

@@ -49,3 +49,9 @@ html.club-motion-boot body>main:has(#view-home.active){opacity:1}
 body.catalog-guide-visible .catalog-reading-guide.pe-chat-collapsed .pe-chat-reopen{z-index:150}
 @font-face{font-family:reading-guide-icons;src:url('assets/reading-guide-icons.woff') format('woff');font-display:block}
 .pe-source:empty,.oc-source:empty,.portal-source-note:empty,.rd-note:empty{display:none}
+
+.catalog-reading-guide .ai-maximize{display:flex!important;align-items:center;justify-content:center;padding:0;flex:none}
+
+#view-magazines :is(.magazines-stories, #magazine-packages) {
+  display: none;
+}

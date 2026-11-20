@@ -1,0 +1,156 @@
+/* Periodical account shell, aligned with the Reading Club V3 personal space. */
+#portal-main[data-page=me]:has(.qikan-account) { width:calc(100% - 48px); max-width:1360px; padding-top:168px; }
+body:has(.qikan-account) { background:#fff; }
+.qikan-account { --account-section-gap:20px; --account-item-gap:12px; color:#131921; }
+.qikan-account-header { display:grid; justify-items:center; gap:20px; margin-bottom:40px; }
+.qikan-account-avatar { width:120px; height:120px; border-radius:50%; object-fit:cover; flex:none; }
+.qikan-account-header h1 { margin:0; font-size:20px; line-height:32px; text-align:center; overflow-wrap:anywhere; }
+.qikan-account-stats { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; width:min(100%,720px); }
+.qikan-account-stats > div { display:grid; text-align:center; padding:16px 10px; background:#f5f7fa; border-radius:20px; }
+.qikan-account-stats strong { font-size:32px; line-height:38px; }
+.qikan-account-stats span,.qikan-account small,.qikan-account-empty { color:#626973; font-size:13px; line-height:20px; }
+.qikan-account .portal-account { grid-template-columns:minmax(0,280px) minmax(0,760px); justify-content:center; align-items:start; gap:40px; }
+.qikan-account .portal-account-side { position:static; padding:8px 0; background:none; }
+.qikan-account .portal-account-side nav { display:grid; gap:4px; }
+.qikan-account .portal-account-side a,.qikan-account-logout { display:flex; align-items:center; gap:8px; min-height:44px; padding:8px 16px; border:0; border-radius:12px; background:none; color:#606266; font:inherit; font-size:14px; text-decoration:none; cursor:pointer; }
+.qikan-account .portal-account-side a[aria-current=page],.qikan-account .portal-account-side a:hover,.qikan-account-logout:hover { color:#131921; background:#f0f2f5; }
+.qikan-account .portal-account-side a[aria-current=page] { font-weight:600; }
+.qikan-account .portal-account-side .iconfont { font-size:20px; }
+.qikan-account .portal-account-panel { min-width:0; padding:8px 0 0; background:#fff; }
+.qikan-account .portal-account-panel > h2 { margin:0 0 var(--account-section-gap); padding:0 0 16px; border-bottom:1px solid #e4e7ed; }
+.qikan-account .portal-account-panel h2 { font-size:20px; line-height:32px; }
+.qikan-account .portal-profile-form { display:grid; grid-template-columns:minmax(0,1fr); gap:var(--account-section-gap); }
+.qikan-account .portal-profile-form > * { grid-column:auto; }
+.qikan-account .portal-profile-form input,.qikan-account .portal-profile-form textarea { width:100%; min-height:50px; box-sizing:border-box; border:1px solid #e4e7ed; border-radius:12px; background:#fafbfc; font-size:16px; }
+.qikan-account .portal-profile-form > button { justify-self:start; min-height:48px; }
+.qikan-account .portal-form-status:empty { display:none; }
+.qikan-account-hub,.qikan-account-return { display:none; }
+.qikan-account-recent,.qikan-account-event-list { display:grid; gap:var(--account-item-gap); }
+.qikan-account-recent h3 { margin:0; font-size:15px; line-height:22px; }
+.qikan-account-empty { margin:0; }
+.qikan-account-membership-body { display:grid; gap:var(--account-section-gap); justify-items:start; }
+.qikan-member-card { display:grid; gap:32px; box-sizing:border-box; width:min(100%,480px); padding:20px; border-radius:16px; background:#131921; color:#fff; box-shadow:0 2px 6px #0000001a; }
+.qikan-member-card header { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px 20px; }
+.qikan-member-card :is(h3,h4) { margin:0; font-size:16px; line-height:26px; }
+.qikan-member-card p { margin:4px 0 0; color:#c0c4cc; font-size:14px; line-height:22px; }
+.qikan-member-card .button { margin:0; background:#fff; color:#131921; font-weight:600; }
+.qikan-member-card dl { display:grid; gap:8px; margin:0; }
+.qikan-member-card dl > div { display:grid; grid-template-columns:78px minmax(0,1fr); gap:12px; padding:12px 0; border-bottom:1px solid #ffffff33; font-size:14px; line-height:22px; }
+.qikan-member-card dt { color:#c0c4cc; }
+.qikan-member-card dd { margin:0; overflow-wrap:anywhere; }
+.qikan-account-recent + .qikan-account-recent { margin-top:40px; }
+.qikan-account-recent > h3 { font-size:14px; font-weight:500; }
+@media(min-width:761px) {
+  .qikan-account .portal-account-panel { padding:24px 30px 36px; border:1px solid #e4e7ed; border-radius:20px; }
+  .qikan-account .qikan-account-recent-link { border:0; border-radius:16px; padding:14px 16px; background:#fff; box-shadow:0 2px 6px #0000001a; }
+  .qikan-account-recent-link small { margin-top:4px; }
+}
+.qikan-account-event-list .portal-chapter-link { margin:0; padding:12px 0; border-bottom:1px solid #e4e7ed; border-radius:0; background:none; }
+.qikan-account-event-list .portal-chapter-link span { width:auto; flex:none; }
+.qikan-account .portal-account-panel > .portal-empty { padding:12px 0; text-align:left; background:none; border-radius:0; }
+.qikan-account .portal-account-panel > .portal-empty p { margin:0 0 12px; color:#606266; }
+.qikan-account-recent-link { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 0; border-block:1px solid #e4e7ed; color:#131921; text-decoration:none; }
+.qikan-account-recent-link strong,.qikan-account-recent-link small { display:block; overflow-wrap:anywhere; }
+.qikan-account :is(a,button,input,textarea):focus-visible { outline:2px solid #2766bd; outline-offset:2px; }
+@media(max-width:760px) {
+  #portal-main[data-page=me]:has(.qikan-account) { width:calc(100% - 32px); padding-top:120px; }
+  body:has(.qikan-account[data-account-tab=overview]) { background:#f5f7fa; }
+  .qikan-account-header,.qikan-account .portal-account-side,.qikan-account[data-account-tab=overview] .portal-account { display:none; }
+  .qikan-account-hub { display:grid; gap:16px; }
+  .qikan-account-identity,.qikan-account-member { display:flex; align-items:center; gap:16px; min-width:0; color:#131921; text-decoration:none; }
+  .qikan-account-identity { padding:6px 4px; }
+  .qikan-account-identity > span,.qikan-account-member > span { flex:1; min-width:0; overflow-wrap:anywhere; }
+  .qikan-account-identity strong,.qikan-account-member strong,.qikan-account-hub small { display:block; }
+  .qikan-account-identity .qikan-account-avatar { width:64px; height:64px; }
+  .qikan-account-stats { gap:0; }
+  .qikan-account-stats > div { border-radius:0; padding:4px; border-inline-end:1px solid #e4e7ed; }
+  .qikan-account-stats > div:last-child { border:0; }
+  .qikan-account-stats strong { font-size:24px; line-height:32px; }
+  .qikan-account-member { border-radius:20px; background:#131921; color:#fff; padding:20px; }
+  .qikan-account-member small { color:#d3d7df; }
+  .qikan-account-shortcuts { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); border-radius:20px; padding:12px 8px; background:#fff; }
+  .qikan-account-shortcuts a { display:grid; justify-items:center; align-content:center; gap:8px; min-height:62px; text-align:center; color:#131921; text-decoration:none; font-size:13px; }
+  .qikan-account-shortcuts .iconfont { font-size:21px; }
+  .qikan-account-logout { justify-content:center; background:#fff; }
+  .qikan-account-return { display:inline-flex; gap:8px; align-items:center; min-height:44px; margin-bottom:8px; color:#303743; text-decoration:none; }
+  .qikan-account .portal-account { grid-template-columns:minmax(0,1fr); }
+  .qikan-account .portal-account-panel { padding:8px 0 0; }
+  .qikan-account .portal-profile-form > button { width:100%; }
+  .qikan-account-hub .qikan-account-recent-link { background:#fff; border:0; border-radius:16px; padding:16px; }
+}
+.qikan-profile-avatar { display:grid; gap:10px; font-size:14px; }
+.qikan-profile-avatar .qikan-account-avatar { width:64px; height:64px; }
+.qikan-field-label { display:flex; justify-content:space-between; gap:12px; align-items:baseline; }
+.qikan-field-label small { font-variant-numeric:tabular-nums; white-space:nowrap; }
+.qikan-saved-list { list-style:none; padding:0; margin:0; }
+.qikan-saved-list li { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:16px 0; }
+.qikan-saved-list li:first-child { padding-top:0; }
+.qikan-saved-list li:last-child { padding-bottom:0; }
+.qikan-saved-list li+li { border-top:1px solid #e4e7ed; }
+.qikan-saved-link { display:flex; flex:1; align-items:center; gap:16px; min-width:0; color:#131921; text-decoration:none; }
+.qikan-saved-cover { flex:none; width:88px; height:auto; aspect-ratio:2/3; object-fit:cover; border-radius:4px; }
+.qikan-saved-text { display:grid; gap:4px; min-width:0; }
+.qikan-saved-text strong { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; overflow-wrap:anywhere; }
+.qikan-saved-text small { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.qikan-saved-remove { display:grid; flex:none; place-items:center; width:44px; height:44px; padding:0; border:0; border-radius:12px; background:none; color:#131921; cursor:pointer; }
+.qikan-saved-remove [class~="icon-StarFill"] { color:#ad5400; }
+.qikan-saved-remove:hover { background:#f0f2f5; }
+.qikan-saved-remove .iconfont { font-size:24px; }
+.qikan-account .portal-account-panel .button { min-height:44px; border-radius:12px; font-size:14px; line-height:20px; }
+@media(max-width:760px) {
+  .qikan-account .portal-profile-form input { min-height:48px; }
+  .qikan-saved-cover { width:64px; }
+  .qikan-saved-link { gap:12px; }
+}
+
+/* Match the Reading Club V3 component metrics on corresponding account views. */
+.qikan-account .portal-account-side a { line-height:20px; font-weight:500; }
+.qikan-account .portal-account-side a .iconfont { display:grid; place-items:center; flex:0 0 20px; height:20px; line-height:20px; }
+.qikan-account .portal-account-side a[aria-current=page] { font-weight:600; }
+.qikan-account .portal-profile-form label,.qikan-profile-avatar { line-height:20px; }
+.qikan-account .portal-profile-form label input { padding:10px 12px; line-height:28px; }
+.qikan-account .qikan-field-label small { font-size:12px; line-height:16px; }
+.qikan-saved-list li { padding-block:20px; }
+.qikan-saved-list li:last-child { padding-bottom:0; }
+.qikan-saved-cover { align-self:flex-start; box-shadow:0 8px 16px #21212112; }
+.qikan-saved-text strong { font-size:20px; line-height:32px; }
+.qikan-saved-text small { font-size:12px; line-height:16px; }
+.qikan-account-empty { font-size:14px; line-height:24px; }
+@media(min-width:761px) {
+  #portal-main[data-page=me]:has(.qikan-account) { padding-bottom:80px; }
+  .qikan-account-stats > div { padding:16px 24px; }
+  .qikan-account-stats span { font-size:12px; line-height:16px; }
+  .qikan-account .portal-account-side a { min-height:42px; padding:10px 16px; }
+  .qikan-account:not([data-account-tab=profile]) .portal-account-panel { padding:16px 30px; }
+  .qikan-account[data-account-tab=profile] .portal-account-panel { padding:24px 30px; }
+  .qikan-account .portal-account-panel > h2 { box-sizing:border-box; min-height:53px; padding:10px 0; }
+  .qikan-account-recent { gap:10px; }
+  .qikan-account-recent > h3 { line-height:20px; font-weight:400; }
+  .qikan-account .qikan-account-recent-link { padding:12px 16px; gap:20px; }
+  .qikan-account-recent-link strong { font-size:16px; line-height:28px; font-weight:600; }
+  .qikan-account-recent-link small { margin-top:0; font-size:14px; line-height:24px; color:#606266; }
+  .qikan-account-recent-link > .iconfont { display:grid; place-items:center; width:32px; height:32px; flex:none; font-size:16px; }
+  .qikan-member-card { gap:40px; }
+  .qikan-member-card :is(h3,h4) { line-height:28px; font-weight:600; }
+  .qikan-member-card p { margin:0; line-height:24px; }
+  .qikan-account .qikan-member-card .button { min-height:36px; padding:8px 16px; font-weight:700; border:0; }
+  .qikan-member-card dl { gap:20px; }
+  .qikan-member-card dl > div { grid-template-columns:80px minmax(0,1fr); gap:10px; padding:0 0 10px; line-height:24px; }
+  .qikan-saved-list li,.qikan-saved-link { gap:20px; }
+  .qikan-saved-remove { width:46px; height:46px; border-radius:50%; box-shadow:0 2px 6px #0000001a; }
+  .qikan-account-event-list .portal-chapter-link { padding:20px 0; gap:20px; font-size:16px; line-height:28px; }
+}
+@media(min-width:761px) and (max-width:1050px) {
+  .qikan-account .portal-account { grid-template-columns:minmax(164px,200px) minmax(0,760px); gap:24px; }
+}
+@media(max-width:760px) {
+  .qikan-account .portal-profile-form { gap:24px; }
+  .qikan-account .portal-profile-form label input { height:48px; padding:12px; line-height:24px; }
+  .qikan-account .portal-account-panel > h2 { line-height:28px; }
+  .qikan-member-card { gap:24px; }
+  .qikan-member-card header { align-items:flex-start; flex-direction:column; gap:16px; }
+  .qikan-member-card dl { gap:14px; }
+  .qikan-member-card dl > div { grid-template-columns:72px minmax(0,1fr); }
+  .qikan-saved-text strong { font-size:16px; line-height:26px; }
+  .qikan-saved-remove { border-radius:50%; background:#f5f7fa; }
+}

@@ -12,11 +12,6 @@
  /* The complete header group (back + navigation) is centered on the viewport. */
  body.portal-body.issue-preview-page>.site-header{position:fixed;left:0!important;right:0!important;top:0;width:100%!important;display:flex;justify-content:center!important;align-items:flex-start;align-content:normal;gap:20px;padding:10px 20px;height:74px;box-sizing:border-box;grid-template-columns:none}
  body.portal-body.issue-preview-page>.site-header>.portal-back{position:static;left:auto;top:auto;transform:none;width:54px;height:54px;min-width:54px;margin:0}
- body.portal-body.issue-preview-page>.site-header>.nav-shell{flex:none;width:720px;max-width:calc(100% - 74px);min-width:0;margin:0;padding:10px;box-sizing:border-box;column-gap:0}
- body.issue-preview-page .site-header .nav-shell>.brand{margin-right:24px}
- body.issue-preview-page .site-header .nav-shell>.brand img{width:146px;height:32px;object-fit:contain}
- body.issue-preview-page .site-header .nav-shell>nav{flex:1;min-width:0;gap:16px;margin:0 20px 0 0;overflow-x:auto;scrollbar-width:none}
- body.issue-preview-page .site-header .nav-shell>.login{padding:0 10px 0 20px}
  body.issue-preview-page .issue-preview-article{width:100%;max-width:720px;margin-inline:auto}
  body.issue-preview-page .issue-preview-article .portal-article-head{gap:12px;padding-bottom:24px}
  body.issue-preview-page .issue-preview-article .portal-article-head h1{margin:0;font-size:32px;line-height:48px}
@@ -49,14 +44,6 @@
  body.portal-body.issue-preview-page .demo-reading-widget{position:static;display:flex;justify-content:center;width:calc(100% - 48px);max-width:720px;margin:0 auto 40px}
  body.portal-body.issue-preview-page .demo-reading-widget .pe-chat{position:relative!important;inset:auto!important;width:100%!important;max-width:720px!important;height:800px!important;max-height:calc(100dvh - 20px)!important;margin:0;border-radius:24px!important}
 }
-/* The island hugs its actual controls; no empty flex track before the divider. */
-@media(min-width:761px){
- body.portal-body.issue-preview-page>.site-header>.nav-shell{width:max-content;max-width:calc(100% - 74px);padding:10px;column-gap:24px}
- body.issue-preview-page .site-header .nav-shell>.brand{flex:none;width:auto;margin:0;padding:0}
- body.issue-preview-page .site-header .nav-shell>.brand img{display:block;width:125px;height:32px;object-fit:contain}
- body.issue-preview-page .site-header .nav-shell>nav{flex:0 1 auto;width:auto;margin:0;padding:0;gap:16px}
- body.issue-preview-page .site-header .nav-shell>.login{flex:none;margin:0;padding:0 10px 0 20px}
-}
 /* Fade directory text at its scroll boundaries instead of clipping it abruptly. */
 @media(min-width:761px){
  body.issue-preview-page .issue-toc-slot>.portal-toc{--toc-fade:24px;padding-top:var(--toc-fade);padding-bottom:var(--toc-fade);-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 var(--toc-fade),#000 calc(100% - var(--toc-fade)),transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 var(--toc-fade),#000 calc(100% - var(--toc-fade)),transparent 100%)}
@@ -69,4 +56,8 @@ body.issue-preview-page .portal-toc nav .reader-toc-article[aria-current] strong
 }
 @media(min-width:761px) and (max-width:1559px){
  body.issue-preview-page .issue-toc-slot.is-open>.portal-toc{padding-top:32px;padding-bottom:48px;scroll-padding-block:32px 48px}
+}
+/* The preview rails leave with the end of the reading area. */
+body.issue-preview-page :is(.issue-toc-slot > .portal-toc,.reader-guide-widget .pe-chat,.issue-directory-toggle) {
+  translate:0 var(--issue-rail-offset,0px);
 }
