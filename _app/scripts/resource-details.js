@@ -32,9 +32,9 @@
   if(m.title==='第一财经'){m={...m,issues:window.periodicalReference.archive.map(a=>({src:a.cover,label:a.issue}))};}
   const claimed=q.has('claimed')?q.get('claimed')==='1':publicationState(m).claimed;const index=Math.min(m.issues.length-1,Math.max(0,Math.floor(Number(q.get('issue'))||0)));const issue=m.issues[index];context={type:'magazine',m,issue,claimed};
   if(m.title==='第一财经'&&q.get('page')==='membership'){
-   return `<div class="rd-periodical pe-figma-detail oc-publication"><main class="oc-main" aria-label="第一财经会员">
+   return `<div class="rd-periodical pe-figma-detail oc-publication"><main class="oc-main qikan-publication-membership" aria-label="第一财经会员">
     <a class="oc-button" href="magazine-home.html">返回《第一财经》</a>
-    ${window.renderSignedMembership(true)}
+    ${window.renderSignedMembership(true,m.title)}
    </main>${renderResourceChat()}</div>`;
   }
   if(m.title==='南风窗'&&(q.get('club')==='1'||(claimed&&q.has('issue')&&!q.has('page')))){context.claimed=true;return window.renderOctoberClaimedIssue(m,issue);}

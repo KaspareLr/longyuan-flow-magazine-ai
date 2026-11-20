@@ -14,3 +14,14 @@
 .signed-membership-content .portal-faq summary{list-style:none;display:flex;align-items:center;justify-content:space-between}.signed-membership-content .portal-faq summary::-webkit-details-marker{display:none}
 
 #oc-membership.oc-membership{background:transparent;color:#131921;padding:0;border-radius:0}
+
+#view-magazine .oc-publication .qikan-publication-membership { gap: 0; }
+.qikan-publication-membership > .oc-button { align-self: flex-start; }
+.qikan-publication-membership .signed-membership-content .portal-heading {
+  margin: 20px 0 24px;
+  padding: 0;
+  min-height: 0;
+}
+.qikan-publication-membership .signed-membership-content .portal-heading h1 {
+  font-size: clamp(32px, 4vw, 48px);
+}

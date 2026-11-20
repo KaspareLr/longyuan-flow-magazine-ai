@@ -3,7 +3,7 @@
  const session=clubSession,root='#/magazine/'+encodeURIComponent('南风窗')+'?claimed=1&page=membership';
  const dialog=document.createElement('dialog');dialog.className='signed-member-dialog';dialog.setAttribute('aria-label','会员方案');document.body.append(dialog);
  function notice(title,body){dialog.innerHTML=`<form method="dialog"><button class="signed-dialog-close" aria-label="关闭弹窗">×</button></form><h2>${title}</h2>${body}`;dialog.showModal();}
- function refresh(){document.querySelectorAll('.signed-membership-content').forEach(el=>{el.outerHTML=renderSignedMembership(el.dataset.membershipPage==='true');});}
+ function refresh(){document.querySelectorAll('.signed-membership-content').forEach(el=>{el.outerHTML=renderSignedMembership(el.dataset.membershipPage==='true',el.dataset.membershipPublication);});}
  function activate(plan){const start=new Date(),end=new Date(start);end.setDate(end.getDate()+plan.durationDays);session.member({label:plan.periodLabel,period:plan.periodCode,price:plan.priceFen/100});session.write('membership',{...session.membership,started:start.toISOString().slice(0,10),expires:end.toISOString().slice(0,10)});dialog.close();refresh();}
  document.addEventListener('click',event=>{
   const button=event.target.closest('.signed-membership-content button,[data-signed-confirm]');if(!button)return;
