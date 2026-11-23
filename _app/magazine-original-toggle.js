@@ -8,12 +8,12 @@
   const dialog=document.createElement('dialog');
   dialog.className='native-original-spread';
   dialog.setAttribute('aria-label','第一财经原貌阅读');
-  const colors={white:'白色',paper:'暖纸色',mist:'雾蓝色',charcoal:'炭灰色'};
+  const colors={white:'白色',green:'浅绿色',yellow:'浅黄色',blue:'浅蓝色'};
   const spreads=[[data.pages[0]],...data.pages.slice(1).filter((_,i)=>i%2===0).map((_,i)=>data.pages.slice(i*2+1,i*2+3))];
   const thumbnails=spreads.map(pages=>{
    const first=pages[0].page,last=pages.at(-1).page,label=first===1?'封面':`第 ${first}–${last} 页`;
    return `<button type="button" data-original-jump="${first}" aria-label="${label}">
-    <span class="original-thumbnail-pages">${pageFigures({pages}).replaceAll('data-src=', 'src=')}</span><span>${label}</span></button>`;
+    <span class="original-thumbnail-pages">${pageFigures({pages}).replaceAll('data-src=', 'src=')}</span></button>`;
   }).join('');
   dialog.innerHTML=`
    <div class="original-rail original-rail-left" aria-label="向前翻页">
@@ -29,17 +29,18 @@
     </div>
     <button class="original-mode-active" data-original-close aria-label="切换为文本阅读">${icon('double')}</button>
     <button data-original-more aria-label="更多阅读选项" aria-expanded="false">${artwork('cc41b')}</button>
+    <div class="original-rail-group original-color-options" role="group" aria-label="阅读背景色" hidden>
+     ${Object.entries(colors).map(([color,label])=>`<button type="button" data-original-color="${color}" aria-label="${label}" title="${label}" aria-pressed="${color==='white'}"></button>`).join('')}
+     <button type="button" data-original-more-close aria-label="收起背景色选项">${artwork('98ae5')}</button>
+    </div>
    </div>
    <output class="original-spread-number" aria-live="polite"></output>
    <section class="original-thumbnail-directory" aria-label="原貌目录" hidden>${thumbnails}</section>
-   <div class="original-spread-panel" aria-label="背景色" hidden>
-    <strong>阅读背景</strong>
-    <div class="original-color-options">${Object.entries(colors).map(([color,label])=>`<button type="button" data-original-color="${color}" aria-pressed="${color==='white'}"><span></span>${label}</button>`).join('')}</div>
-    <a href="${data.source}" target="_blank" rel="noopener">在官网查看原貌</a>
-   </div>`;
+   <a class="original-official-link" hidden href="${data.source}" target="_blank" rel="noopener">在官网查看原貌</a>`;
   const stage=dialog.querySelector('.original-spread-pages');
   const figures=[...stage.querySelectorAll('figure')];
-  const panel=dialog.querySelector('.original-spread-panel');
+  const panel=dialog.querySelector('.original-color-options');
+  const more=dialog.querySelector('[data-original-more]');
   const directory=dialog.querySelector('.original-thumbnail-directory');
   const coverButton=stage.querySelector('.original-open-cover');
   const breakpoint=matchMedia('(max-width:760px)');
@@ -54,7 +55,9 @@
   function showPanel(mode){
    directory.hidden=mode!=='directory';panel.hidden=mode!=='more';
    dialog.querySelector('[data-original-directory]').setAttribute('aria-expanded',String(!directory.hidden));
-   dialog.querySelector('[data-original-more]').setAttribute('aria-expanded',String(!panel.hidden));
+   more.hidden=!panel.hidden;more.setAttribute('aria-expanded',String(!panel.hidden));
+   dialog.querySelector(".original-official-link").hidden=panel.hidden;
+   dialog.classList.toggle('has-color-options',!panel.hidden);
    stage.inert=!directory.hidden;
    dialog.classList.toggle('is-directory',!directory.hidden);
   }
@@ -154,7 +157,8 @@
    if(button.dataset.originalStep)step(Number(button.dataset.originalStep));
    if(button.dataset.originalEdge){showPanel(null);go(button.dataset.originalEdge==='first'?0:lastStart());}
    if(button.hasAttribute('data-original-directory'))showPanel(directory.hidden?'directory':null);
-   if(button.hasAttribute('data-original-more'))showPanel(panel.hidden?'more':null);
+   if(button.hasAttribute('data-original-more')){showPanel('more');panel.querySelector('[aria-pressed=true]').focus();}
+   if(button.hasAttribute('data-original-more-close')){showPanel(null);more.focus();}
    if(button.dataset.originalJump){
     showPanel(null);go(data.pages.findIndex(page=>page.page===Number(button.dataset.originalJump)));
     dialog.querySelector('[data-original-directory]').focus();
@@ -167,7 +171,7 @@
   dialog.addEventListener('keydown',event=>{
    if(event.key==='Escape'&&(!directory.hidden||!panel.hidden)){
     event.preventDefault();
-    const control=dialog.querySelector('[aria-expanded="true"]');showPanel(null);control?.focus();
+    const control=directory.hidden?more:dialog.querySelector("[data-original-directory]");showPanel(null);control.focus();
    }
    if(!['ArrowLeft','ArrowRight'].includes(event.key))return;
    event.preventDefault();step(event.key==='ArrowLeft'?-1:1);
