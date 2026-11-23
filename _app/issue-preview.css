@@ -13,10 +13,18 @@ body.issue-preview-page .issue-preview-article .portal-article-head h1{font-size
 .issue-preview-excerpt figure{margin:28px auto;text-align:center}
 .issue-preview-excerpt figure img{display:block;width:auto;max-width:100%;height:auto;max-height:440px;object-fit:contain;margin:0 auto;border-radius:4px}
 .issue-preview-excerpt figcaption{font:12px/20px Figtree,"PingFang SC",sans-serif;color:#909399;margin-top:8px}
-.issue-preview-bottom{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:24px}
-.issue-preview-bottom>span{font-size:12px;line-height:20px;color:#909399}
-.issue-preview-bottom>.button{display:flex;align-items:center;gap:12px;border-radius:100px;padding:12px 20px;font-size:14px;line-height:24px;white-space:nowrap;background:#131921;color:white;text-decoration:none}
-.issue-preview-bottom .iconfont{font-size:20px}
+.issue-preview-bottom {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 72px; padding-top: 24px; box-sizing: border-box;
+}
+.issue-preview-bottom > .button {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 12px 24px; border: 1px solid #131921; border-radius: 100px;
+  background: #fff; color: #131921; text-decoration: none; white-space: nowrap;
+  font: 700 14px/20px Figtree,"PingFang SC",sans-serif;
+}
+.issue-preview-bottom > .button:hover { background: #eef0f4; }
+.issue-preview-bottom > .button:focus-visible { outline: 2px solid #2f54eb; outline-offset: 3px; }
 body.issue-preview-page .portal-toc{max-height:calc(100dvh - 130px);overflow:auto}
 body.issue-full-page .portal-reader.is-standalone{display:block;max-width:720px;margin-inline:auto}
 body.issue-full-page .portal-reader-content{padding-right:64px}
@@ -51,7 +59,7 @@ body.issue-full-page .portal-reader.is-standalone .portal-reader-content{width:1
  .issue-toc-slot{min-width:0;align-self:stretch}
  body.issue-preview-page .issue-toc-slot>.portal-toc{position:fixed;left:var(--toc-left);width:var(--toc-width);top:0;bottom:0;height:100dvh;max-height:100dvh;padding-block:24px;box-sizing:border-box;overflow-y:auto;background:#fafafa;z-index:20}
 }
-.issue-preview-bottom{justify-content:flex-end}
+
 
 /* 420px tray, 10px viewport inset and 20px content separation. */
 @media(min-width:761px){
