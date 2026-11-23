@@ -58,7 +58,32 @@
  }
  window.addEventListener('scroll',scheduleRails,{passive:true});
  window.addEventListener('resize',scheduleRails);
+ function guidePurchaseKey(){
+  const profile=window.clubSession?.profile;
+  return 'issue-purchase:dycy202609:'+(profile?.dsuId||profile?.email||profile?.nickname||'guest');
+ }
+ let lastLocalPurchase='';
+ function hasGuideAccess(){
+  const key=guidePurchaseKey();
+  return lastLocalPurchase===key||window.clubSession?.read(key,false)===true;
+ }
+ function refreshGuideAccess(){
+  const preview=document.body.classList.contains('issue-preview-page');
+  document.body.classList.toggle('issue-guide-locked',preview&&!hasGuideAccess());
+  const purchase=document.querySelector('body > .issue-purchase-entry [data-issue-purchase]');
+  if(purchase){
+   const owned=hasGuideAccess();
+   purchase.disabled=owned;
+   purchase.textContent=owned?'本期已购买':'购买本期：￥48.00';
+  }
+  window.syncReaderGuide?.();
+ }
+ window.addEventListener('club-session-change',refreshGuideAccess);
+ window.addEventListener('storage',event=>{
+  if(event.key===null||event.key?.startsWith('club-demo:issue-purchase:'))refreshGuideAccess();
+ });
  const api={
+ hasGuideAccess,
  isPreview:(a,params)=>a.context==='magazine'&&a.rid==='第一财经'&&params.get('full')!=='1',
  hasFull:a=>Boolean(fullArticle(a)),
  previewBody,
@@ -71,25 +96,30 @@
    <button type="button" class="button" data-issue-purchase aria-haspopup="dialog">购买本期：￥48.00</button>
    <a class="button dark" href="index.html#/magazine/${encodeURIComponent(a.rid)}?page=membership"><img src="assets/magazine-home/member-dock.svg" alt="" width="24" height="24">成为会员</a>
   </nav>
-  <dialog class="issue-purchase-dialog" aria-labelledby="issue-purchase-title">
-   <h2 id="issue-purchase-title">购买本期</h2>
-   <p>《${esc(a.resource)}》2026年09期 · 电子版</p>
-   <strong>¥48.00</strong>
-   <div class="issue-purchase-actions">
-    <form method="dialog"><button class="button">取消</button></form>
-    <a class="button dark" href="${esc(window.periodicalReference.source)}" target="_blank" rel="noopener noreferrer">前往龙源期刊网</a>
-   </div>
-  </dialog>${rows.map(item=>{const full=fullArticle(item);return `<article class="issue-preview-article" id="issue-preview-${item.index}" data-preview-index="${item.index}"><header class="portal-article-head"><span class="club-overline">${String(item.index+1).padStart(2,'0')} · ${esc(item.group)}</span><h1>${esc(item.title)}</h1><div class="portal-article-meta">${full?.authors?.length?`<span>${esc(full.authors.join(' / '))}</span>`:''}<span>${esc(a.resource)} · 2026年09期</span></div></header><div class="issue-preview-excerpt portal-prose">${previewBody(item)}</div><footer class="issue-preview-bottom"><a class="button" href="portal.html#/article/${item.index}?context=magazine&resource=${encodeURIComponent(a.rid)}&full=1">${full?'继续阅读全文':'查看试读'}</a></footer></article>`;}).join('')}</section></div>`;
+  <dialog class="issue-purchase-dialog"></dialog>${rows.map(item=>{const full=fullArticle(item);return `<article class="issue-preview-article" id="issue-preview-${item.index}" data-preview-index="${item.index}"><header class="portal-article-head"><span class="club-overline">${String(item.index+1).padStart(2,'0')} · ${esc(item.group)}</span><h1>${esc(item.title)}</h1><div class="portal-article-meta">${full?.authors?.length?`<span>${esc(full.authors.join(' / '))}</span>`:''}<span>${esc(a.resource)} · 2026年09期</span></div></header><div class="issue-preview-excerpt portal-prose">${previewBody(item)}</div><footer class="issue-preview-bottom"><a class="button" href="portal.html#/article/${item.index}?context=magazine&resource=${encodeURIComponent(a.rid)}&full=1">${full?'继续阅读全文':'查看试读'}</a></footer></article>`;}).join('')}</section></div>`;
  },
  mount(a,params){
   const preview=api.isPreview(a,params);if(params.get('full')==='1'&&a.rid==='第一财经'){try{localStorage.setItem('magazine-home:last-read',JSON.stringify({index:a.index}));}catch{}}document.body.classList.toggle('issue-preview-page',preview);document.body.classList.toggle('issue-full-page',a.context==='magazine'&&params.get('full')==='1');
-  window.syncReaderGuide?.();
+  refreshGuideAccess();
   if(api.directoryObserver){api.directoryObserver.disconnect();api.directoryObserver=null;}
   document.querySelector('body > .issue-purchase-entry')?.remove();
   if(!preview)return;
   document.body.append(document.querySelector('.issue-purchase-entry'));
   const purchaseDialog=document.querySelector('.issue-purchase-dialog');
-  document.querySelector('[data-issue-purchase]').addEventListener('click',()=>purchaseDialog.showModal());
+  const purchase=document.querySelector('[data-issue-purchase]');
+  window.magazineCheckout.mount(purchase,purchaseDialog,{
+   title:'购买《第一财经》本期',product:'单期电子版',price:48,
+   issue:'2026 年第 09 期',success:'模拟购买成功',
+   onPaid(){
+    lastLocalPurchase=guidePurchaseKey();
+    window.clubSession?.write(lastLocalPurchase,true);
+    refreshGuideAccess();
+   }
+  });
+  purchaseDialog.addEventListener('close',()=>{
+   if(hasGuideAccess())document.querySelector('[data-issue-mode=jev]')?.focus({preventScroll:true});
+  });
+  refreshGuideAccess();
   document.querySelectorAll('.issue-toc-slot .reader-toc-article').forEach(link=>{link.title=link.querySelector('strong')?.textContent||'';});
   const slot=document.querySelector('.issue-toc-slot');
   const fit=()=>{scheduleRails();if(!slot||!slot.isConnected)return;const box=slot.getBoundingClientRect();slot.style.setProperty('--toc-left',box.left+'px');slot.style.setProperty('--toc-width',box.width+'px');};

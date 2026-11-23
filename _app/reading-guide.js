@@ -100,12 +100,17 @@ function syncGuideSurface(){
  mount.classList.toggle('catalog-reading-guide',portal&&!preview);
  mount.classList.toggle('demo-reading-widget',!portal||preview);
  document.body.classList.toggle('catalog-guide-visible',portal&&!preview);
+ if(preview&&!window.clubIssuePreview?.hasGuideAccess()){
+  mount.hidden=true;mount.inert=true;
+  document.body.classList.remove('reading-guide-open');
+  return;
+ }
  applyGuidePreference(mount);
 }
 window.syncReaderGuide=syncGuideSurface;
 syncGuideSurface();
 const initializedGuides=new WeakSet();
-function initializeGuides(){document.querySelectorAll('.rd-periodical .pe-chat').forEach(chat=>{if(initializedGuides.has(chat))return;const root=chat.closest('.rd-periodical');initializedGuides.add(chat);applyGuidePreference(root);});}
+function initializeGuides(){document.querySelectorAll('.rd-periodical .pe-chat').forEach(chat=>{if(initializedGuides.has(chat))return;const root=chat.closest('.rd-periodical');initializedGuides.add(chat);if(root!==mount)applyGuidePreference(root);});}
 // Runs before painting freshly mounted routed, article, and shelf details.
 new MutationObserver(initializeGuides).observe(document.body,{childList:true,subtree:true});
 initializeGuides();

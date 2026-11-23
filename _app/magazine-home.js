@@ -52,61 +52,9 @@
  const follow=document.querySelector('#mh-follow');function syncFollow(){follow.setAttribute('aria-pressed',String(following));follow.textContent=following?'已关注':'关注';}syncFollow();
  let timer;function toast(text){const t=document.querySelector('.mh-toast');t.textContent=text;t.classList.add('visible');clearTimeout(timer);timer=setTimeout(()=>t.classList.remove('visible'),2200);}
  follow.addEventListener('click',()=>{following=!following;try{localStorage.setItem('magazine-home:follow:yimagazine',String(following));}catch{}syncFollow();toast(following?'已关注《第一财经》':'已取消关注');});
- const subscription=document.querySelector('#mh-subscribe-dialog');
- const paymentSteps=[...subscription.querySelectorAll('[data-payment-step]')];
- const paymentMethods={
-  scan:{label:'微信扫码',heading:'微信扫码支付',instructions:'扫码可查看演示说明。点击下方按钮模拟扫码支付完成。',confirm:'模拟扫码完成'},
-  alipay:{label:'支付宝',heading:'支付宝支付确认',instructions:'请核对订单金额 ¥188.00，再确认模拟支付。此步骤在当前页面完成。',confirm:'模拟支付宝支付'},
-  dsu:{label:'DSU 余额',heading:'DSU 余额支付',instructions:'可用演示余额 0 DSU，本单需 188 DSU。可模拟充值后继续支付。',confirm:'模拟充值 188 DSU'}
- };
- let payment='scan',demoBalance=0;
- function showPaymentStep(step){
-  paymentSteps.forEach(section=>{section.hidden=section.dataset.paymentStep!==step;});
-  const active=paymentSteps.find(section=>!section.hidden);
-  (active.querySelector('h3')||active.querySelector(':checked'))?.focus();
- }
- function showPaymentConfirmation(){
-  const method=paymentMethods[payment];
-  subscription.querySelector('[data-payment-heading]').textContent=method.heading;
-  subscription.querySelector('[data-payment-code]').hidden=payment!=='scan';
-  subscription.querySelector('[data-payment-instructions]').textContent=payment==='dsu'&&demoBalance?
-   '可用演示余额 188 DSU，本单将模拟扣除 188 DSU。':method.instructions;
-  subscription.querySelector('[data-payment-action=confirm]').textContent=payment==='dsu'&&demoBalance?
-   '确认模拟支付 188 DSU':method.confirm;
-  showPaymentStep('confirm');
- }
- document.querySelector('#mh-subscribe').addEventListener('click',()=>{
-  demoBalance=0;
-  subscription.querySelector('[value=scan]').checked=true;
-  paymentSteps.forEach(section=>{section.hidden=section.dataset.paymentStep!=='choose';});
-  subscription.showModal();
-  subscription.querySelector(':checked').focus();
- });
- subscription.addEventListener('click',event=>{
-  const action=event.target.closest('[data-payment-action]')?.dataset.paymentAction;
-  switch(action){
-   case 'next':
-    payment=subscription.querySelector('[name=mh-payment]:checked').value;
-    showPaymentConfirmation();
-    break;
-   case 'back':
-    showPaymentStep('choose');
-    break;
-   case 'confirm':
-    if(payment==='dsu'&&!demoBalance){
-     demoBalance=188;
-     showPaymentConfirmation();
-     break;
-    }
-    if(payment==='dsu')demoBalance=0;
-    subscription.querySelector('[data-payment-receipt]').textContent=payment==='dsu'?
-     'DSU 余额 · 188 DSU · 演示完成':paymentMethods[payment].label+' · ¥188.00 · 演示完成';
-    showPaymentStep('success');
-    break;
-   case 'done':
-    subscription.close();
-    break;
-  }
+ window.magazineCheckout.mount(document.querySelector('#mh-subscribe'),document.querySelector('#mh-subscribe-dialog'),{
+  title:'订阅《第一财经》全年', product:'全年电子版', price:188,
+  issue:'2026 年第 11 期至 2027 年第 10 期',success:'模拟订阅成功'
  });
  const dialog=document.querySelector('#mh-share-dialog'),input=document.querySelector('#mh-share-url');document.querySelector('#mh-share').addEventListener('click',async()=>{if(matchMedia('(max-width:760px)').matches&&navigator.share){try{await navigator.share({title:'第一财经 · 探索一个明亮的商业世界',url:location.href});return;}catch(error){if(error.name==='AbortError')return;}}input.value=location.href.split('#')[0];dialog.showModal();});
  document.querySelector('#mh-close-share').addEventListener('click',()=>dialog.close());document.querySelector('#mh-copy').addEventListener('click',async()=>{input.select();try{await navigator.clipboard.writeText(input.value);toast('链接已复制');}catch{toast('请复制已选中的链接');}});

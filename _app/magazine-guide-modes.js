@@ -47,7 +47,7 @@
   {title:'把数字、人物与事件放在一起读',text:'以《数字世界》《人物》《大事件》为一组，分别从数据、个体和事件寻找变化。这里是建议的阅读路径，不把推测当作原文结论。',ids:['dycy20260904','dycy20260905','dycy20260902']}
  ];
  function mount(chat){
-  if(mounted.has(chat)||!chat.querySelector('.pe-chat-messages'))return;
+  if(!window.clubIssuePreview?.hasGuideAccess()||mounted.has(chat)||!chat.querySelector('.pe-chat-messages'))return;
   const rows=articles();if(!rows.length)return;
   const original=chat.querySelector('.pe-chat-messages');
   const state={mode:'jev',minimum:50,rows,original:[...original.childNodes],placeholder:chat.querySelector('textarea').placeholder,controller:new AbortController()};mounted.set(chat,state);chat.dataset.issueGuide='true';
@@ -95,7 +95,7 @@
   }else messages.scrollTop=messages.scrollHeight;
  }
  // Capture only this experiment's form, before the original demo reply handler.
- window.addEventListener('submit',async event=>{const form=event.target.closest('.pe-chat-form'),chat=form?.closest('[data-issue-guide]');if(!chat)return;event.preventDefault();event.stopImmediatePropagation();const input=form.querySelector('textarea'),q=input.value.trim();if(!q)return;const state=mounted.get(chat),mode=state.mode;
+ window.addEventListener('submit',async event=>{const form=event.target.closest('.pe-chat-form'),chat=form?.closest('[data-issue-guide]');if(!chat)return;event.preventDefault();event.stopImmediatePropagation();if(!window.clubIssuePreview?.hasGuideAccess())return;const input=form.querySelector('textarea'),q=input.value.trim();if(!q)return;const state=mounted.get(chat),mode=state.mode;
   if(mode==='llm'&&!await qikanDSU.confirmAI(q))return;
   if(mounted.get(chat)!==state)return;
   addReply(chat,state,mode,q);input.value='';
@@ -109,7 +109,7 @@
  function sync(){
   const chat=document.querySelector('.reader-guide-widget .pe-chat');
   if(!chat)return;
-  if(document.body.classList.contains('issue-preview-page')){
+  if(document.body.classList.contains('issue-preview-page')&&window.clubIssuePreview?.hasGuideAccess()){
    mount(chat);
    return;
   }
