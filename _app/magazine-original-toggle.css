@@ -29,16 +29,24 @@
 @media(max-width:760px){.native-original-view{gap:8px;height:calc(100dvh - var(--native-top,108px) - 12px)}.native-original-heading h2{font-size:18px;line-height:26px}.native-original-heading p{font-size:12px}.native-original-controls{padding:4px 8px;min-height:44px}.native-original-controls button{width:36px;height:36px}}
 
 .portal-reader:has(.native-original-mode) ~ .issue-continuation { display: none; }
-.portal-article-actions { display: flex; justify-content: flex-end; margin-top: 24px; }
+.portal-article-actions {
+  display: flex; justify-content: center; align-items: center; gap: 16px;
+  margin: 32px 0 12px;
+}
+.portal-article-actions::before,.portal-article-actions::after {
+  content: ""; flex: 0 1 32px; height: 1px; background: currentColor; opacity: .14;
+}
 .portal-article-save {
-  display: inline-flex; align-items: center; gap: 8px; min-height: 44px;
-  padding: 8px 16px; border: 0; border-radius: 999px;
-  color: #fff; background: #131921; font: 600 14px/20px Figtree, sans-serif;
-  cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-width: 108px; min-height: 44px; padding: 9px 18px; border: 1px solid #ffffff20;
+  border-radius: 999px; color: #fff; background: #131921;
+  font: 500 13px/20px Figtree,"PingFang SC",sans-serif;
+  box-shadow: 0 2px 4px #13192112,0 6px 16px #13192112; cursor: pointer;
 }
 .portal-article-save:hover { background: #303943; }
-.portal-article-save .iconfont { font-size: 20px; }
-.night .portal-article-save { border: 1px solid #909399; }
+.portal-article-save:focus-visible { outline: 2px solid #2f54eb; outline-offset: 3px; }
+.portal-article-save .iconfont { font-size: 17px; }
+.night .portal-article-save { border-color: #909399; }
 
 /* Figma 673:3250. The scanned pages fill the stage between the floating rails. */
 .native-original-spread {
@@ -149,11 +157,23 @@ body:has(.native-original-spread[open]) { overflow: hidden; }
   background: transparent; border: 0; color: inherit; display: grid; gap: 8px;
   min-width: 0; padding: 0; text-align: center; cursor: pointer;
 }
-.original-thumbnail-pages { display: flex; justify-content: center; aspect-ratio: 28/19; }
-.original-thumbnail-pages figure { width: 50%; margin: 0; min-width: 0; }
+.original-thumbnail-pages {
+  position: relative; display: flex; align-items: flex-start; width: 100%;
+  box-shadow: 0 2px 4px #00000010,0 10px 24px #00000013;
+}
+.original-thumbnail-pages:has(> :only-child) { width: 50%; justify-self: center; }
+.original-thumbnail-pages figure { flex: 1 1 0; margin: 0; min-width: 0; }
 .original-thumbnail-pages .native-original-tiles { width: 100%; box-shadow: none; }
 .original-thumbnail-pages figcaption { display: none; }
-.original-thumbnail-directory button[aria-current=true] .original-thumbnail-pages { outline: 2px solid #2f54eb; outline-offset: 5px; }
+.original-thumbnail-pages:has(> :nth-child(2))::after {
+  content: ""; position: absolute; inset: 0 auto 0 50%; width: 18px;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg,transparent,#00000013 49%,#00000030 50%,#00000015 52%,transparent);
+  pointer-events: none;
+}
+.original-thumbnail-directory button[aria-current=true] .original-thumbnail-pages {
+  outline: 2px solid #2f54eb; outline-offset: 5px;
+}
 .native-original-spread.is-directory .original-spread-number { z-index: 2; }
 .original-rail .original-color-options button[aria-pressed=true] { border: 2px solid #2f54eb; }
 .original-rail button[data-original-color=green] { background: #f6ffed; }

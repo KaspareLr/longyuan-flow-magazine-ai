@@ -6,5 +6,43 @@
 .magazine-home .mh-main{padding:0}
 @media(max-width:360px){.mh-actions{flex-wrap:wrap}.mh-actions>.mh-primary{flex-basis:100%}.mh-actions>.mh-button:not(.mh-primary){flex:1}.mh-cover-stack{transform:scale(.9);height:254px;transform-origin:center}}
 
-.magazine-home #mh-subscribe-dialog strong{font-size:24px;color:#131921}
+
 .magazine-home .mh-actions{flex-wrap:wrap}
+
+.magazine-home #mh-subscribe-dialog {
+  width: min(540px, calc(100% - 32px)); max-height: calc(100dvh - 32px);
+  padding: clamp(18px, 4vw, 30px); overscroll-behavior: contain;
+  border: 1px solid #ffffffc9; background: #fbfbfc;
+}
+.magazine-home #mh-subscribe-dialog::backdrop { background: #13192135; }
+#mh-subscribe-dialog .mh-dialog-head { gap: 12px; }
+#mh-subscribe-dialog .mh-dialog-head h2 { font-size: clamp(17px, 4vw, 22px); }
+#mh-subscribe-dialog .mh-dialog-head button { width: 44px; height: 44px; color: inherit; }
+.mh-order-summary { margin-top: 20px; }
+.magazine-home #mh-subscribe-dialog .mh-order-summary strong {
+  font-size: clamp(18px, 5vw, 25px); white-space: nowrap;
+}
+.magazine-home #mh-subscribe-dialog p { margin: 12px 0; color: #575d66; }
+.magazine-home #mh-subscribe-dialog .mh-payment-notice { font-size: 12px; margin-bottom: 20px; }
+.mh-payment-methods { border: 0; padding: 0; margin: 0; display: grid; gap: 8px; }
+.mh-payment-methods legend { padding: 0; margin-bottom: 10px; font-weight: 600; }
+.magazine-home #mh-subscribe-dialog .mh-payment-methods label {
+  display: flex; align-items: center; gap: 10px; min-height: 46px; padding: 8px 12px;
+  border: 1px solid #dce0e6; border-radius: 12px; background: #fff; color: #131921;
+  font-size: 14px; cursor: pointer;
+}
+.mh-payment-methods label:has(input:checked) { box-shadow: inset 0 0 0 1px #131921; }
+.mh-payment-methods input { accent-color: #131921; width: 16px; height: 16px; }
+.mh-payment-actions { margin-top: 20px; }
+#mh-subscribe-dialog [data-payment-step] h3 { margin: 0 0 12px; font-size: 18px; }
+.mh-payment-code {
+  width: 136px; height: 136px; margin: 12px auto; color: #131921;
+  background: #fff; border: 1px solid #dce0e6; border-radius: 12px; overflow: hidden;
+}
+.mh-payment-code svg { display: block; width: 100%; }
+.mh-payment-success {
+  display: grid; place-items: center; width: 48px; height: 48px; margin: 0 auto 12px;
+  border-radius: 50%; background: #e6efe9; color: #24563e; font-size: 23px;
+}
+[data-payment-step=success] { text-align: center; }
+[data-payment-step=success] .mh-payment-actions { justify-content: center; }
