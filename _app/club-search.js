@@ -10,6 +10,15 @@
   }
   for(const [name,issue] of [['第一财经',window.periodicalReference],['南风窗',window.nanfcIssueReference],['十月少年文学',window.octoberIssueReference]]){if(!issue)continue;const known=all.find(r=>r.type==='杂志'&&r.title===name),source=issue.source?.match(/\/(20\d{2})\/(\d+)\.html/);if(source&&!all.some(r=>r.type==='杂志'&&r.journal===name&&r.year===source[1]&&r.issue===String(Number(source[2]))))all.push({type:'杂志',journal:name,title:name,year:source[1],issue:String(Number(source[2])),meta:`${source[1]}年第${Number(source[2])}期`,cover:known?.cover||(issue.cover?F().url(issue.cover):''),href:F().url('index.html#/magazine/'+encodeURIComponent(name)+'?claimed=0'),summary:issue.intro||''});}
   for(const [name,issue] of [['第一财经',window.periodicalReference],['南风窗',window.nanfcIssueReference],['十月少年文学',window.octoberIssueReference]])for(const r of all.filter(r=>r.type==='杂志'&&r.journal===name))r.sections=(issue?.groups||[]).map(g=>g.title);
+  // The current first-finance issue has a dedicated continuous preview.
+  const previewIssue=window.periodicalReference?.source?.match(/\/(20\d{2})\/(\d+)\.html/);
+  if(previewIssue){
+   for(const row of all){
+    if(row.type==='杂志'&&row.journal==='第一财经'&&row.year===previewIssue[1]&&row.issue===String(Number(previewIssue[2]))){
+     row.href=F().url('portal.html#/article/0?context=magazine&resource='+encodeURIComponent(row.journal));
+    }
+   }
+  }
   return all.sort((a,b)=>types.indexOf(a.type)-types.indexOf(b.type));
  }
  function base(){return items.filter(r=>state.type==='全部'||r.type===state.type);}
