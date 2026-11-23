@@ -522,9 +522,3 @@
 
 /* Page boundaries run vertically down the magazine fore-edge. */
 .oc-book-magazine .oc-book-pages{background:repeating-linear-gradient(90deg,#fff 0 1px,#dedbd4 1px 2px)}
-
-/* Finance contributor artwork uses the issue cover. */
-.finance-community .people-hero-media img { object-fit: contain; }
-.finance-community .people-guide-portrait img { object-fit: contain; }
-.finance-community .oc-profile-portrait img { object-fit: contain; }
-.finance-community .oc-feature { background-position: center; background-color: #131921; }
