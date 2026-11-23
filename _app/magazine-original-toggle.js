@@ -8,12 +8,19 @@
   const dialog=document.createElement('dialog');
   dialog.className='native-original-spread';
   dialog.setAttribute('aria-label','第一财经原貌阅读');
+  const colors={white:'白色',paper:'暖纸色',mist:'雾蓝色',charcoal:'炭灰色'};
+  const spreads=[[data.pages[0]],...data.pages.slice(1).filter((_,i)=>i%2===0).map((_,i)=>data.pages.slice(i*2+1,i*2+3))];
+  const thumbnails=spreads.map(pages=>{
+   const first=pages[0].page,last=pages.at(-1).page,label=first===1?'封面':`第 ${first}–${last} 页`;
+   return `<button type="button" data-original-jump="${first}" aria-label="${label}">
+    <span class="original-thumbnail-pages">${pageFigures({pages}).replaceAll('data-src=', 'src=')}</span><span>${label}</span></button>`;
+  }).join('');
   dialog.innerHTML=`
    <div class="original-rail original-rail-left" aria-label="向前翻页">
     <button data-original-step="-1" aria-label="上一原貌页">${artwork('5623e')}</button>
     <button data-original-edge="first" aria-label="跳到首页">${artwork('98641')}</button>
    </div>
-   <div class="native-original-pages original-spread-pages">${pageFigures(data)}</div>
+   <div class="native-original-pages original-spread-pages">${pageFigures(data)}<button class="original-open-cover" type="button" aria-label="打开杂志封面"></button></div>
    <div class="original-rail original-rail-right" aria-label="原貌阅读工具">
     <button data-original-directory aria-label="原貌目录" aria-expanded="false">${artwork('8d639')}</button>
     <div class="original-rail-group">
@@ -24,24 +31,46 @@
     <button data-original-more aria-label="更多阅读选项" aria-expanded="false">${artwork('cc41b')}</button>
    </div>
    <output class="original-spread-number" aria-live="polite"></output>
-   <div class="original-spread-panel" hidden>
-    <label>跳转原貌页 <select aria-label="跳转原貌页">${data.pages.map(p=>`<option value="${p.page}">${p.page}</option>`).join('')}</select></label>
+   <section class="original-thumbnail-directory" aria-label="原貌目录" hidden>${thumbnails}</section>
+   <div class="original-spread-panel" aria-label="背景色" hidden>
+    <strong>阅读背景</strong>
+    <div class="original-color-options">${Object.entries(colors).map(([color,label])=>`<button type="button" data-original-color="${color}" aria-pressed="${color==='white'}"><span></span>${label}</button>`).join('')}</div>
     <a href="${data.source}" target="_blank" rel="noopener">在官网查看原貌</a>
    </div>`;
   const stage=dialog.querySelector('.original-spread-pages');
   const figures=[...stage.querySelectorAll('figure')];
   const panel=dialog.querySelector('.original-spread-panel');
-  const select=panel.querySelector('select');
+  const directory=dialog.querySelector('.original-thumbnail-directory');
+  const coverButton=stage.querySelector('.original-open-cover');
   const breakpoint=matchMedia('(max-width:760px)');
+  const reduced=matchMedia('(prefers-reduced-motion: reduce)');
   let current=0;
   const spreadSize=()=>breakpoint.matches?1:2;
-  const lastStart=()=>Math.floor((figures.length-1)/spreadSize())*spreadSize();
+  const startAt=index=>index===0?0:1+Math.floor((index-1)/spreadSize())*spreadSize();
+  const lastStart=()=>startAt(figures.length-1);
+  function showPanel(mode){
+   directory.hidden=mode!=='directory';panel.hidden=mode!=='more';
+   dialog.querySelector('[data-original-directory]').setAttribute('aria-expanded',String(!directory.hidden));
+   dialog.querySelector('[data-original-more]').setAttribute('aria-expanded',String(!panel.hidden));
+   stage.inert=!directory.hidden;
+   dialog.classList.toggle('is-directory',!directory.hidden);
+  }
+  function enterCover(){
+   if(reduced.matches)return;
+   figures[0].animate([
+    {transform:'perspective(1100px) translateY(110dvh) rotateX(26deg) rotateY(-14deg)',opacity:.45},
+    {transform:'perspective(1100px) translateY(-2%) rotateY(-8deg)',opacity:1,offset:.82},
+    {transform:'perspective(1100px) rotateY(-5deg)',opacity:1}
+   ],{duration:650,easing:'cubic-bezier(.2,.75,.25,1)'});
+  }
   function draw(){
    if(!dialog.open)return;
-   const size=spreadSize(), start=Math.floor(current/size)*size;
+   const start=startAt(current),size=start===0?1:spreadSize();
+   dialog.classList.toggle('is-cover',start===0);coverButton.hidden=start!==0;
    const visible=data.pages.slice(start,start+size);
    const widthLimit=stage.clientWidth/size;
    const height=Math.min(stage.clientHeight,...visible.map(p=>widthLimit*p.height/p.width));
+   if(start===0){coverButton.style.width=height*visible[0].width/visible[0].height+"px";coverButton.style.height=height+"px";}
    figures.forEach((figure,index)=>{
     figure.hidden=index<start||index>=start+visible.length;
     if(figure.hidden)return;
@@ -52,40 +81,71 @@
    });
    const first=visible[0].page,last=visible.at(-1).page;
    dialog.querySelector('output').textContent=(first===last?first:first+'–'+last)+'  共 '+figures.length+' 页';
-   select.value=String(data.pages[current].page);
+   directory.querySelectorAll('[data-original-jump]').forEach(item=>item.setAttribute('aria-current',String(Number(item.dataset.originalJump)===data.pages[startAt(current)].page)));
    dialog.querySelectorAll('[data-original-step="-1"],[data-original-edge="first"]').forEach(button=>button.disabled=start===0);
    dialog.querySelectorAll('[data-original-step="1"],[data-original-edge="last"]').forEach(button=>button.disabled=start===lastStart());
   }
-  function go(index){current=Math.max(0,Math.min(lastStart(),index));draw();}
-  function step(direction){go(Math.floor(current/spreadSize())*spreadSize()+direction*spreadSize());}
+  function go(index){
+   const wasCover=current===0;
+   current=Math.max(0,Math.min(figures.length-1,index));draw();
+   if(wasCover&&current>0&&!reduced.matches){
+    stage.animate([{transform:'scale(.94)',opacity:.65},{transform:'scale(1)',opacity:1}],{duration:320,easing:'ease-out'});
+    const right=figures[startAt(current)+1];
+    if(!breakpoint.matches&&right&&!right.hidden)right.animate([
+     {transform:'perspective(1000px) rotateY(-68deg)',transformOrigin:'left center',opacity:.65},
+     {transform:'perspective(1000px) rotateY(0)',transformOrigin:'left center',opacity:1}
+    ],{duration:380,easing:'ease-out'});
+   }
+  }
+  function step(direction){
+   showPanel(null);
+   const start=startAt(current);
+   go(direction>0?(start===0?1:start+spreadSize()):start-spreadSize());
+  }
   const observer=new ResizeObserver(draw);
   dialog.addEventListener('click',event=>{
    const button=event.target.closest('button');
    if(!button)return;
    if(button.hasAttribute('data-original-close'))dialog.close();
+   if(button===coverButton)step(1);
    if(button.dataset.originalStep)step(Number(button.dataset.originalStep));
-   if(button.dataset.originalEdge)go(button.dataset.originalEdge==='first'?0:lastStart());
-   if(button.matches('[data-original-directory],[data-original-more]')){
-    const open=button.getAttribute('aria-expanded')!=='true';
-    dialog.querySelectorAll('[aria-expanded]').forEach(control=>control.setAttribute('aria-expanded',String(open&&control===button)));
-    panel.hidden=!open;
-    if(open)select.focus();
+   if(button.dataset.originalEdge){showPanel(null);go(button.dataset.originalEdge==='first'?0:lastStart());}
+   if(button.hasAttribute('data-original-directory'))showPanel(directory.hidden?'directory':null);
+   if(button.hasAttribute('data-original-more'))showPanel(panel.hidden?'more':null);
+   if(button.dataset.originalJump){
+    showPanel(null);go(data.pages.findIndex(page=>page.page===Number(button.dataset.originalJump)));
+    dialog.querySelector('[data-original-directory]').focus();
+   }
+   if(button.dataset.originalColor){
+    dialog.dataset.background=button.dataset.originalColor;
+    panel.querySelectorAll('button').forEach(option=>option.setAttribute('aria-pressed',String(option===button)));
    }
   });
   dialog.addEventListener('keydown',event=>{
-   if(event.target===select||!['ArrowLeft','ArrowRight'].includes(event.key))return;
+   if(event.key==='Escape'&&(!directory.hidden||!panel.hidden)){
+    event.preventDefault();
+    const control=dialog.querySelector('[aria-expanded="true"]');showPanel(null);control?.focus();
+   }
+   if(!['ArrowLeft','ArrowRight'].includes(event.key))return;
    event.preventDefault();step(event.key==='ArrowLeft'?-1:1);
   });
-  select.addEventListener('change',()=>{current=data.pages.findIndex(page=>page.page===Number(select.value));draw();});
   trigger.addEventListener('click',()=>{
    if(dialog.open)return;
+   const from=tools.getBoundingClientRect();
+   current=0;
    host.classList.add('native-spread-open');
    trigger.setAttribute('aria-pressed','true');
-   dialog.showModal();observer.observe(stage);draw();
+   dialog.showModal();observer.observe(stage);draw();enterCover();
+   if(!reduced.matches){
+    const rail=dialog.querySelector('.original-rail-right'),to=rail.getBoundingClientRect();
+    rail.animate([
+     {translate:`${from.x+from.width/2-to.x-to.width/2}px ${from.y+from.height/2-to.y-to.height/2}px`},
+     {translate:'0 0'}
+    ],{duration:450,easing:'cubic-bezier(.2,.75,.25,1)'});
+   }
   });
   dialog.addEventListener('close',()=>{
-   observer.disconnect();host.classList.remove('native-spread-open');trigger.setAttribute('aria-pressed','false');
-   panel.hidden=true;dialog.querySelectorAll('[aria-expanded]').forEach(button=>button.setAttribute('aria-expanded','false'));
+   observer.disconnect();host.classList.remove('native-spread-open');trigger.setAttribute('aria-pressed','false');showPanel(null);
   });
   states.set(host,dialog);tools.append(trigger);host.append(dialog);
  }
