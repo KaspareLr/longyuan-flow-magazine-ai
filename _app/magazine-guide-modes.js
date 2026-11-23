@@ -74,9 +74,9 @@
   }else{
    const matches=rank(state.rows,q,preset);
    reply.classList.add('issue-jev-reply');
-   reply.innerHTML=`<strong>本期推荐</strong>
+   reply.innerHTML=`<div class="issue-jev-reply-heading"><strong>本期推荐</strong>
     <label class="issue-salience-control"><span>最低显著度 <output class="issue-salience-value"></output></span>
-    <input type="range" min="0" max="100" step="1" title="演示评分的最低门槛，本轮最高为 100%" value="${state.minimum}" aria-label="最低相对显著度"></label>
+    <input type="range" min="0" max="100" step="1" title="演示评分的最低门槛，本轮最高为 100%" value="${state.minimum}" aria-label="最低相对显著度"></label></div>
     <div class="issue-results-count" role="status"></div><div class="issue-filter-results"></div>`;
    const slider=reply.querySelector('input');
    const update=()=>{
