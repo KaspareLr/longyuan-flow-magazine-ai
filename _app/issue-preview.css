@@ -132,24 +132,35 @@ body.issue-preview-page .portal-toc .reader-toc-article[aria-current]::before{co
 
 
 .issue-purchase-entry {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px 16px;
-  padding-bottom: 16px;
-  margin-bottom: 24px;
-  border-bottom: 1px solid #dcdfe6;
-  color: #606266;
+  position: fixed; left: 50%; bottom: max(20px, env(safe-area-inset-bottom));
+  transform: translateX(-50%); z-index: 1100;
+  display: flex; align-items: center; gap: 40px;
+  max-width: calc(100% - 24px); padding: 10px;
+  border: 1px solid #ffffffc9; border-radius: 100px; background: #ffffff6e;
+  backdrop-filter: blur(100px);
+  box-shadow: 0 7px 30px #252a3508, inset 0 1px #fff9;
 }
-.issue-purchase-entry .button, .issue-purchase-actions .button {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  padding: 8px 16px;
-  border-radius: 12px;
+.issue-purchase-entry .button {
+  display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;
+  padding: 14px 32px; border: 1px solid #e4e7ed; border-radius: 100px;
+  background: white; color: #131921;
+  font: 700 14px/20px Figtree,"PingFang SC",sans-serif; cursor: pointer;
 }
-.issue-purchase-entry .dark, .issue-purchase-actions .dark { background: #131921; color: #fff; }
+.issue-purchase-entry .dark {
+  padding: 12px 24px 12px 18px; border: 0; background: #131921; color: white;
+}
+.issue-purchase-entry .dark img { flex: none; }
+body.issue-preview-page > .club-site-footer { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
+@media(max-width:760px) {
+  .issue-purchase-entry { gap: 8px; bottom: max(12px, env(safe-area-inset-bottom)); }
+  .issue-purchase-entry .button { padding-inline: 12px; }
+  .issue-purchase-entry .dark { padding-inline: 10px 14px; }
+}
+.issue-purchase-actions .button {
+  display: inline-flex; align-items: center; min-height: 44px;
+  padding: 8px 16px; border-radius: 12px;
+}
+.issue-purchase-actions .dark { background: #131921; color: #fff; }
 .issue-purchase-dialog {
   box-sizing: border-box;
   width: min(420px, calc(100% - 32px));
@@ -165,3 +176,8 @@ body.issue-preview-page .portal-toc .reader-toc-article[aria-current]::before{co
 .issue-purchase-dialog strong { font-size: 24px; }
 .issue-purchase-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin-top: 20px; }
 .issue-purchase-actions form { margin: 0; }
+@media(min-width:761px) {
+  .issue-purchase-entry [data-issue-purchase] { width: 190px; justify-content: center; }
+  .issue-purchase-entry .dark { width: 126px; justify-content: center; }
+}
+body:not(.issue-preview-page) > .issue-purchase-entry { display: none; }

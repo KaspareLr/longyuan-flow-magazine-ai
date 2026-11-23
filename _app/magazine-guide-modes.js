@@ -12,10 +12,9 @@
   })).map((article,index)=>({...article,index}));
  }
  const presets=[
-  {question:'想看睡眠经济，先读哪几篇？',matches:[[19,100],[1,94],[32,49]]},
-  {question:'本期有哪些值得读的 AI 和科技文章？',matches:[[15,100],[25,89],[10,73],[4,57]]},
-  {question:'电影市场变化和新导演，有哪些报道？',matches:[[12,100],[23,85],[33,63]]},
-  {question:'想了解品牌经营和成本变化，读什么？',matches:[[16,100],[13,94],[14,70],[18,52]]}
+  {title:'睡眠经济',question:'想看睡眠经济，先读哪几篇？',matches:[[19,100],[1,94],[32,49]]},
+  {title:'AI 与科技',question:'本期有哪些值得读的 AI 和科技文章？',matches:[[15,100],[25,89],[10,73],[4,57]]},
+  {title:'电影市场',question:'电影市场变化和新导演，有哪些报道？',matches:[[12,100],[23,85],[33,63]]}
  ];
  const segmenter=new Intl.Segmenter('zh',{granularity:'word'});
  const questionTopic=/^(本期|哪些|什么|想看|想读|想了解|有|的|和|文章|报道|先读|值得|我|几篇|读)$/;
@@ -37,8 +36,8 @@
   const filtered=matches.filter(entry=>entry.score>=minimum);
   reply.querySelector('.issue-salience-value').value=minimum+'%';
   reply.querySelector('.issue-results-count').textContent='符合门槛 '+filtered.length+' / '+matches.length+' 篇';
-  reply.querySelector('.issue-filter-results').innerHTML=filtered.length?filtered.map(({article,score})=>
-   `<a class="issue-result" href="${link(article)}"><span><strong>${e(article.title)}</strong><small>${e(article.group)} · ${article.full?'全文 · 约 '+article.minutes+' 分钟':'摘要预览'}</small></span><span class="issue-salience-score" aria-label="相对显著度 ${score}%">${score}%</span>${icon('Arrow_Forward-2')}</a>`
+  reply.querySelector('.issue-filter-results').innerHTML=filtered.length?filtered.map(({article,score},index)=>
+   `<a class="issue-result" href="${link(article)}"><span class="issue-result-rank" aria-hidden="true">${String(index+1).padStart(2,'0')}</span><span class="issue-result-summary"><strong>${e(article.title)}</strong><span class="issue-result-meta"><small>${e(article.group)} · ${article.full?'全文 · 约 '+article.minutes+' 分钟':'摘要预览'}</small><span class="issue-salience-score" aria-label="相对显著度 ${score}%">${score}%</span></span></span></a>`
   ).join(''):`<p class="issue-empty">${matches.length?'没有文章达到这个门槛，试试调低最低显著度。':'本期没有找到明显相关的文章，试试更具体的关键词。'}</p>`;
  }
  function link(a){return '#issue-preview-'+a.index;}
@@ -51,12 +50,12 @@
   if(mounted.has(chat)||!chat.querySelector('.pe-chat-messages'))return;
   const rows=articles();if(!rows.length)return;
   const original=chat.querySelector('.pe-chat-messages');
-  const state={mode:'jev',minimum:60,rows,original:[...original.childNodes],placeholder:chat.querySelector('textarea').placeholder,controller:new AbortController()};mounted.set(chat,state);chat.dataset.issueGuide='true';
+  const state={mode:'jev',minimum:50,rows,original:[...original.childNodes],placeholder:chat.querySelector('textarea').placeholder,controller:new AbortController()};mounted.set(chat,state);chat.dataset.issueGuide='true';
   const tabs=document.createElement('div');tabs.className='issue-guide-tabs';tabs.setAttribute('role','group');tabs.setAttribute('aria-label','阅读向导功能');tabs.innerHTML='<button type="button" data-issue-mode="jev" aria-pressed="true" aria-label="JEV 快速筛选">JEV</button><button type="button" data-issue-mode="llm" aria-pressed="false" aria-label="LLM 主题归纳">LLM</button>';const heading=document.createElement('header');heading.className='issue-guide-heading';heading.innerHTML='<img class="issue-guide-avatar" src="assets/issue-guide-figma-avatar.png" width="44" height="44" alt=""><div class="issue-guide-identity"><h2>阅读向导</h2><p>找好文章，也帮你读得更舒服</p></div>';heading.append(tabs);chat.prepend(heading);
   const input=chat.querySelector('textarea');
   const setComposer=()=>{input.placeholder=state.mode==='llm'?'输入你想了解的本期主题':'问问本期值得读什么';input.setAttribute('aria-label',input.placeholder);};
   setComposer();
-  const messages=chat.querySelector('.pe-chat-messages');messages.innerHTML=`<section data-issue-panel="jev"><div class="pe-guide-welcome"><h3>这一期，先读什么？</h3><p>选一个问题，看本期哪些文章最相关。</p></div><div class="issue-preset-questions" role="group" aria-label="本期预设问题">${presets.map((preset,index)=>`<button type="button" data-issue-question="${index}"><span>${e(preset.question)}</span>${icon('Arrow_Forward-2')}</button>`).join('')}</div><div class="issue-guide-conversation" data-issue-log="jev" aria-live="polite"></div></section><section data-issue-panel="llm" hidden><div class="issue-engine">LLM · 主题阅读线索</div><div class="pe-guide-welcome"><h3>把这一期，连起来读</h3><p>从已收录内容中找到值得追问的主题。</p></div>${themes.map((t,n)=>`<article class="issue-theme"><span>TOPIC ${String(n+1).padStart(2,'0')}</span><h4>${e(t.title)}</h4><p>${e(t.text)}</p><div class="issue-theme-sources">${t.ids.map(id=>rows.find(a=>a.id===id)).filter(Boolean).map(a=>`<a href="${link(a)}">${icon('Book')}<span>${e(a.title)}</span></a>`).join('')}</div></article>`).join('')}<p class="issue-guide-note">主题为本地预设阅读建议，未调用实时LLM。</p><div class="issue-guide-conversation" data-issue-log="llm" aria-live="polite"></div></section>`;
+  const messages=chat.querySelector('.pe-chat-messages');messages.innerHTML=`<section data-issue-panel="jev"><div class="pe-guide-welcome"><h3>这一期，先读什么？</h3><p>选一个问题，看本期哪些文章最相关。</p></div><div class="issue-preset-questions" role="group" aria-label="本期预设问题">${presets.map((preset,index)=>`<button type="button" data-issue-question="${index}"><span><strong>${e(preset.title)}</strong><small>${e(preset.question)}</small></span><span class="issue-preset-arrow"><img src="assets/issue-guide/prompt-arrow.svg" alt=""></span></button>`).join('')}</div><div class="issue-guide-conversation" data-issue-log="jev" aria-live="polite"></div></section><section data-issue-panel="llm" hidden><div class="issue-engine">LLM · 主题阅读线索</div><div class="pe-guide-welcome"><h3>把这一期，连起来读</h3><p>从已收录内容中找到值得追问的主题。</p></div>${themes.map((t,n)=>`<article class="issue-theme"><span>TOPIC ${String(n+1).padStart(2,'0')}</span><h4>${e(t.title)}</h4><p>${e(t.text)}</p><div class="issue-theme-sources">${t.ids.map(id=>rows.find(a=>a.id===id)).filter(Boolean).map(a=>`<a href="${link(a)}">${icon('Book')}<span>${e(a.title)}</span></a>`).join('')}</div></article>`).join('')}<p class="issue-guide-note">主题为本地预设阅读建议，未调用实时LLM。</p><div class="issue-guide-conversation" data-issue-log="llm" aria-live="polite"></div></section>`;
   chat.addEventListener('click',event=>{const b=event.target.closest('button');if(!b)return;
    if(b.dataset.issueMode){state.mode=b.dataset.issueMode;setComposer();tabs.querySelectorAll('button').forEach(n=>n.setAttribute('aria-pressed',String(n===b)));chat.querySelectorAll('[data-issue-panel]').forEach(n=>n.hidden=n.dataset.issuePanel!==state.mode);}
    if(b.hasAttribute('data-issue-question')){
@@ -77,13 +76,13 @@
    reply.classList.add('issue-jev-reply');
    reply.innerHTML=`<strong>本期推荐</strong>
     <label class="issue-salience-control"><span>最低显著度 <output class="issue-salience-value"></output></span>
-    <input type="range" min="0" max="100" step="1" value="${state.minimum}" aria-label="最低相对显著度"></label>
-    <p class="issue-guide-note">演示评分 · 本轮最相关的文章为 100%</p>
+    <input type="range" min="0" max="100" step="1" title="演示评分的最低门槛，本轮最高为 100%" value="${state.minimum}" aria-label="最低相对显著度"></label>
     <div class="issue-results-count" role="status"></div><div class="issue-filter-results"></div>`;
    const slider=reply.querySelector('input');
    const update=()=>{
     const minimum=Number(slider.value);
     slider.setAttribute('aria-valuetext',minimum+'%');
+    slider.style.setProperty('--issue-salience',minimum+'%');
     showResults(reply,matches,minimum);
    };
    slider.addEventListener('input',()=>{update();state.minimum=Number(slider.value);});

@@ -67,11 +67,14 @@
   const list=a.list;const mk=i=>'#issue-preview-'+i;
   const rows=list.map((item,index)=>({...item,index,summary:item.excerpt||item.summary,resource:a.resource,group:item.group||'本期文章'}));
   const tocData={...a,list:list.map(item=>({...item,excerpt:'',summary:''}))};
-  return `<div class="portal-reader issue-preview-reader"><button type="button" class="issue-directory-toggle" aria-expanded="false" aria-controls="issue-preview-directory">本期目录 <span aria-hidden="true">☰</span></button><div class="issue-toc-slot" id="issue-preview-directory">${toc(tocData,mk).replace(/<img[^>]*>/g,'').replace(/aria-label="返回期刊详情"/,'aria-label="返回刊物首页"')}</div><section class="portal-reader-content issue-preview-stream" aria-label="本期文章预览"><div class="issue-purchase-entry"><span>${esc(a.resource)} · 2026年09期</span><button type="button" class="button dark" data-issue-purchase>购买本期</button></div>
+  return `<div class="portal-reader issue-preview-reader"><button type="button" class="issue-directory-toggle" aria-expanded="false" aria-controls="issue-preview-directory">本期目录 <span aria-hidden="true">☰</span></button><div class="issue-toc-slot" id="issue-preview-directory">${toc(tocData,mk).replace(/<img[^>]*>/g,'').replace(/aria-label="返回期刊详情"/,'aria-label="返回刊物首页"')}</div><section class="portal-reader-content issue-preview-stream" aria-label="本期文章预览"><nav class="issue-purchase-entry" aria-label="本期购买和会员">
+   <button type="button" class="button" data-issue-purchase aria-haspopup="dialog">购买本期：￥48.00</button>
+   <a class="button dark" href="index.html#/magazine/${encodeURIComponent(a.rid)}?page=membership"><img src="assets/magazine-home/member-dock.svg" alt="" width="24" height="24">成为会员</a>
+  </nav>
   <dialog class="issue-purchase-dialog" aria-labelledby="issue-purchase-title">
    <h2 id="issue-purchase-title">购买本期</h2>
    <p>《${esc(a.resource)}》2026年09期 · 电子版</p>
-   <strong>¥18.00</strong>
+   <strong>¥48.00</strong>
    <div class="issue-purchase-actions">
     <form method="dialog"><button class="button">取消</button></form>
     <a class="button dark" href="${esc(window.periodicalReference.source)}" target="_blank" rel="noopener noreferrer">前往龙源期刊网</a>
@@ -82,7 +85,9 @@
   const preview=api.isPreview(a,params);if(params.get('full')==='1'&&a.rid==='第一财经'){try{localStorage.setItem('magazine-home:last-read',JSON.stringify({index:a.index}));}catch{}}document.body.classList.toggle('issue-preview-page',preview);document.body.classList.toggle('issue-full-page',a.context==='magazine'&&params.get('full')==='1');
   window.syncReaderGuide?.();
   if(api.directoryObserver){api.directoryObserver.disconnect();api.directoryObserver=null;}
+  document.querySelector('body > .issue-purchase-entry')?.remove();
   if(!preview)return;
+  document.body.append(document.querySelector('.issue-purchase-entry'));
   const purchaseDialog=document.querySelector('.issue-purchase-dialog');
   document.querySelector('[data-issue-purchase]').addEventListener('click',()=>purchaseDialog.showModal());
   document.querySelectorAll('.issue-toc-slot .reader-toc-article').forEach(link=>{link.title=link.querySelector('strong')?.textContent||'';});
