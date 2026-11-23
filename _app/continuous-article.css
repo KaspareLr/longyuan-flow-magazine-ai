@@ -7,3 +7,5 @@ body.issue-full-page .portal-reader:not(.issue-continuation) .portal-reader-cont
 @keyframes continuous-arrive{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 @media(max-width:760px){body.issue-full-page .issue-continuation{margin-top:64px!important;padding-top:28px}body.issue-full-page .portal-reader:not(.issue-continuation) .portal-reader-content>.portal-reader-tools{top:auto!important;right:20px!important;bottom:calc(20px + env(safe-area-inset-bottom))!important;transform:none!important}body.issue-full-page .portal-reader:not(.issue-continuation) .portal-reader-content>.portal-reader-tools.reader-tools-open{right:50%!important;transform:translateX(50%)!important}}
 @media(prefers-reduced-motion:reduce){body.issue-full-page .issue-continuation{animation:none}}
+
+body.issue-full-page .portal-reader:has(.portal-article-end) + .issue-continuation { border-top: 0; }

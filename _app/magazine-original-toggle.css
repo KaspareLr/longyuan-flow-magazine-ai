@@ -30,23 +30,39 @@
 
 .portal-reader:has(.native-original-mode) ~ .issue-continuation { display: none; }
 .portal-article-actions {
-  display: flex; justify-content: center; align-items: center; gap: 16px;
-  margin: 32px 0 12px;
+  display: flex; flex-direction: column; align-items: center; gap: 40px;
+  padding-top: 48px; color: #131921;
+  font-family: Figtree,"PingFang SC",sans-serif;
 }
-.portal-article-actions::before,.portal-article-actions::after {
-  content: ""; flex: 0 1 32px; height: 1px; background: currentColor; opacity: .14;
+.portal-article-save-group {
+  display: grid; justify-items: center; gap: 10px; text-align: center;
 }
+.portal-article-save-label { font-size: 16px; font-weight: 500; line-height: 28px; }
+.portal-article-save-group p { margin: 0; font-size: 12px; line-height: 16px; color: #909399; }
 .portal-article-save {
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  min-width: 108px; min-height: 44px; padding: 9px 18px; border: 1px solid #ffffff20;
-  border-radius: 999px; color: #fff; background: #131921;
-  font: 500 13px/20px Figtree,"PingFang SC",sans-serif;
-  box-shadow: 0 2px 4px #13192112,0 6px 16px #13192112; cursor: pointer;
+  display: grid; place-items: center; width: 40px; height: 40px; padding: 7px;
+  border: 1px solid #ffffffc9; border-radius: 50%; background: #ffffffb3; color: #131921;
+  box-shadow: 0 7px 30px #252a3508,inset 0 1px #fff9;
+  backdrop-filter: blur(100px); cursor: pointer;
 }
-.portal-article-save:hover { background: #303943; }
+.portal-article-save:hover { background: white; }
 .portal-article-save:focus-visible { outline: 2px solid #2f54eb; outline-offset: 3px; }
-.portal-article-save .iconfont { font-size: 17px; }
-.night .portal-article-save { border-color: #909399; }
+.portal-article-save img { display: block; }
+.portal-article-save .iconfont { display: none; font-size: 24px; }
+.portal-article-save[aria-pressed=true] img { display: none; }
+.portal-article-save[aria-pressed=true] .iconfont { display: block; }
+.portal-article-end {
+  box-sizing: border-box; width: min(100%,680px); padding-block: 16px;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  border-block: 1px solid #13192126; color: #606266;
+  font-size: 12px; font-weight: 600; line-height: 16px;
+}
+.portal-article-end::before,.portal-article-end::after {
+  content: ""; width: 4px; height: 4px; background: currentColor;
+}
+.night .portal-article-actions,.night .portal-article-end { color: #e1e4ea; }
+.night .portal-article-save-group p { color: #b5bac3; }
+.night .portal-article-end { border-color: #ffffff30; }
 
 /* Figma 673:3250. The scanned pages fill the stage between the floating rails. */
 .native-original-spread {
