@@ -35,7 +35,32 @@
   const full=fullArticle(a);
   return full?blocks(a,issueExcerpt(full.blocks)):trialBody(a);
  }
- let railFrame=0;
+ let railFrame=0,directoryState=null;
+ function syncCurrentArticle(){
+  if(!directoryState)return;
+  const {articles,links,rail}=directoryState;
+  const readingLine=Math.max(145,Math.min(180,innerHeight*.23));
+  let index=0;
+  for(let i=1;i<articles.length;i++){
+   if(articles[i].getBoundingClientRect().top>readingLine)break;
+   index=i;
+  }
+  const current=links.get(String(index));
+  if(current!==directoryState.current){
+   directoryState.current?.removeAttribute('aria-current');
+   current?.setAttribute('aria-current','page');
+   directoryState.current=current;
+  }
+  if(!current||directoryState.revealed===current||!rail.clientHeight)return;
+  directoryState.revealed=current;
+  const box=rail.getBoundingClientRect(),row=current.getBoundingClientRect(),style=getComputedStyle(rail);
+  const top=box.top+(parseFloat(style.scrollPaddingTop)||16);
+  const bottom=box.top+rail.clientHeight-(parseFloat(style.scrollPaddingBottom)||16);
+  if(row.top<top||row.bottom>bottom){
+   rail.scrollTop+=(row.top+row.bottom-top-bottom)/2;
+  }
+ }
+
  const railOffsets=new WeakMap();
  function updateRails(){
   railFrame=0;
@@ -52,12 +77,13 @@
    railOffsets.set(rail,offset);
    rail.style.setProperty('--issue-rail-offset',offset+'px');
   }
+  syncCurrentArticle();
  }
  function scheduleRails(){
   if(!railFrame)railFrame=requestAnimationFrame(updateRails);
  }
  window.addEventListener('scroll',scheduleRails,{passive:true});
- window.addEventListener('resize',scheduleRails);
+ window.addEventListener('resize',()=>{if(directoryState)directoryState.revealed=null;scheduleRails();});
  function guidePurchaseKey(){
   const profile=window.clubSession?.profile;
   return 'issue-purchase:dycy202609:'+(profile?.dsuId||profile?.email||profile?.nickname||'guest');
@@ -99,6 +125,7 @@
   refreshGuideAccess();
   if(api.directoryObserver){api.directoryObserver.disconnect();api.directoryObserver=null;}
   document.querySelector('body > .issue-purchase-entry')?.remove();
+  directoryState=null;
   if(!preview)return;
   document.body.append(document.querySelector('.issue-purchase-entry'));
   const purchaseDialog=document.querySelector('.issue-purchase-dialog');
@@ -121,11 +148,17 @@
   if(slot){fit();api.directoryObserver=new ResizeObserver(fit);api.directoryObserver.observe(document.querySelector('.issue-preview-reader'));}
 
   const target=document.getElementById('issue-preview-'+a.index);if(target&&a.index>0)requestAnimationFrame(()=>target.scrollIntoView({block:'start',behavior:'instant'}));
-  let observer=new IntersectionObserver(entries=>{for(const en of entries)if(en.isIntersecting){const i=en.target.dataset.previewIndex;document.querySelectorAll('.issue-preview-reader .reader-toc-article').forEach(link=>{if(link.getAttribute('href')==='#issue-preview-'+i)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current');});}},{rootMargin:'-16% 0px -66% 0px'});
-  document.querySelectorAll('[data-preview-index]').forEach(n=>observer.observe(n));
+  const rail=slot?.querySelector('.portal-toc');
+  if(rail){
+   const links=new Map([...rail.querySelectorAll('a[href^="#issue-preview-"]')].map(link=>
+    [link.getAttribute('href').slice('#issue-preview-'.length),link]));
+   rail.querySelectorAll('[aria-current]').forEach(link=>link.removeAttribute('aria-current'));
+   directoryState={rail,links,articles:[...document.querySelectorAll('.issue-preview-article')],current:null,revealed:null};
+   scheduleRails();
+  }
  }
  };
  window.clubIssuePreview=api;
  window.addEventListener('keydown',event=>{if(event.key==='Escape'){document.querySelector('.issue-toc-slot')?.classList.remove('is-open');document.querySelector('.issue-directory-toggle')?.setAttribute('aria-expanded','false');}});
- window.addEventListener('click',event=>{const toggle=event.target.closest('.issue-directory-toggle');if(toggle){const open=toggle.getAttribute('aria-expanded')!=='true';toggle.setAttribute('aria-expanded',String(open));document.querySelector('.issue-toc-slot')?.classList.toggle('is-open',open);scheduleRails();return;}const link=event.target.closest('a[href^="#issue-preview-"]');if(!link||!document.body.classList.contains('issue-preview-page'))return;if(event.button||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;event.preventDefault();event.stopImmediatePropagation();document.querySelector('.issue-toc-slot')?.classList.remove('is-open');document.querySelector('.issue-directory-toggle')?.setAttribute('aria-expanded','false');document.querySelector(link.getAttribute('href'))?.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'instant':'smooth'});},true);
+ window.addEventListener('click',event=>{const toggle=event.target.closest('.issue-directory-toggle');if(toggle){const open=toggle.getAttribute('aria-expanded')!=='true';toggle.setAttribute('aria-expanded',String(open));document.querySelector('.issue-toc-slot')?.classList.toggle('is-open',open);if(directoryState)directoryState.revealed=null;scheduleRails();return;}const link=event.target.closest('a[href^="#issue-preview-"]');if(!link||!document.body.classList.contains('issue-preview-page'))return;if(event.button||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;event.preventDefault();event.stopImmediatePropagation();document.querySelector('.issue-toc-slot')?.classList.remove('is-open');document.querySelector('.issue-directory-toggle')?.setAttribute('aria-expanded','false');document.querySelector(link.getAttribute('href'))?.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'instant':'smooth'});},true);
 })();
