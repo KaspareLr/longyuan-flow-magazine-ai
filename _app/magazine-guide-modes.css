@@ -28,3 +28,24 @@ body.issue-preview-page .pe-chat[data-issue-guide] .issue-result:last-child{bord
 body.issue-preview-page .pe-chat[data-issue-guide] .issue-result strong{font-size:16px;line-height:26px;font-weight:600}
 body.issue-preview-page .pe-chat[data-issue-guide] .issue-result small{font-size:12px;line-height:20px;color:#909399;margin-top:8px}
 body.issue-preview-page .pe-chat[data-issue-guide] .issue-result:hover{background:#f5f7fa}
+
+.issue-preset-questions { display: grid; gap: 8px; }
+.issue-preset-questions button {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  min-height: 44px; width: 100%; padding: 10px 12px; text-align: left;
+  border: 1px solid #e4e7ed; border-radius: 12px; background: #fff;
+  color: #131921; font: 500 13px/22px Figtree,"PingFang SC",sans-serif; cursor: pointer;
+}
+.issue-preset-questions button:hover { background: #f5f7fa; }
+.issue-preset-questions .iconfont { flex: none; }
+.issue-jev-reply .issue-filter-results { margin-top: 0 !important; }
+.issue-jev-reply .issue-result { text-decoration: none; margin-top: 0; }
+.issue-jev-reply .issue-result > .issue-salience-score {
+  flex: none; min-width: 42px; text-align: right; color: #39435a;
+  font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums;
+}
+.issue-salience-control { display: block; margin-top: 12px; color: #454c58; font-size: 13px; }
+.issue-salience-control > span { display: flex; justify-content: space-between; gap: 8px; }
+.issue-salience-value { font-weight: 600; font-variant-numeric: tabular-nums; }
+.issue-salience-control input { display: block; width: 100%; height: 36px; margin: 0; accent-color: #131921; cursor: pointer; }
+.issue-salience-control input:focus-visible,.issue-preset-questions button:focus-visible { outline: 2px solid #2f54eb; outline-offset: 2px; }
