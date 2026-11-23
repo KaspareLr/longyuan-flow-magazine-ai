@@ -178,6 +178,7 @@ body:has(.native-original-spread[open]) { overflow: hidden; }
   background: transparent; cursor: pointer; touch-action: manipulation;
 }
 .original-page-turn:focus-visible { outline: 2px solid #2f54eb; outline-offset: -3px; }
+.original-spread-pages:has(> .original-spread-turn) { perspective: max(1600px, 600dvh); }
 .original-spread-turn {
   position: absolute; inset: 0; transform-style: preserve-3d; pointer-events: none;
 }
@@ -188,11 +189,11 @@ body:has(.native-original-spread[open]) { overflow: hidden; }
   transform-origin: left center; transform-style: preserve-3d;
 }
 .original-paper-face {
-  position: absolute; inset: 0 -.45px 0 0; overflow: hidden;
+  position: absolute; inset: 0 -.75px 0 0; overflow: hidden; background: #fff;
   backface-visibility: hidden;
 }
 .original-paper-back { transform: rotateY(180deg); }
-.original-paper-face .native-original-tiles { position: absolute; top: 0; }
+.original-paper-face .native-original-tiles { position: absolute; top: 0; max-width: none; }
 .original-paper-shade {
   position: absolute; inset: 0; background: #17131a; pointer-events: none;
 }

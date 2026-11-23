@@ -162,8 +162,8 @@
      const face=document.createElement('div');
      face.className=reverse?'original-paper-face original-paper-back':'original-paper-face';
      const texture=page.cloneNode(true);
-     texture.style.width=(count*100)+'%';
-     texture.style.left=(-100*(reverse?count-1-index:index))+'%';
+     texture.style.width=width+'px';
+     texture.style.left=(-width/count*(reverse?count-1-index:index))+'px';
      const shade=document.createElement('span');
      shade.className='original-paper-shade';
      face.append(texture,shade);strip.append(face);
