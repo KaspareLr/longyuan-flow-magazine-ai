@@ -2,12 +2,100 @@
 (()=>{
  const base=new URL('.',document.currentScript.src),states=new WeakMap();
  const icon=n=>`<i class="iconfont club-local-icon icon-${n}" aria-hidden="true"></i>`;
+ const pageFigures=data=>data.pages.map(p=>`<figure data-native-page="${p.page}"><div class="native-original-tiles" role="img" aria-label="原貌试读第${p.page}页" style="aspect-ratio:${p.width}/${p.height};grid-template-columns:${p.columns.map(x=>x+'fr').join(' ')};grid-template-rows:${p.rows.map(x=>x+'fr').join(' ')}">${p.tiles.map(t=>`<img data-src="${new URL(t.src,base).href}" alt="" aria-hidden="true" width="${t.width}" height="${t.height}" style="grid-column:${t.col+1};grid-row:${t.row+1}" loading="lazy">`).join('')}</div><figcaption>${String(p.page).padStart(2,'0')} / ${data.pages.length}</figcaption></figure>`).join('');
+ const artwork=name=>`<img src="assets/original-reader-ui/${name}.svg" alt="">`;
+ function mountSpread(host,tools,data,trigger){
+  const dialog=document.createElement('dialog');
+  dialog.className='native-original-spread';
+  dialog.setAttribute('aria-label','第一财经原貌阅读');
+  dialog.innerHTML=`
+   <div class="original-rail original-rail-left" aria-label="向前翻页">
+    <button data-original-step="-1" aria-label="上一原貌页">${artwork('5623e')}</button>
+    <button data-original-edge="first" aria-label="跳到首页">${artwork('98641')}</button>
+   </div>
+   <div class="native-original-pages original-spread-pages">${pageFigures(data)}</div>
+   <div class="original-rail original-rail-right" aria-label="原貌阅读工具">
+    <button data-original-directory aria-label="原貌目录" aria-expanded="false">${artwork('8d639')}</button>
+    <div class="original-rail-group">
+     <button data-original-step="1" aria-label="下一原貌页">${artwork('5623e')}</button>
+     <button data-original-edge="last" aria-label="跳到末页">${artwork('0fb05')}</button>
+    </div>
+    <button class="original-mode-active" data-original-close aria-label="切换为文本阅读">${artwork('085fb')}</button>
+    <button data-original-more aria-label="更多阅读选项" aria-expanded="false">${artwork('cc41b')}</button>
+   </div>
+   <output class="original-spread-number" aria-live="polite"></output>
+   <div class="original-spread-panel" hidden>
+    <label>跳转原貌页 <select aria-label="跳转原貌页">${data.pages.map(p=>`<option value="${p.page}">${p.page}</option>`).join('')}</select></label>
+    <a href="${data.source}" target="_blank" rel="noopener">在官网查看原貌</a>
+   </div>`;
+  const stage=dialog.querySelector('.original-spread-pages');
+  const figures=[...stage.querySelectorAll('figure')];
+  const panel=dialog.querySelector('.original-spread-panel');
+  const select=panel.querySelector('select');
+  const breakpoint=matchMedia('(max-width:760px)');
+  let current=0;
+  const spreadSize=()=>breakpoint.matches?1:2;
+  const lastStart=()=>Math.floor((figures.length-1)/spreadSize())*spreadSize();
+  function draw(){
+   if(!dialog.open)return;
+   const size=spreadSize(), start=Math.floor(current/size)*size;
+   const visible=data.pages.slice(start,start+size);
+   const widthLimit=stage.clientWidth/size;
+   const height=Math.min(stage.clientHeight,...visible.map(p=>widthLimit*p.height/p.width));
+   figures.forEach((figure,index)=>{
+    figure.hidden=index<start||index>=start+visible.length;
+    if(figure.hidden)return;
+    const page=data.pages[index], tiles=figure.querySelector('.native-original-tiles');
+    tiles.style.width=height*page.width/page.height+'px';
+    tiles.style.height=height+'px';
+    tiles.querySelectorAll('img[data-src]').forEach(img=>{img.src=img.dataset.src;delete img.dataset.src;});
+   });
+   const first=visible[0].page,last=visible.at(-1).page;
+   dialog.querySelector('output').textContent=(first===last?first:first+'–'+last)+'  共 '+figures.length+' 页';
+   select.value=String(data.pages[current].page);
+   dialog.querySelectorAll('[data-original-step="-1"],[data-original-edge="first"]').forEach(button=>button.disabled=start===0);
+   dialog.querySelectorAll('[data-original-step="1"],[data-original-edge="last"]').forEach(button=>button.disabled=start===lastStart());
+  }
+  function go(index){current=Math.max(0,Math.min(lastStart(),index));draw();}
+  function step(direction){go(Math.floor(current/spreadSize())*spreadSize()+direction*spreadSize());}
+  const observer=new ResizeObserver(draw);
+  dialog.addEventListener('click',event=>{
+   const button=event.target.closest('button');
+   if(!button)return;
+   if(button.hasAttribute('data-original-close'))dialog.close();
+   if(button.dataset.originalStep)step(Number(button.dataset.originalStep));
+   if(button.dataset.originalEdge)go(button.dataset.originalEdge==='first'?0:lastStart());
+   if(button.matches('[data-original-directory],[data-original-more]')){
+    const open=button.getAttribute('aria-expanded')!=='true';
+    dialog.querySelectorAll('[aria-expanded]').forEach(control=>control.setAttribute('aria-expanded',String(open&&control===button)));
+    panel.hidden=!open;
+    if(open)select.focus();
+   }
+  });
+  dialog.addEventListener('keydown',event=>{
+   if(event.target===select||!['ArrowLeft','ArrowRight'].includes(event.key))return;
+   event.preventDefault();step(event.key==='ArrowLeft'?-1:1);
+  });
+  select.addEventListener('change',()=>{current=data.pages.findIndex(page=>page.page===Number(select.value));draw();});
+  trigger.addEventListener('click',()=>{
+   if(dialog.open)return;
+   host.classList.add('native-spread-open');
+   trigger.setAttribute('aria-pressed','true');
+   dialog.showModal();observer.observe(stage);draw();
+  });
+  dialog.addEventListener('close',()=>{
+   observer.disconnect();host.classList.remove('native-spread-open');trigger.setAttribute('aria-pressed','false');
+   panel.hidden=true;dialog.querySelectorAll('[aria-expanded]').forEach(button=>button.setAttribute('aria-expanded','false'));
+  });
+  states.set(host,dialog);tools.append(trigger);host.append(dialog);
+ }
  function mount(host,tools){
   if(!host||!tools||states.has(host))return;
   const data=window.magazineOriginalData;if(!data?.pages?.length)return;
   const button=document.createElement('button');button.type='button';button.className='native-original-toggle rd-button pe-icon-button';button.setAttribute('aria-label','切换为原貌阅读');button.setAttribute('title','原貌阅读');button.setAttribute('aria-pressed','false');button.innerHTML=icon('Book')+'<span class="pe-tooltip">原貌阅读</span>';
+  if(tools.matches('.portal-reader-tools')){mountSpread(host,tools,data,button);return;}
   const view=document.createElement('section');view.className='native-original-view';view.hidden=true;view.setAttribute('aria-label','第一财经原貌试读');
-  view.innerHTML=`<header class="native-original-heading"><div><span class="pe-kicker">ORIGINAL EDITION</span><h2>第一财经 · 原貌阅读</h2><p>2026年09期 · 已收录11页试读</p></div></header><div class="native-original-controls"><button type="button" data-native-prev aria-label="上一原貌页">${icon('Arrow_Forward-2')}</button><label>原貌页 <select aria-label="跳转原貌页">${data.pages.map(p=>`<option value="${p.page}">${String(p.page).padStart(2,'0')}</option>`).join('')}</select> / ${data.pages.length}</label><button type="button" data-native-next aria-label="下一原貌页">${icon('Arrow_Forward-2')}</button></div><div class="native-original-pages">${data.pages.map(p=>`<figure data-native-page="${p.page}"><div class="native-original-tiles" role="img" aria-label="原貌试读第${p.page}页" style="aspect-ratio:${p.width}/${p.height};grid-template-columns:${p.columns.map(x=>x+'fr').join(' ')};grid-template-rows:${p.rows.map(x=>x+'fr').join(' ')}">${p.tiles.map(t=>`<img data-src="${new URL(t.src,base).href}" alt="" aria-hidden="true" width="${t.width}" height="${t.height}" style="grid-column:${t.col+1};grid-row:${t.row+1}" loading="lazy">`).join('')}</div><figcaption>${String(p.page).padStart(2,'0')} / ${data.pages.length}</figcaption></figure>`).join('')}</div><p class="native-original-end">已读完本地收录的试读部分。<a href="${data.source}" target="_blank" rel="noopener">前往官方继续阅读</a></p>`;
+  view.innerHTML=`<header class="native-original-heading"><div><span class="pe-kicker">ORIGINAL EDITION</span><h2>第一财经 · 原貌阅读</h2><p>2026年09期 · 已收录11页试读</p></div></header><div class="native-original-controls"><button type="button" data-native-prev aria-label="上一原貌页">${icon('Arrow_Forward-2')}</button><label>原貌页 <select aria-label="跳转原貌页">${data.pages.map(p=>`<option value="${p.page}">${String(p.page).padStart(2,'0')}</option>`).join('')}</select> / ${data.pages.length}</label><button type="button" data-native-next aria-label="下一原貌页">${icon('Arrow_Forward-2')}</button></div><div class="native-original-pages">${pageFigures(data)}</div><p class="native-original-end">已读完本地收录的试读部分。<a href="${data.source}" target="_blank" rel="noopener">前往官方继续阅读</a></p>`;
   const state={button,view,original:false,page:1,textY:0,originalY:0};states.set(host,state);tools.append(button);host.append(view);
   function fit(){
    if(!state.original)return;
