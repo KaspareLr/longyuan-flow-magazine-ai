@@ -150,6 +150,39 @@
    const [left,right=0]=pages.map(page=>height*page.width/page.height);
    return {height,left,right,spine:(stage.clientWidth+left-right)/2,top:(stage.clientHeight-height)/2};
   }
+  function curlLeaf(leaf,front,back,width,options){
+   const count=16;
+   const samples=[0,.12,.26,.42,.58,.74,.88,1];
+   const animations=[];
+   for(let index=0;index<count;index++){
+    const strip=document.createElement('div');
+    strip.className='original-paper-strip';
+    strip.style.width=(100/count)+'%';
+    for(const [page,reverse] of [[front,false],[back,true]]){
+     const face=document.createElement('div');
+     face.className=reverse?'original-paper-face original-paper-back':'original-paper-face';
+     const texture=page.cloneNode(true);
+     texture.style.width=(count*100)+'%';
+     texture.style.left=(-100*(reverse?count-1-index:index))+'%';
+     const shade=document.createElement('span');
+     shade.className='original-paper-shade';
+     face.append(texture,shade);strip.append(face);
+     animations.push(shade.animate(samples.map(offset=>({
+      offset,opacity:Math.sin(Math.PI*offset)**2*(.06+.23*(index/count))*(reverse ? .7 : 1)
+     })),options));
+    }
+    leaf.append(strip);
+    animations.push(strip.animate(samples.map(offset=>{
+     const bend=1.2*Math.sin(Math.PI*offset)**1.6;
+     const position=index/count;
+     const angle=bend*position;
+     const x=bend>1e-5?width*Math.sin(angle)/bend:width*position;
+     const z=bend>1e-5?width*(1-Math.cos(angle))/bend:0;
+     return {offset,transform:`translate3d(${x}px,0,${z}px) rotateY(${-angle}rad)`};
+    }),options));
+   }
+   return animations;
+  }
   function turnSpread(from,to){
    const early=Math.min(from,to),late=Math.max(from,to);
    const a=spreadGeometry(early),b=spreadGeometry(late);
@@ -165,16 +198,24 @@
    const leaf=document.createElement('div');
    leaf.className='original-turning-leaf';
    const front=copyPage(early+1),back=copyPage(late);
-   back.classList.add('original-leaf-back');
-   leaf.append(front,back);
    place(leaf,a.spine,a.top,a.right,a.height);
    stage.append(scene);
-   const duration=560;
+   const duration=640;
+   const options={duration,easing:'cubic-bezier(.32,.12,.24,1)',fill:'both'};
    const animation=leaf.animate([
     {transform:'translate3d(0,0,0) rotateY(0deg) scale(1)'},
     {transform:`translate3d(${b.spine-a.spine}px,${b.top-a.top}px,0) rotateY(-180deg) scale(${b.left/a.right},${b.height/a.height})`}
-   ],{duration,easing:'cubic-bezier(.32,.12,.24,1)',fill:'both'});
-   void finishTurn(scene,[animation],to,to<from,duration);
+   ],options);
+   const curves=curlLeaf(leaf,front,back,a.right,options);
+   const shadow=document.createElement('div');
+   shadow.className='original-paper-cast-shadow';
+   place(shadow,a.spine-a.right,a.top,2*a.right,a.height);
+   const cast=shadow.animate([
+    {opacity:0,transform:'translateX(15%)'},
+    {opacity:.28,transform:'translateX(0)'},
+    {opacity:0,transform:'translateX(-15%)'}
+   ],options);
+   void finishTurn(scene,[animation,...curves,cast],to,to<from,duration);
   }
   async function finishTurn(scene,animations,next,reverse,duration){
    const focusDirection=document.activeElement?.classList.contains('original-page-turn')?

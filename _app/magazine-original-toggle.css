@@ -182,3 +182,21 @@ body:has(.native-original-spread[open]) { overflow: hidden; }
   position: absolute; inset: 0; transform-style: preserve-3d; pointer-events: none;
 }
 .original-spread-turn .original-turning-leaf { inset: auto; }
+
+.original-paper-strip {
+  position: absolute; left: 0; top: 0; bottom: 0;
+  transform-origin: left center; transform-style: preserve-3d;
+}
+.original-paper-face {
+  position: absolute; inset: 0 -.45px 0 0; overflow: hidden;
+  backface-visibility: hidden;
+}
+.original-paper-back { transform: rotateY(180deg); }
+.original-paper-face .native-original-tiles { position: absolute; top: 0; }
+.original-paper-shade {
+  position: absolute; inset: 0; background: #17131a; pointer-events: none;
+}
+.original-paper-cast-shadow {
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, #17131a 0%, #17131a55 42%, transparent 72%);
+}
