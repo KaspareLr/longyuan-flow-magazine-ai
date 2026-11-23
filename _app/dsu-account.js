@@ -71,18 +71,31 @@
     window.dispatchEvent(new Event('dsu-change'));
   }
 
+  function applyCharge(state, type, description, amount, article) {
+    if (article && unlocked(state, article)) return;
+    const quota = Math.min(remaining(state), amount);
+    const wallet = amount - quota;
+    if (wallet && state.walletEnabled === false) throw Error('充值余额扣费已关闭，可在 DSU 账户开启。');
+    if (wallet > state.balance) throw Error('可用 DSU 不足，请充值或开通会员。');
+    if (wallet > walletAvailable(state)) throw Error('已达到充值余额的每月消费上限，可在 DSU 账户调整。');
+    if (quota) state.subscription.used += quota;
+    state.balance -= wallet;
+    state.records.unshift({type, description, amount, quota, wallet, article, time:Date.now()});
+  }
+
   function charge(type, description, amount, article) {
-    return change(state => {
-      if (article && unlocked(state, article)) return;
-      const quota = Math.min(remaining(state), amount);
-      const wallet = amount - quota;
-      if (wallet && state.walletEnabled === false) throw Error('充值余额扣费已关闭，可在 DSU 账户开启。');
-      if (wallet > state.balance) throw Error('可用 DSU 不足，请充值或开通会员。');
-      if (wallet > walletAvailable(state)) throw Error('已达到充值余额的每月消费上限，可在 DSU 账户调整。');
-      if (quota) state.subscription.used += quota;
-      state.balance -= wallet;
-      state.records.unshift({type, description, amount, quota, wallet, article, time:Date.now()});
-    });
+    return change(state => applyCharge(state,type,description,amount,article));
+  }
+
+  const repeatableIssueArticle = article => /^dycy202609\d{2}$/.test(article);
+  const pageUnlocks=new Map();
+  function unlockIssueArticle(owner,article,title) {
+    if(!owner||identity(profile())!==owner)throw Error('账号已切换，请重试。');
+    const state=structuredClone(load(owner));
+    applyCharge(state,'article',title,articlePrice,article);
+    const articles=pageUnlocks.get(owner)||new Set();
+    articles.add(article);
+    pageUnlocks.set(owner,articles);
   }
 
   function loadSample(state) {
@@ -258,9 +271,10 @@
 
   function purchaseArticle(button) {
     if (!signedIn()) return Promise.resolve(false);
+    const article=button.dataset.dsuArticle,title=button.dataset.title,owner=identity(profile());
     return confirm({
-      article:button.dataset.title, label:`支付 ${articlePrice} DSU`,
-      submit:() => charge('article', button.dataset.title, articlePrice, button.dataset.dsuArticle)
+      article:title,label:`支付 ${articlePrice} DSU`,
+      submit:()=>repeatableIssueArticle(article)?unlockIssueArticle(owner,article,title):charge('article',title,articlePrice,article)
     });
   }
 
@@ -400,14 +414,18 @@
   window.qikanDSU = {
     page(a) { return window.qikanArticleRoutes?.[articleId(a)]; },
     panel, confirmAI, articleId, articlePrice, aiPrice,
-    canRead(a) { const id = identity(profile()); return !!id && unlocked(load(id), articleId(a)); },
+    canRead(a) {
+      const owner=identity(profile()),article=articleId(a);
+      if(!owner)return false;
+      return repeatableIssueArticle(article)?Boolean(pageUnlocks.get(owner)?.has(article)):unlocked(load(owner),article);
+    },
     gate(a, preview) {
       return `<div class="dsu-gate">
         <div class="portal-prose dsu-reading-excerpt">${preview}</div>
         <section class="dsu-reading-unlock" aria-label="全文解锁">
           <div class="dsu-reading-divider" aria-hidden="true"><i class="iconfont icon-Lock"></i></div>
           <h2>解锁全文</h2>
-          <p>解锁后可以随时回来阅读。</p>
+          <p>${repeatableIssueArticle(articleId(a))?'解锁后可在当前页面会话阅读。':'解锁后可以随时回来阅读。'}</p>
           <button type="button" class="dsu-button dsu-reading-button" data-dsu-article="${esc(articleId(a))}" data-title="${esc(a.title)}">用 ${articlePrice} DSU 解锁全文</button>
         </section>
       </div>`;
