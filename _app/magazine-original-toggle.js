@@ -20,7 +20,7 @@
      <button data-original-step="1" aria-label="下一原貌页">${artwork('5623e')}</button>
      <button data-original-edge="last" aria-label="跳到末页">${artwork('0fb05')}</button>
     </div>
-    <button class="original-mode-active" data-original-close aria-label="切换为文本阅读">${artwork('085fb')}</button>
+    <button class="original-mode-active" data-original-close aria-label="切换为文本阅读">${icon('double')}</button>
     <button data-original-more aria-label="更多阅读选项" aria-expanded="false">${artwork('cc41b')}</button>
    </div>
    <output class="original-spread-number" aria-live="polite"></output>
@@ -92,7 +92,7 @@
  function mount(host,tools){
   if(!host||!tools||states.has(host))return;
   const data=window.magazineOriginalData;if(!data?.pages?.length)return;
-  const button=document.createElement('button');button.type='button';button.className='native-original-toggle rd-button pe-icon-button';button.setAttribute('aria-label','切换为原貌阅读');button.setAttribute('title','原貌阅读');button.setAttribute('aria-pressed','false');button.innerHTML=icon('Book')+'<span class="pe-tooltip">原貌阅读</span>';
+  const button=document.createElement('button');button.type='button';button.className='native-original-toggle rd-button pe-icon-button';button.setAttribute('aria-label','切换为原貌阅读');button.setAttribute('title','原貌阅读');button.setAttribute('aria-pressed','false');button.innerHTML=icon('double')+'<span class="pe-tooltip">原貌阅读</span>';
   if(tools.matches('.portal-reader-tools')){mountSpread(host,tools,data,button);return;}
   const view=document.createElement('section');view.className='native-original-view';view.hidden=true;view.setAttribute('aria-label','第一财经原貌试读');
   view.innerHTML=`<header class="native-original-heading"><div><span class="pe-kicker">ORIGINAL EDITION</span><h2>第一财经 · 原貌阅读</h2><p>2026年09期 · 已收录11页试读</p></div></header><div class="native-original-controls"><button type="button" data-native-prev aria-label="上一原貌页">${icon('Arrow_Forward-2')}</button><label>原貌页 <select aria-label="跳转原貌页">${data.pages.map(p=>`<option value="${p.page}">${String(p.page).padStart(2,'0')}</option>`).join('')}</select> / ${data.pages.length}</label><button type="button" data-native-next aria-label="下一原貌页">${icon('Arrow_Forward-2')}</button></div><div class="native-original-pages">${pageFigures(data)}</div><p class="native-original-end">已读完本地收录的试读部分。<a href="${data.source}" target="_blank" rel="noopener">前往官方继续阅读</a></p>`;
@@ -115,7 +115,7 @@
   function go(n){state.page=Math.max(1,Math.min(data.pages.length,Number(n)));controls();}
   button.addEventListener('click',()=>{
    if(state.original)state.originalY=scrollY;else state.textY=scrollY;
-   state.original=!state.original;host.classList.toggle('native-original-mode',state.original);view.hidden=!state.original;button.setAttribute('aria-pressed',String(state.original));button.setAttribute('aria-label',state.original?'切换为文本阅读':'切换为原貌阅读');button.title=state.original?'文本阅读':'原貌阅读';button.innerHTML=icon(state.original?'FontNew':'Book')+`<span class="pe-tooltip">${state.original?'文本阅读':'原貌阅读'}</span>`;
+   state.original=!state.original;host.classList.toggle('native-original-mode',state.original);view.hidden=!state.original;button.setAttribute('aria-pressed',String(state.original));button.setAttribute('aria-label',state.original?'切换为文本阅读':'切换为原貌阅读');button.title=state.original?'文本阅读':'原貌阅读';button.innerHTML=icon(state.original?'FontNew':'double')+`<span class="pe-tooltip">${state.original?'文本阅读':'原貌阅读'}</span>`;
    if(state.original){controls();requestAnimationFrame(()=>{fit();const top=parseFloat(view.style.getPropertyValue('--native-top'));window.scrollTo({top:scrollY+view.getBoundingClientRect().top-top,behavior:'instant'});requestAnimationFrame(fit);});}
    else requestAnimationFrame(()=>window.scrollTo({top:state.textY,behavior:'instant'}));
   });
