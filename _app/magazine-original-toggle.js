@@ -100,6 +100,13 @@
     button.dataset.originalStep=direction;
     button.setAttribute('aria-label',direction<0?'点击左页翻回上一跨页':'点击右页翻到下一跨页');
    });
+   if(!reduced.matches&&spreadSize()===2){
+    const first=Math.max(1,start-1),last=Math.min(figures.length,start+4);
+    for(let index=first;index<last;index++){
+     loadPage(figures[index]);
+     window.originalPaperMesh?.prepare(data.pages[index],figures[index]);
+    }
+   }
    const first=visible[0].page,last=visible.at(-1).page;
    dialog.querySelector('output').textContent=(first===last?first:first+'–'+last)+'  共 '+figures.length+' 页';
    directory.querySelectorAll('[data-original-jump]').forEach(item=>item.setAttribute('aria-current',String(Number(item.dataset.originalJump)===data.pages[startAt(current)].page)));
@@ -183,7 +190,7 @@
    }
    return animations;
   }
-  function turnSpread(from,to){
+  function turnSpread(from,to,corner){
    const early=Math.min(from,to),late=Math.max(from,to);
    const a=spreadGeometry(early),b=spreadGeometry(late);
    const scene=document.createElement('div');
@@ -206,7 +213,11 @@
     {transform:'translate3d(0,0,0) rotateY(0deg) scale(1)'},
     {transform:`translate3d(${b.spine-a.spine}px,${b.top-a.top}px,0) rotateY(-180deg) scale(${b.left/a.right},${b.height/a.height})`}
    ],options);
-   const curves=curlLeaf(leaf,front,back,a.right,options);
+   const cleanup=window.originalPaperMesh?.mount({
+    scene,stage,front:data.pages[early+1],back:data.pages[late],
+    from:a,to:b,clock:animation,corner
+   });
+   const curves=cleanup?[]:curlLeaf(leaf,front,back,a.right,options);
    const shadow=document.createElement('div');
    shadow.className='original-paper-cast-shadow';
    place(shadow,a.spine-a.right,a.top,2*a.right,a.height);
@@ -215,12 +226,12 @@
     {opacity:.28,transform:'translateX(0)'},
     {opacity:0,transform:'translateX(-15%)'}
    ],options);
-   void finishTurn(scene,[animation,...curves,cast],to,to<from,duration);
+   void finishTurn(scene,[animation,...curves,cast],to,to<from,duration,cleanup);
   }
-  async function finishTurn(scene,animations,next,reverse,duration){
+  async function finishTurn(scene,animations,next,reverse,duration,cleanup){
    const focusDirection=document.activeElement?.classList.contains('original-page-turn')?
     document.activeElement.dataset.originalStep:null;
-   const turn={animations,scene};
+   const turn={animations,scene,cleanup};
    opening=turn;
    stage.classList.add('is-turning');
    if(reverse)for(const animation of animations){
@@ -244,12 +255,12 @@
   }
   function clearTurn(){
    if(!opening)return;
-   const {animations,scene}=opening;
+   const {animations,scene,cleanup}=opening;
    opening=null;
    animations.forEach(animation=>animation.cancel());
-   scene.remove();stage.classList.remove('is-turning');
+   cleanup?.();scene.remove();stage.classList.remove('is-turning');
   }
-  function go(index,animateSpread=false){
+  function go(index,animateSpread=false,corner=0){
    if(opening)return;
    const next=Math.max(0,Math.min(figures.length-1,index));
    const from=startAt(current),to=startAt(next);
@@ -257,14 +268,14 @@
     void turnCover(next);return;
    }
    if(animateSpread&&from>0&&Math.abs(to-from)===2&&spreadSize()===2&&!reduced.matches){
-    turnSpread(from,to);return;
+    turnSpread(from,to,corner);return;
    }
    current=next;draw();
   }
-  function step(direction){
+  function step(direction,corner=0){
    showPanel(null);
    const start=startAt(current);
-   go(direction>0?(start===0?1:start+spreadSize()):start-spreadSize(),true);
+   go(direction>0?(start===0?1:start+spreadSize()):start-spreadSize(),true,corner);
   }
   const observer=new ResizeObserver(()=>{
    if(opening)clearTurn();
@@ -275,7 +286,12 @@
    if(!button)return;
    if(button.hasAttribute('data-original-close'))dialog.close();
    if(button===coverButton)step(1);
-   if(button.dataset.originalStep)step(Number(button.dataset.originalStep));
+   if(button.dataset.originalStep){
+    const bounds=button.getBoundingClientRect();
+    const corner=button.classList.contains('original-page-turn')&&event.detail?
+     1-2*(event.clientY-bounds.top)/bounds.height:0;
+    step(Number(button.dataset.originalStep),corner);
+   }
    if(button.dataset.originalEdge){showPanel(null);go(button.dataset.originalEdge==='first'?0:lastStart());}
    if(button.hasAttribute('data-original-directory'))showPanel(directory.hidden?'directory':null);
    if(button.hasAttribute('data-original-more')){showPanel('more');panel.querySelector('[aria-pressed=true]').focus();}
