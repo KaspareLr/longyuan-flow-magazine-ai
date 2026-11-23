@@ -39,7 +39,7 @@
  }
  function sync(){
   const hash=decodeURIComponent(location.hash);
-  if(!new URLSearchParams(hash.split('?')[1]||'').has('full')&&location.pathname.endsWith('/portal.html')&&hash.includes('context=magazine')&&hash.includes('resource=第一财经'))mount(document.querySelector('.portal-reader-content'),document.querySelector('.portal-reader-tools'));
+  if(location.pathname.endsWith('/portal.html')&&hash.includes('context=magazine')&&hash.includes('resource=第一财经'))mount(document.querySelector('.portal-reader-content:not(.issue-preview-stream)'),document.querySelector('.portal-reader-tools'));
   document.querySelectorAll('.view.active .pe-resource-detail').forEach(detail=>{if(detail.querySelector('.pe-identity-top h1')?.textContent.trim()!=='第一财经'||!/2026.*0?9\s*期/.test(detail.querySelector('.pe-metadata')?.textContent||''))return;mount(detail.querySelector('.pe-reading'),detail.querySelector('.pe-social'));});
  }
  let pending=false;new MutationObserver(()=>{if(pending)return;pending=true;requestAnimationFrame(()=>{pending=false;sync();});}).observe(document.body,{childList:true,subtree:true});addEventListener('hashchange',sync);sync();

@@ -10,7 +10,7 @@
   state={first:reader,bar,articles:[reader],last:index,current:index,total:info.list.length,loading:false,lastY:scrollY};update();
  }
  function update(){
-  if(!state||!eligible())return;
+  if(!state||!eligible()||state.first.querySelector('.native-original-mode'))return;
   const edge=Math.min(180,innerHeight*.25);let active=state.articles[0];
   for(const article of state.articles){if(article.getBoundingClientRect().top<=edge)active=article;else break;}
   const index=Number(active.dataset.continuousIndex),info=clubArticleDetail.infoAt(index),rect=active.getBoundingClientRect();
@@ -23,7 +23,7 @@
   }
  }
  function append(){
-  if(!state||!eligible()||state.loading||state.last>=state.total-1)return;
+  if(!state||!eligible()||state.first.querySelector('.native-original-mode')||state.loading||state.last>=state.total-1)return;
   const last=state.articles.at(-1);if(last.getBoundingClientRect().bottom>innerHeight+120)return;
   state.loading=true;const index=state.last+1;try{
    const doc=new DOMParser().parseFromString(clubArticleDetail.renderAt(index),'text/html'),next=doc.querySelector('.portal-reader');if(!next)return;

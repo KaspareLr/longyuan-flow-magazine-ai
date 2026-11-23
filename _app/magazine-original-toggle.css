@@ -27,3 +27,15 @@
 .native-original-pages figcaption{flex:none;margin:8px 0 0;line-height:20px}
 .native-original-end{display:none}
 @media(max-width:760px){.native-original-view{gap:8px;height:calc(100dvh - var(--native-top,108px) - 12px)}.native-original-heading h2{font-size:18px;line-height:26px}.native-original-heading p{font-size:12px}.native-original-controls{padding:4px 8px;min-height:44px}.native-original-controls button{width:36px;height:36px}}
+
+.portal-reader:has(.native-original-mode) ~ .issue-continuation { display: none; }
+.portal-article-actions { display: flex; justify-content: flex-end; margin-top: 24px; }
+.portal-article-save {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px;
+  padding: 8px 16px; border: 0; border-radius: 999px;
+  color: #fff; background: #131921; font: 600 14px/20px Figtree, sans-serif;
+  cursor: pointer;
+}
+.portal-article-save:hover { background: #303943; }
+.portal-article-save .iconfont { font-size: 20px; }
+.night .portal-article-save { border: 1px solid #909399; }
