@@ -1,7 +1,7 @@
 /* Reuses the discovery shelf RAF, drag, hover-wave, entrance and keyboard engine. */
-const flowShelfData=(window.magazineArchiveData||[])
+const flowShelfData=window.magazineHomePublication.archiveRows
  .slice().sort((a,b)=>b.year-a.year||b.issue-a.issue).slice(0,20)
- .map(item=>({title:'第一财经',issue:item.label,src:item.cover,url:item.year===2026&&item.issue===9?'portal.html#/article/0?context=magazine&resource='+encodeURIComponent('第一财经'):item.url}));
+ .map(item=>({title:window.magazineHomePublication.name,issue:item.label,src:item.cover,url:item.year===2026&&item.issue===9?window.magazineHomePublication.issue:item.url}));
 (() => {
   const root=document.querySelector('.hero-shelf');
   const stage=root.querySelector('.shelf-stage');
@@ -17,7 +17,7 @@ const flowShelfData=(window.magazineArchiveData||[])
 
   root.addEventListener('pointermove',event=>{if(event.pointerType==='touch')return;const card=event.target.closest('.shelf-cover');tipIndex=card?Number(card.dataset.index):null;updateIssueTip();});root.addEventListener('pointerleave',()=>{tipIndex=null;updateIssueTip();});root.addEventListener('focusin',event=>{const card=event.target.closest('.shelf-cover');tipIndex=card?Number(card.dataset.index):null;updateIssueTip();});root.addEventListener('focusout',()=>{tipIndex=null;updateIssueTip();});
 
-  const initialIndex=Math.max(0,flowShelfData.findIndex(item=>item.title==='第一财经'));
+  const initialIndex=0;
   let position=initialIndex,selected=initialIndex,frame=0,drag=null,suppressClick=false,wheelUntil=0,scrollScale=1,scrollSpread=1;
   const reduced=window.matchMedia('(prefers-reduced-motion: reduce)');
   const normalize=n=>((n%count)+count)%count;

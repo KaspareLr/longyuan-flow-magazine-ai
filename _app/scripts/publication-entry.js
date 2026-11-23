@@ -48,7 +48,9 @@
  window.openShelfMagazine=index=>{
   const magazine=flowShelfData[index],source=document.querySelector(`.shelf-cover[data-index="${index}"]`);
   if(!magazine||!source)return;
-  return openPublication(source.querySelector('img'),'#/magazine/'+encodeURIComponent(magazine.title),source);
+  const image=source.querySelector('img');
+  const home=window.magazineHomeDestination?.(magazine.title);
+  return home?window.longyuanOpenPublication(image,home,source):openPublication(image,'#/magazine/'+encodeURIComponent(magazine.title),source);
  };
  document.addEventListener('click',event=>{
   const link=event.target.closest('a[href*="#/magazine/"]');

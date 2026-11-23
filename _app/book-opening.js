@@ -49,7 +49,7 @@
  }
  window.longyuanOpenPublication=openPublication;
  function revealDetail(){
-  const root=document.querySelector('.portal-book-detail, [data-page=book]');
+  const root=document.querySelector('.portal-book-detail, [data-page=book], .mh-identity');
   if(!root||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
   const groups=[['h1',0],['.book-sidebar-meta,.book-sidebar-category',55],['.book-contents-header,.book-contents-group:first-of-type,.book-sidebar-capabilities',110]];
   for(const [selector,delay] of groups){for(const element of root.querySelectorAll(selector)){

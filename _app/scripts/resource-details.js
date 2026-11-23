@@ -36,6 +36,7 @@
 
    return q.has('page')?window.renderOctoberCommunity(q.get('page'),q.get('id'),m.title):window.renderClaimedPublication(m);
   }
+  if(m.title==='南风窗'&&q.get('page')==='membership'){context.claimed=true;return window.renderOctoberCommunity('membership',q.get('id'),m.title);}
   if(m.title==='南风窗'&&(q.get('club')==='1'||(claimed&&q.has('issue')&&!q.has('page')))){context.claimed=true;return window.renderOctoberClaimedIssue(m,issue);}
   if(!claimed)return window.renderOrdinaryPeriodical(m,issue);
   if(m.title==='南风窗')return q.has('page')?window.renderOctoberCommunity(q.get('page'),q.get('id')):window.renderClaimedPublication(m);
@@ -90,7 +91,7 @@
   const tool=e.target.closest('[data-rd-tool]');if(tool){showBookTool(tool.dataset.rdTool);return}
   const content=e.target.closest('[data-rd-content]');if(content){openModal(content.dataset.rdContent,`<span class="rd-state">${esc(content.dataset.rdKind)}</span><p>属于《${esc(context.m.title)}》读书会。正式内容将关联本刊期次、领读人和单刊会员权限。</p><p>${content.dataset.rdKind==='活动'?'活动详情包括时间、地点、适合读者、流程、报名状态与结束后的回顾。当前未开放报名。':content.dataset.rdKind==='领读人'?'这里展示领读人的介绍、领读内容、观点、近期活动和关注入口。':'媒体介绍、关联原文与播放内容将在资源接入后展示。'}</p>`);return}
   const a=e.target.closest('[data-rd-action]');if(!a)return;const key=a.dataset.rdAction;
-  if(key==='member'&&context.m?.title==='第一财经'){location.hash=route('magazine',context.m.title,'page=membership');return;}
+  if(key==='member'&&['第一财经','南风窗'].includes(context.m?.title)){location.hash=route('magazine',context.m.title,'page=membership');return;}
   if(key==='archive'){
    const m=context.m;const entries=m.title==='第一财经'?window.magazineArchiveData.map(a=>({src:a.cover,label:a.label,href:a.year===2026&&a.issue===9?'portal.html#/article/0?context=magazine&resource='+encodeURIComponent(m.title):a.url})):m.issues.map((a,i)=>({...a,index:i}));
    const latest=Math.max(...entries.map(a=>Number(a.label.match(/\d{4}/)?.[0])||2026));

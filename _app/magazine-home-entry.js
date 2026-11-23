@@ -1,4 +1,19 @@
-/* Cover entries represent the publication; issue reading remains a separate destination. */
+/* Publication home destinations, distinct from reading and membership routes. */
 (()=>{
- window.addEventListener('click',event=>{if(event.defaultPrevented||event.button||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;const a=event.target.closest('a');if(!a)return;let url;try{url=new URL(a.href,location.href);}catch{return;}if(decodeURIComponent(url.hash)==='#/magazine/第一财经'){event.preventDefault();event.stopImmediatePropagation();location.href=new URL('magazine-home.html',location.href).href;}},true);
+ const destinations={'第一财经':'magazine-home.html','南风窗':'magazine-home.html?publication=nanfc'};
+ window.magazineHomeDestination=name=>Object.hasOwn(destinations,name)?destinations[name]:null;
+
+ window.addEventListener('click',event=>{
+  if(event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
+  const link=event.target.closest('a');
+  if(!link||link.target==='_blank'||!link.hash.startsWith('#/magazine/'))return;
+  const name=decodeURIComponent(link.hash.slice('#/magazine/'.length));
+  const destination=window.magazineHomeDestination(name);
+  if(!destination)return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  const image=link.querySelector('img');
+  if(image&&window.longyuanOpenPublication)window.longyuanOpenPublication(image,destination,image.closest('[data-book-tilt],.hinged-cover')||image);
+  else location.assign(destination);
+ },true);
 })();
