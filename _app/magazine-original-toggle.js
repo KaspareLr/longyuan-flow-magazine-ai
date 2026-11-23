@@ -39,6 +39,12 @@
    <a class="original-official-link" hidden href="${data.source}" target="_blank" rel="noopener">在官网查看原貌</a>`;
   const stage=dialog.querySelector('.original-spread-pages');
   const figures=[...stage.querySelectorAll('figure')];
+  const pageButtons=figures.map(figure=>{
+   const button=document.createElement('button');
+   button.type='button';button.className='original-page-turn';button.hidden=true;
+   figure.append(button);
+   return button;
+  });
   const panel=dialog.querySelector('.original-color-options');
   const more=dialog.querySelector('[data-original-more]');
   const directory=dialog.querySelector('.original-thumbnail-directory');
@@ -88,6 +94,11 @@
     tiles.style.width=height*page.width/page.height+'px';
     tiles.style.height=height+'px';
     loadPage(figure);
+    const direction=index===start?-1:1;
+    const button=pageButtons[index];
+    button.hidden=start===0||size!==2||(direction===1&&start===lastStart());
+    button.dataset.originalStep=direction;
+    button.setAttribute('aria-label',direction<0?'点击左页翻回上一跨页':'点击右页翻到下一跨页');
    });
    const first=visible[0].page,last=visible.at(-1).page;
    dialog.querySelector('output').textContent=(first===last?first:first+'–'+last)+'  共 '+figures.length+' 页';
@@ -110,17 +121,10 @@
    pose.className='original-turn-pose';
    const leaf=document.createElement('div');
    leaf.className='original-turning-leaf';
-   const [front,back,under]=figures.slice(0,3).map(figure=>{
-    loadPage(figure);
-    const tiles=figure.querySelector('.native-original-tiles').cloneNode(true);
-    tiles.style.width='100%';tiles.style.height='100%';
-    tiles.querySelectorAll('img').forEach(img=>img.loading='eager');
-    return tiles;
-   });
+   const [front,back,under]=[0,1,2].map(copyPage);
    back.classList.add('original-leaf-back');
    leaf.append(front,back);pose.append(under,leaf);scene.append(pose);stage.append(scene);
    figures[0].getAnimations().forEach(animation=>animation.cancel());
-   stage.classList.add('is-turning');
    const closed='translateX('+shift+'px) scale('+closedWidth/rightWidth+', '+closedHeight/height+')';
    const duration=820, flatten=.28;
    const easing='cubic-bezier(.35,.12,.25,1)';
@@ -130,14 +134,67 @@
     pose.animate([{transform:'var(--original-cover-pose)',easing},{transform:'none',offset:flatten},{transform:'none'}],options),
     leaf.animate([{transform:'rotateY(0deg)'},{transform:'rotateY(0deg)',offset:flatten,easing},{transform:'rotateY(-180deg)'}],options)
    ];
+   await finishTurn(scene,animations,next,next===0,duration);
+  }
+  function copyPage(index){
+   const figure=figures[index];
+   loadPage(figure);
+   const tiles=figure.querySelector('.native-original-tiles').cloneNode(true);
+   tiles.style.width='100%';tiles.style.height='100%';
+   tiles.querySelectorAll('img').forEach(img=>img.loading='eager');
+   return tiles;
+  }
+  function spreadGeometry(start){
+   const pages=data.pages.slice(start,start+2);
+   const height=pageHeight(pages);
+   const [left,right=0]=pages.map(page=>height*page.width/page.height);
+   return {height,left,right,spine:(stage.clientWidth+left-right)/2,top:(stage.clientHeight-height)/2};
+  }
+  function turnSpread(from,to){
+   const early=Math.min(from,to),late=Math.max(from,to);
+   const a=spreadGeometry(early),b=spreadGeometry(late);
+   const scene=document.createElement('div');
+   scene.className='original-spread-turn';
+   scene.setAttribute('aria-hidden','true');
+   function place(element,x,y,width,height){
+    Object.assign(element.style,{position:'absolute',left:x+'px',top:y+'px',width:width+'px',height:height+'px'});
+    scene.append(element);
+   }
+   place(copyPage(early),a.spine-a.left,a.top,a.left,a.height);
+   if(b.right)place(copyPage(late+1),b.spine,b.top,b.right,b.height);
+   const leaf=document.createElement('div');
+   leaf.className='original-turning-leaf';
+   const front=copyPage(early+1),back=copyPage(late);
+   back.classList.add('original-leaf-back');
+   leaf.append(front,back);
+   place(leaf,a.spine,a.top,a.right,a.height);
+   stage.append(scene);
+   const duration=560;
+   const animation=leaf.animate([
+    {transform:'translate3d(0,0,0) rotateY(0deg) scale(1)'},
+    {transform:`translate3d(${b.spine-a.spine}px,${b.top-a.top}px,0) rotateY(-180deg) scale(${b.left/a.right},${b.height/a.height})`}
+   ],{duration,easing:'cubic-bezier(.32,.12,.24,1)',fill:'both'});
+   void finishTurn(scene,[animation],to,to<from,duration);
+  }
+  async function finishTurn(scene,animations,next,reverse,duration){
+   const focusDirection=document.activeElement?.classList.contains('original-page-turn')?
+    document.activeElement.dataset.originalStep:null;
    const turn={animations,scene};
    opening=turn;
-   if(next===0)for(const animation of animations){
+   stage.classList.add('is-turning');
+   if(reverse)for(const animation of animations){
     animation.playbackRate=-1;animation.currentTime=duration;
    }
    try {
     await Promise.all(animations.map(animation=>animation.finished));
-    if(opening===turn){current=next;draw();}
+    if(opening===turn){
+     current=next;clearTurn();draw();
+     const active=document.activeElement;
+     if(focusDirection&&(active===document.body||stage.contains(active))){
+      const control=pageButtons.find(button=>!button.hidden&&!button.closest('figure').hidden&&button.dataset.originalStep===focusDirection);
+      (control||dialog.querySelector('.original-mode-active')).focus({preventScroll:true});
+     }
+    }
    } catch {
     // Closing the reader or resizing the stage cancels the temporary scene.
    } finally {
@@ -151,19 +208,22 @@
    animations.forEach(animation=>animation.cancel());
    scene.remove();stage.classList.remove('is-turning');
   }
-  function go(index){
+  function go(index,animateSpread=false){
    if(opening)return;
    const next=Math.max(0,Math.min(figures.length-1,index));
    const from=startAt(current),to=startAt(next);
    if(((from===0&&to===1)||(from===1&&to===0))&&spreadSize()===2&&figures.length>=3&&!reduced.matches){
     void turnCover(next);return;
    }
+   if(animateSpread&&from>0&&Math.abs(to-from)===2&&spreadSize()===2&&!reduced.matches){
+    turnSpread(from,to);return;
+   }
    current=next;draw();
   }
   function step(direction){
    showPanel(null);
    const start=startAt(current);
-   go(direction>0?(start===0?1:start+spreadSize()):start-spreadSize());
+   go(direction>0?(start===0?1:start+spreadSize()):start-spreadSize(),true);
   }
   const observer=new ResizeObserver(()=>{
    if(opening)clearTurn();
