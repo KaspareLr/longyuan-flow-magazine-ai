@@ -21,6 +21,12 @@ window.renderOctoberCommunity=function(page,id,publication='南风窗'){
  let body='';
  if(page==='lecturers')body=clubPeoplePage.render(route);
  if(page==='activities')body=renderSignedActivities(publication);
+ if(page==='read-together'){
+  const data=publicationV3.publication(publication);
+  body=publicationReading.render(publication)+`<section class="oc-section"><header class="oc-heading"><span>READING PROGRAMS</span><h2>找到你的阅读节奏</h2></header>
+   <div class="portal-tabs oc-v3-reading-tabs" role="group" aria-label="筛选共读计划">${['全部','进行中','即将开始','已完结','期刊'].map((label,index)=>`<button type="button" data-publication-plan-filter="${label}" aria-pressed="${index===0}">${label}</button>`).join('')}</div>
+   <div class="oc-v3-reading-programs">${data.articles.slice(0,3).map((a,index)=>`<article data-publication-plan="${['进行中','即将开始','已完结'][index]}"><span>${publication} · ${data.issue} · 演示</span><h3>${e(a.title)}</h3><p>${e(a.excerpt)}</p>${button('开始共读',a.href,true)}</article>`).join('')}</div></section>`;
+ }
  if(page==='lecturer'){
   const p=profiles.find(p=>p.id===id);if(!p)return '<p>未找到这位领读人。</p>';
   const associated=activities.filter(a=>[...(a.leaders||[]),...(a.guests||[])].some(x=>x.id===p.id));

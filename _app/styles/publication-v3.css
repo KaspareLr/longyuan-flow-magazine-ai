@@ -1,0 +1,95 @@
+/* V3 recommendation, daily reading and selected article patterns. */
+.oc-v3 .v3-recommendation{height:600px;display:flex;align-items:center;gap:30px;padding:80px;border-radius:40px;background:#fff;box-shadow:0 4px 10px #0003}
+.oc-v3 .v3-recommendation>*{min-width:0}.v3-recommendation-copy{flex:1;display:flex;flex-direction:column;align-items:flex-start;gap:20px}
+.oc-v3 .v3-recommendation-copy h2{font-size:40px;line-height:48px;white-space:pre-line;font-weight:700}
+.oc-v3 .v3-recommendation-copy>p{font-size:16px;line-height:28px;color:#606266;white-space:pre-line}
+.oc-v3 .v3-resource{width:640px;height:440px;flex:none;background:#f5f7fa;padding:30px;border-radius:40px;display:flex;gap:20px;align-items:stretch}
+.oc-v3 .v3-resource-copy{min-width:0;flex:1;display:flex;flex-direction:column;gap:20px}
+.oc-v3 .v3-resource-top{flex:1;min-height:0;padding:10px 10px 20px;border-bottom:1px solid #e4e7ed;display:flex;flex-direction:column;justify-content:space-between;gap:16px}
+.oc-v3 .v3-resource h3{font-size:24px;line-height:32px;font-weight:600}
+.oc-v3 .v3-resource-top>div>p{font-size:12px;line-height:16px;color:#909399;margin-top:4px}
+.oc-v3 .v3-reason{padding:20px;background:#fff;border-radius:12px}
+.oc-v3 .v3-reason p{font-size:12px;line-height:16px;color:#909399;margin-top:4px}
+.oc-v3 .v3-cover-link{height:100%;width:auto;aspect-ratio:2/3;flex:none;display:block;padding:0;perspective:900px}
+.oc-v3 .v3-cover-link.magazine{aspect-ratio:14/19}
+.oc-v3 .v3-cover-link>span{height:100%;width:100%;display:block;border-radius:8px}
+.oc-v3 .v3-cover-link img{height:100%;width:100%;aspect-ratio:auto;object-fit:cover;border-radius:8px;box-shadow:0 8px 16px #21212112}
+.oc-v3 .v3-recommendation-magazine .v3-resource{order:-1}
+.oc-v3 .v3-recommendation-magazine .v3-cover-link{order:-1}
+.oc-v3 .v3-recommendation-article{padding:0;gap:10px;overflow:hidden}
+.oc-v3 .v3-recommendation-article .v3-recommendation-copy{padding:80px}
+.oc-v3 .v3-recommendation-article .v3-recommendation-copy>p{color:#909399}
+.oc-v3 .v3-recommendation-image{height:100%;aspect-ratio:2/3;flex:none;overflow:hidden}
+.oc-v3 .v3-recommendation-image img{width:100%;height:100%;object-fit:cover;transition:transform 420ms cubic-bezier(.2,.8,.2,1)}
+.oc-v3 .v3-daily{height:480px;width:320px;min-height:480px;aspect-ratio:2/3;border-radius:20px;padding:0;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-end;text-align:left;isolation:isolate;overflow:hidden}
+.oc-v3 .v3-daily[data-kind=magazine]{aspect-ratio:14/19;width:calc(480px * 14 / 19)}
+.oc-v3 .v3-daily>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2}
+.oc-v3 .v3-daily>div{position:relative;z-index:2;padding:30px 20px;background:linear-gradient(to bottom,rgba(0,0,0,0) 0%,rgba(0,0,0,.5) 100%);backdrop-filter:blur(50px);-webkit-backdrop-filter:blur(50px);width:100%;color:#fff}
+.oc-v3 .v3-daily h3{font-size:24px;line-height:32px;white-space:pre-line;margin:0}
+.oc-v3 .v3-daily p{font-size:12px;line-height:16px;color:#e4e7ed;margin-top:10px}
+.oc-v3 .v3-mixed-item{display:flex;align-items:stretch;gap:20px;min-width:0}
+.oc-v3 .v3-mixed-cover{position:relative;width:200px;flex:none;align-self:flex-start;display:block;padding:0;perspective:900px}
+.oc-v3 .v3-mixed-cover>span:first-child{display:block;width:100%;aspect-ratio:2/3;overflow:hidden;border-radius:4px;box-shadow:0 2px 6px #0000001a}
+.oc-v3 .v3-mixed-cover.magazine>span:first-child{aspect-ratio:14/19;overflow:visible}
+.oc-v3 .v3-mixed-cover img{width:100%;height:100%;object-fit:cover;aspect-ratio:auto}
+.oc-v3 .v3-mixed-item[data-kind=podcast] .v3-mixed-cover>span:first-child{aspect-ratio:1;border-radius:20px}
+.oc-v3 .v3-mixed-content{flex:1;min-width:0;display:grid;grid-template-columns:1fr 2fr;gap:40px;border-bottom:1px solid #131921}
+.oc-v3 .v3-mixed-meta{padding:40px 0;display:flex;flex-direction:column;justify-content:space-between;gap:16px;min-width:0}
+.oc-v3 .v3-mixed-meta strong{font-size:24px;line-height:32px}
+.oc-v3 .v3-mixed-meta p{font-size:12px;line-height:16px}
+.oc-v3 .v3-mixed-summary{display:flex;flex-direction:column;gap:10px;padding:40px 0;min-width:0}
+.oc-v3 .v3-mixed-summary h3{font-size:24px;line-height:32px}
+.oc-v3 .v3-mixed-summary>p{font-size:16px;line-height:28px;color:#606266}
+.oc-v3 .v3-mixed-summary .v3-audio{width:100%}
+.oc-v3 .v3-arrow{margin-top:auto;align-self:flex-end;border:1px solid #131921;border-radius:50%;width:40px;height:40px;display:grid;place-items:center;flex:none}
+.oc-v3 .v3-arrow>span{position:relative;display:block;width:24px;height:24px}
+.oc-v3 .v3-arrow img{position:absolute;left:25%;top:29.17%;width:auto;height:auto;max-width:none}
+.oc-v3 .v3-recommendation,.oc-v3 .v3-resource { box-sizing: border-box; }
+.oc-v3 .v3-resource p,.oc-v3 .v3-resource h3,.oc-v3 .v3-recommendation-copy > * { margin: 0; }
+.oc-v3 .v3-resource { width: min(56%,640px); min-width: 0; }
+.oc-v3 .v3-resource blockquote { margin: 0; }
+.oc-v3 .oc-v3-daily .oc-heading { text-align: center; }
+.oc-v3 .daily-window { width: 100%; overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: thin; }
+.oc-v3 .daily-track { display: flex; gap: 20px; padding-block: 4px 10px; width: max-content; }
+.oc-v3 .v3-daily { position: relative; flex: none; overflow: hidden; color: white; scroll-snap-align: start; text-decoration: none; }
+.oc-v3 .v3-daily > div { backdrop-filter: none; -webkit-backdrop-filter: none; overflow: hidden; }
+.oc-v3 .v3-daily h3,.oc-v3 .v3-daily p { position: relative; }
+.oc-v3 .v3-daily-progressive-blur { position: absolute; inset: 0; pointer-events: none; }
+.oc-v3 .v3-daily-progressive-blur > span { position: absolute; inset: 0; backdrop-filter: blur(var(--daily-blur)); mask-image: var(--daily-mask); }
+.oc-v3 .v3-daily > img,.oc-v3 .v3-mixed-cover img { transition: transform 420ms cubic-bezier(.2,.8,.2,1); }
+.oc-v3 .v3-daily:is(:hover,:focus-visible) > img,.oc-v3 .v3-mixed-cover:is(:hover,:focus-visible) img { transform: scale(1.04); }
+.oc-v3 .v3-article-list { display: grid; gap: 40px; }
+.oc-v3 .v3-mixed-summary p { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+.oc-v3 .v3-arrow { align-self: end; }
+.oc-v3 :is(.daily-window,.v3-daily,.v3-mixed-item a):focus-visible { outline: 2px solid #2f54eb; outline-offset: -2px; }
+@media(max-width:1100px) {
+ .oc-v3 .v3-recommendation { padding: 36px; height: auto; }
+ .oc-v3 .v3-resource { padding: 20px; height: 340px; }
+ .oc-v3 .v3-mixed-content { gap: 20px; }
+}
+@media(max-width:760px) {
+ .oc-v3 .v3-recommendation { padding: 20px; border-radius: 24px; flex-direction: column; align-items: stretch; gap: 20px; }
+ .oc-v3 .v3-recommendation-copy h2 { font-size: 28px; line-height: 38px; }
+ .oc-v3 .v3-resource { width: 100%; height: auto; min-height: 228px; padding: 14px; border-radius: 16px; display: grid; grid-template-columns: minmax(84px,34%) minmax(0,1fr); }
+ .oc-v3 .v3-cover-link.magazine { width: 100%; height: auto; align-self: center; }
+ .oc-v3 .v3-resource-top,.oc-v3 .v3-reason { padding: 8px; }
+ .oc-v3 .v3-resource h3 { font-size: 17px; line-height: 23px; }
+ .oc-v3 .daily-track { gap: 12px; }
+ .oc-v3 .v3-daily { width: 215px; height: 322px; min-height: 322px; border-radius: 16px; }
+ .oc-v3 .v3-daily > div { padding: 16px; }
+ .oc-v3 .v3-daily h3 { font-size: 18px; line-height: 26px; }
+ .oc-v3 .v3-article-list { gap: 20px; }
+ .oc-v3 .v3-mixed-item { gap: 12px; }
+ .oc-v3 .v3-mixed-cover { width: 90px; }
+ .oc-v3 .v3-mixed-content { display: flex; flex-direction: column; gap: 6px; }
+ .oc-v3 .v3-mixed-meta { flex-direction: row; padding: 0; align-items: center; }
+ .oc-v3 .v3-mixed-meta strong { font-size: 14px; }
+ .oc-v3 .v3-mixed-summary { padding: 0 0 14px; }
+ .oc-v3 .v3-mixed-summary h3 { font-size: 18px; line-height: 26px; }
+ .oc-v3 .v3-mixed-summary > p { font-size: 14px; line-height: 22px; }
+ #view-magazine .oc-dock { max-width: calc(100vw - 16px); overflow-x: auto; scrollbar-width: none; }
+ #view-magazine .oc-dock > div { flex-wrap: nowrap; flex: none; }
+}
+@media(prefers-reduced-motion:reduce) {
+ .oc-v3 .v3-daily > img,.oc-v3 .v3-mixed-cover img { transition: none; }
+}
