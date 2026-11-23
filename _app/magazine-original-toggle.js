@@ -28,10 +28,11 @@
      <button data-original-edge="last" aria-label="跳到末页">${artwork('0fb05')}</button>
     </div>
     <button class="original-mode-active" data-original-close aria-label="切换为文本阅读">${icon('double')}</button>
-    <button data-original-more aria-label="更多阅读选项" aria-expanded="false">${artwork('cc41b')}</button>
-    <div class="original-rail-group original-color-options" role="group" aria-label="阅读背景色" hidden>
-     ${Object.entries(colors).map(([color,label])=>`<button type="button" data-original-color="${color}" aria-label="${label}" title="${label}" aria-pressed="${color==='white'}"></button>`).join('')}
-     <button type="button" data-original-more-close aria-label="收起背景色选项">${artwork('98ae5')}</button>
+    <div class="original-color-settings">
+     <div class="original-color-options" role="group" aria-label="阅读背景色" aria-hidden="true" inert>
+      ${Object.entries(colors).map(([color,label])=>`<button type="button" data-original-color="${color}" aria-label="${label}" title="${label}" aria-pressed="${color==='white'}"></button>`).join('')}
+     </div>
+     <button data-original-more aria-label="更多阅读选项" aria-expanded="false">${artwork('cc41b')}${artwork('98ae5')}</button>
     </div>
    </div>
    <output class="original-spread-number" aria-live="polite"></output>
@@ -47,11 +48,12 @@
   });
   const panel=dialog.querySelector('.original-color-options');
   const more=dialog.querySelector('[data-original-more]');
+  const rail=dialog.querySelector('.original-rail-right');
   const directory=dialog.querySelector('.original-thumbnail-directory');
   const coverButton=stage.querySelector('.original-open-cover');
   const breakpoint=matchMedia('(max-width:760px)');
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
-  let current=0, opening=null;
+  let current=0, opening=null, exiting=false;
   function loadPage(figure){
    figure.querySelectorAll('img[data-src]').forEach(img=>{img.src=img.dataset.src;delete img.dataset.src;});
   }
@@ -59,21 +61,52 @@
   const startAt=index=>index===0?0:1+Math.floor((index-1)/spreadSize())*spreadSize();
   const lastStart=()=>startAt(figures.length-1);
   function showPanel(mode){
-   directory.hidden=mode!=='directory';panel.hidden=mode!=='more';
+   const expanded=mode==='more';
+   directory.hidden=mode!=='directory';
+   panel.inert=!expanded;panel.setAttribute('aria-hidden',String(!expanded));
+   more.setAttribute('aria-expanded',String(expanded));
+   more.setAttribute('aria-label',expanded?'收起背景色选项':'更多阅读选项');
    dialog.querySelector('[data-original-directory]').setAttribute('aria-expanded',String(!directory.hidden));
-   more.hidden=!panel.hidden;more.setAttribute('aria-expanded',String(!panel.hidden));
-   dialog.querySelector(".original-official-link").hidden=panel.hidden;
-   dialog.classList.toggle('has-color-options',!panel.hidden);
+   dialog.querySelector('.original-official-link').hidden=!expanded;
+   dialog.classList.toggle('has-color-options',expanded);
    stage.inert=!directory.hidden;
    dialog.classList.toggle('is-directory',!directory.hidden);
   }
-  function enterCover(){
-   if(reduced.matches)return;
-   figures[0].animate([
-    {transform:'perspective(1100px) translateY(110dvh) rotateX(26deg) rotateY(-14deg)',opacity:.45},
-    {transform:'translateY(-2%) var(--original-cover-pose)',opacity:1,offset:.82},
-    {transform:'var(--original-cover-pose)',opacity:1}
-   ],{duration:650,easing:'cubic-bezier(.2,.75,.25,1)'});
+  const readerMotion={duration:650,easing:'cubic-bezier(.2,.75,.25,1)'};
+  const coverMotion=[
+   {transform:'perspective(1100px) translateY(110dvh) rotateX(26deg) rotateY(-14deg)',opacity:.45},
+   {transform:'translateY(-2%) var(--original-cover-pose)',opacity:1,offset:.82},
+   {transform:'var(--original-cover-pose)',opacity:1}
+  ];
+  function railOffset(){
+   const from=tools.getBoundingClientRect(),to=rail.getBoundingClientRect();
+   return `${from.x+from.width/2-to.x-to.width/2}px ${from.y+from.height/2-to.y-to.height/2}px`;
+  }
+  async function returnToText(){
+   if(exiting)return;
+   if(reduced.matches){dialog.close();return;}
+   exiting=true;clearTurn();showPanel(null);
+   const destination=railOffset();
+   rail.getAnimations().forEach(animation=>animation.cancel());
+   figures[0].getAnimations().forEach(animation=>animation.cancel());
+   dialog.classList.add('is-returning');
+   const page=startAt(current)===0?figures[0]:stage;
+   const frames=page===stage?[
+    {transform:'translateY(85dvh) scale(.9)',opacity:0},
+    {transform:'translateY(0) scale(1)',opacity:1}
+   ]:coverMotion;
+   const retreat=page.animate(frames,{...readerMotion,fill:'both'});
+   retreat.playbackRate=-1;retreat.currentTime=readerMotion.duration;
+   const toolbar=rail.animate([
+    {translate:'0 0',opacity:1},
+    {translate:destination,opacity:.1}
+   ],{duration:450,delay:170,easing:'cubic-bezier(.35,0,.8,.35)',fill:'both'});
+   const dismiss=dialog.animate([
+    {backgroundColor:getComputedStyle(dialog).backgroundColor},{backgroundColor:'transparent'}
+   ],{duration:620,fill:'forwards'});
+   await Promise.allSettled([retreat.finished,toolbar.finished,dismiss.finished]);
+   if(dialog.open)dialog.close();
+   [retreat,toolbar,dismiss].forEach(animation=>animation.cancel());
   }
   function pageHeight(pages,cover=false){
    const inset=cover ? .82 : 1;
@@ -283,8 +316,8 @@
   });
   dialog.addEventListener('click',event=>{
    const button=event.target.closest('button');
-   if(!button)return;
-   if(button.hasAttribute('data-original-close'))dialog.close();
+   if(!button||exiting)return;
+   if(button.hasAttribute('data-original-close')){void returnToText();return;}
    if(button===coverButton)step(1);
    if(button.dataset.originalStep){
     const bounds=button.getBoundingClientRect();
@@ -294,8 +327,7 @@
    }
    if(button.dataset.originalEdge){showPanel(null);go(button.dataset.originalEdge==='first'?0:lastStart());}
    if(button.hasAttribute('data-original-directory'))showPanel(directory.hidden?'directory':null);
-   if(button.hasAttribute('data-original-more')){showPanel('more');panel.querySelector('[aria-pressed=true]').focus();}
-   if(button.hasAttribute('data-original-more-close')){showPanel(null);more.focus();}
+   if(button===more)showPanel(panel.inert?'more':null);
    if(button.dataset.originalJump){
     showPanel(null);go(data.pages.findIndex(page=>page.page===Number(button.dataset.originalJump)));
     dialog.querySelector('[data-original-directory]').focus();
@@ -306,32 +338,32 @@
    }
   });
   dialog.addEventListener('keydown',event=>{
-   if(event.key==='Escape'&&(!directory.hidden||!panel.hidden)){
+   if(event.key==='Escape'&&(!directory.hidden||!panel.inert)){
     event.preventDefault();
     const control=directory.hidden?more:dialog.querySelector("[data-original-directory]");showPanel(null);control.focus();
    }
-   if(!['ArrowLeft','ArrowRight'].includes(event.key))return;
+   if(exiting||!['ArrowLeft','ArrowRight'].includes(event.key))return;
    event.preventDefault();step(event.key==='ArrowLeft'?-1:1);
   });
+  dialog.addEventListener('cancel',event=>{event.preventDefault();void returnToText();});
   trigger.addEventListener('click',()=>{
    if(dialog.open)return;
-   const from=tools.getBoundingClientRect();
    current=0;
    host.classList.add('native-spread-open');
    trigger.setAttribute('aria-pressed','true');
-   dialog.showModal();observer.observe(stage);draw();enterCover();
+   dialog.showModal();observer.observe(stage);draw();
    figures.slice(1,3).forEach(loadPage);
    if(!reduced.matches){
-    const rail=dialog.querySelector('.original-rail-right'),to=rail.getBoundingClientRect();
-    rail.animate([
-     {translate:`${from.x+from.width/2-to.x-to.width/2}px ${from.y+from.height/2-to.y-to.height/2}px`},
-     {translate:'0 0'}
-    ],{duration:450,easing:'cubic-bezier(.2,.75,.25,1)'});
+    figures[0].animate(coverMotion,readerMotion);
+    rail.animate([{translate:railOffset()},{translate:'0 0'}],
+     {duration:450,easing:readerMotion.easing});
    }
   });
   dialog.addEventListener('close',()=>{
-   clearTurn();
+   clearTurn();exiting=false;dialog.classList.remove('is-returning');
    observer.disconnect();host.classList.remove('native-spread-open');trigger.setAttribute('aria-pressed','false');showPanel(null);
+   const focus=trigger.closest('[inert]')?tools.querySelector('.reader-tools-toggle'):trigger;
+   focus?.focus({preventScroll:true});
   });
   states.set(host,dialog);tools.append(trigger);host.append(dialog);
  }
