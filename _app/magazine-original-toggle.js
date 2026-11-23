@@ -69,13 +69,17 @@
     {transform:'var(--original-cover-pose)',opacity:1}
    ],{duration:650,easing:'cubic-bezier(.2,.75,.25,1)'});
   }
+  function pageHeight(pages,cover=false){
+   const inset=cover ? .82 : 1;
+   const widthLimit=stage.clientWidth*inset/pages.length;
+   return Math.min(stage.clientHeight*inset,...pages.map(page=>widthLimit*page.height/page.width));
+  }
   function draw(){
    if(!dialog.open)return;
    const start=startAt(current),size=start===0?1:spreadSize();
    dialog.classList.toggle('is-cover',start===0);coverButton.hidden=start!==0;
    const visible=data.pages.slice(start,start+size);
-   const widthLimit=stage.clientWidth/size;
-   const height=Math.min(stage.clientHeight,...visible.map(p=>widthLimit*p.height/p.width));
+   const height=pageHeight(visible,start===0);
    if(start===0){coverButton.style.width=height*visible[0].width/visible[0].height+"px";coverButton.style.height=height+"px";}
    figures.forEach((figure,index)=>{
     figure.hidden=index<start||index>=start+visible.length;
@@ -91,55 +95,68 @@
    dialog.querySelectorAll('[data-original-step="-1"],[data-original-edge="first"]').forEach(button=>button.disabled=start===0);
    dialog.querySelectorAll('[data-original-step="1"],[data-original-edge="last"]').forEach(button=>button.disabled=start===lastStart());
   }
-  async function openCover(){
-   const cover=figures[0], left=figures[1], right=figures[2];
-   const front=cover.querySelector('.native-original-tiles');
-   const initialWidth=front.offsetWidth,initialHeight=front.offsetHeight;
-   const [leftPage,rightPage]=data.pages.slice(1,3);
-   const height=Math.min(stage.clientHeight,stage.clientWidth/2*leftPage.height/leftPage.width,
-    stage.clientWidth/2*rightPage.height/rightPage.width);
-   const leftWidth=height*leftPage.width/leftPage.height,rightWidth=height*rightPage.width/rightPage.height;
-   const shift=(leftWidth-rightWidth)/2+initialWidth/2;
-   const pose=getComputedStyle(cover).transform;
-   cover.getAnimations().forEach(animation=>animation.cancel());
-   const reset=cover.animate([
-    {transform:pose},
-    {transform:`translateX(${shift}px) scale(${rightWidth/initialWidth}, ${height/initialHeight})`}
-   ],{duration:240,easing:'cubic-bezier(.2,.7,.25,1)',fill:'forwards'});
-   opening=reset;
-   try {await reset.finished;} catch {return;}
-   if(!dialog.open||opening!==reset)return;
-   current=1;draw();
+  async function turnCover(next){
+   const [cover,left,right]=data.pages;
+   const closedHeight=pageHeight([cover],true),closedWidth=closedHeight*cover.width/cover.height;
+   const height=pageHeight([left,right]);
+   const leftWidth=height*left.width/left.height,rightWidth=height*right.width/right.height;
+   const spine=(stage.clientWidth+leftWidth-rightWidth)/2;
+   const shift=(stage.clientWidth-closedWidth)/2-spine;
+   const scene=document.createElement('div');
+   scene.className='original-turn-scene';
+   scene.setAttribute('aria-hidden','true');
+   Object.assign(scene.style,{left:spine+'px',top:(stage.clientHeight-height)/2+'px',width:rightWidth+'px',height:height+'px'});
+   const pose=document.createElement('div');
+   pose.className='original-turn-pose';
    const leaf=document.createElement('div');
    leaf.className='original-turning-leaf';
-   leaf.setAttribute('aria-hidden','true');
-   leaf.style.left=right.offsetLeft+'px';
-   leaf.style.top=right.offsetTop+'px';
-   leaf.style.width=rightWidth+'px';leaf.style.height=height+'px';
-   const back=left.querySelector('.native-original-tiles').cloneNode(true);
-   const face=front.cloneNode(true);
-   face.classList.add('original-leaf-front');back.classList.add('original-leaf-back');
-   for(const side of [face,back]){
-    side.style.width='100%';side.style.height='100%';
-    side.querySelectorAll('img').forEach(img=>img.loading='eager');
+   const [front,back,under]=figures.slice(0,3).map(figure=>{
+    loadPage(figure);
+    const tiles=figure.querySelector('.native-original-tiles').cloneNode(true);
+    tiles.style.width='100%';tiles.style.height='100%';
+    tiles.querySelectorAll('img').forEach(img=>img.loading='eager');
+    return tiles;
+   });
+   back.classList.add('original-leaf-back');
+   leaf.append(front,back);pose.append(under,leaf);scene.append(pose);stage.append(scene);
+   figures[0].getAnimations().forEach(animation=>animation.cancel());
+   stage.classList.add('is-turning');
+   const closed='translateX('+shift+'px) scale('+closedWidth/rightWidth+', '+closedHeight/height+')';
+   const duration=820, flatten=.28;
+   const easing='cubic-bezier(.35,.12,.25,1)';
+   const options={duration,fill:'both'};
+   const animations=[
+    scene.animate([{transform:closed},{transform:closed,offset:flatten,easing},{transform:'none'}],options),
+    pose.animate([{transform:'var(--original-cover-pose)',easing},{transform:'none',offset:flatten},{transform:'none'}],options),
+    leaf.animate([{transform:'rotateY(0deg)'},{transform:'rotateY(0deg)',offset:flatten,easing},{transform:'rotateY(-180deg)'}],options)
+   ];
+   const turn={animations,scene};
+   opening=turn;
+   if(next===0)for(const animation of animations){
+    animation.playbackRate=-1;animation.currentTime=duration;
    }
-   leaf.append(face,back);stage.append(leaf);
-   left.style.visibility='hidden';
-   reset.cancel();
-   const flip=leaf.animate([
-    {transform:'rotateY(0deg)'},{transform:'rotateY(-180deg)'}
-   ],{duration:610,easing:'cubic-bezier(.35,.12,.25,1)',fill:'forwards'});
-   opening=flip;
-   try {await flip.finished;} catch {} finally {
-    leaf.remove();left.style.visibility='';
-    if(opening===flip)opening=null;
+   try {
+    await Promise.all(animations.map(animation=>animation.finished));
+    if(opening===turn){current=next;draw();}
+   } catch {
+    // Closing the reader or resizing the stage cancels the temporary scene.
+   } finally {
+    if(opening===turn)clearTurn();
    }
+  }
+  function clearTurn(){
+   if(!opening)return;
+   const {animations,scene}=opening;
+   opening=null;
+   animations.forEach(animation=>animation.cancel());
+   scene.remove();stage.classList.remove('is-turning');
   }
   function go(index){
    if(opening)return;
    const next=Math.max(0,Math.min(figures.length-1,index));
-   if(current===0&&next===1&&spreadSize()===2&&figures.length>=3&&!reduced.matches){
-    void openCover();return;
+   const from=startAt(current),to=startAt(next);
+   if(((from===0&&to===1)||(from===1&&to===0))&&spreadSize()===2&&figures.length>=3&&!reduced.matches){
+    void turnCover(next);return;
    }
    current=next;draw();
   }
@@ -148,7 +165,10 @@
    const start=startAt(current);
    go(direction>0?(start===0?1:start+spreadSize()):start-spreadSize());
   }
-  const observer=new ResizeObserver(draw);
+  const observer=new ResizeObserver(()=>{
+   if(opening)clearTurn();
+   draw();
+  });
   dialog.addEventListener('click',event=>{
    const button=event.target.closest('button');
    if(!button)return;
@@ -193,7 +213,7 @@
    }
   });
   dialog.addEventListener('close',()=>{
-   opening?.cancel();opening=null;
+   clearTurn();
    observer.disconnect();host.classList.remove('native-spread-open');trigger.setAttribute('aria-pressed','false');showPanel(null);
   });
   states.set(host,dialog);tools.append(trigger);host.append(dialog);

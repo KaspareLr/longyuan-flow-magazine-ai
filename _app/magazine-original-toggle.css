@@ -93,7 +93,7 @@ body:has(.native-original-spread[open]) { overflow: hidden; }
 .original-spread-pages figure { position: relative; }
 .original-spread-pages {
   --original-cover-pose: rotateX(20deg) rotateY(-20deg) rotateZ(5deg);
-  perspective: 1100px;
+  perspective: max(1100px, 120dvh);
   overflow: visible;
 }
 .is-cover .original-spread-pages figure:not([hidden]) {
@@ -112,7 +112,15 @@ body:has(.native-original-spread[open]) { overflow: hidden; }
   background: repeating-linear-gradient(90deg,#fff 0 1px,#dedbd4 1px 2px);
   border-right: 1px solid #c7c3bb;
 }
+.original-spread-pages.is-turning > figure { visibility: hidden; }
+.original-turn-scene,
+.original-turn-pose {
+  position: absolute; transform-style: preserve-3d; pointer-events: none;
+}
+.original-turn-scene { z-index: 1; transform-origin: left center; }
+.original-turn-pose { inset: 0; }
 .original-turning-leaf {
+  inset: 0;
   position: absolute; z-index: 1; transform-origin: left center;
   transform-style: preserve-3d; pointer-events: none;
 }
