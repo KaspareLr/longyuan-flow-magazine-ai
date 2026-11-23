@@ -97,9 +97,42 @@ body:has(.native-original-spread[open]) { overflow: hidden; }
 .native-original-spread[data-background=charcoal] .original-spread-number { background: #ffffff24; }
 .original-spread-pages { position: relative; }
 .original-spread-pages figure { position: relative; }
+.original-spread-pages {
+  --original-cover-pose: rotateX(20deg) rotateY(-20deg) rotateZ(5deg);
+  perspective: 1100px;
+  overflow: visible;
+}
 .is-cover .original-spread-pages figure:not([hidden]) {
-  transform: perspective(1100px) rotateY(-5deg);
-  box-shadow: 2px 1px #6c6d70, 4px 2px #b9b7af, 6px 3px #d8d4c8, 8px 4px #9e9b94, 14px 18px 32px #13192135;
+  transform: var(--original-cover-pose);
+  transform-style: preserve-3d;
+  border-radius: 2px;
+  box-shadow: 16px 24px 52px #13192146;
+}
+.is-cover .original-spread-pages figure:not([hidden])::after {
+  content: "";
+  position: absolute;
+  left: 100%; top: 2px; bottom: 2px;
+  width: 14px;
+  transform-origin: left center;
+  transform: rotateY(90deg);
+  background: repeating-linear-gradient(90deg,#fff 0 1px,#dedbd4 1px 2px);
+  border-right: 1px solid #c7c3bb;
+}
+.original-turning-leaf {
+  position: absolute; z-index: 1; transform-origin: left center;
+  transform-style: preserve-3d; pointer-events: none;
+}
+.original-turning-leaf > .native-original-tiles {
+  position: absolute; inset: 0; backface-visibility: hidden;
+}
+.original-leaf-back { transform: rotateY(180deg); }
+.original-rail-left { top: calc(50% - 28px); }
+.original-rail-left [data-original-edge="first"] img { transform: scaleX(-1); }
+.original-rail .original-mode-active,
+.original-rail .original-mode-active .iconfont { color: #fff; }
+.original-rail .original-mode-active .iconfont { font-size: 24px; }
+@media(max-width:760px) {
+  .original-rail-left { top: calc(50% - 22px); }
 }
 .original-open-cover { position: absolute; inset: 0; margin: auto; width: min(100%, 560px); border: 0; background: transparent; cursor: pointer; }
 .native-original-spread [hidden] { display: none !important; }

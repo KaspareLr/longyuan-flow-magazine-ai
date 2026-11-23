@@ -44,7 +44,10 @@
   const coverButton=stage.querySelector('.original-open-cover');
   const breakpoint=matchMedia('(max-width:760px)');
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
-  let current=0;
+  let current=0, opening=null;
+  function loadPage(figure){
+   figure.querySelectorAll('img[data-src]').forEach(img=>{img.src=img.dataset.src;delete img.dataset.src;});
+  }
   const spreadSize=()=>breakpoint.matches?1:2;
   const startAt=index=>index===0?0:1+Math.floor((index-1)/spreadSize())*spreadSize();
   const lastStart=()=>startAt(figures.length-1);
@@ -59,8 +62,8 @@
    if(reduced.matches)return;
    figures[0].animate([
     {transform:'perspective(1100px) translateY(110dvh) rotateX(26deg) rotateY(-14deg)',opacity:.45},
-    {transform:'perspective(1100px) translateY(-2%) rotateY(-8deg)',opacity:1,offset:.82},
-    {transform:'perspective(1100px) rotateY(-5deg)',opacity:1}
+    {transform:'translateY(-2%) var(--original-cover-pose)',opacity:1,offset:.82},
+    {transform:'var(--original-cover-pose)',opacity:1}
    ],{duration:650,easing:'cubic-bezier(.2,.75,.25,1)'});
   }
   function draw(){
@@ -77,7 +80,7 @@
     const page=data.pages[index], tiles=figure.querySelector('.native-original-tiles');
     tiles.style.width=height*page.width/page.height+'px';
     tiles.style.height=height+'px';
-    tiles.querySelectorAll('img[data-src]').forEach(img=>{img.src=img.dataset.src;delete img.dataset.src;});
+    loadPage(figure);
    });
    const first=visible[0].page,last=visible.at(-1).page;
    dialog.querySelector('output').textContent=(first===last?first:first+'–'+last)+'  共 '+figures.length+' 页';
@@ -85,17 +88,57 @@
    dialog.querySelectorAll('[data-original-step="-1"],[data-original-edge="first"]').forEach(button=>button.disabled=start===0);
    dialog.querySelectorAll('[data-original-step="1"],[data-original-edge="last"]').forEach(button=>button.disabled=start===lastStart());
   }
-  function go(index){
-   const wasCover=current===0;
-   current=Math.max(0,Math.min(figures.length-1,index));draw();
-   if(wasCover&&current>0&&!reduced.matches){
-    stage.animate([{transform:'scale(.94)',opacity:.65},{transform:'scale(1)',opacity:1}],{duration:320,easing:'ease-out'});
-    const right=figures[startAt(current)+1];
-    if(!breakpoint.matches&&right&&!right.hidden)right.animate([
-     {transform:'perspective(1000px) rotateY(-68deg)',transformOrigin:'left center',opacity:.65},
-     {transform:'perspective(1000px) rotateY(0)',transformOrigin:'left center',opacity:1}
-    ],{duration:380,easing:'ease-out'});
+  async function openCover(){
+   const cover=figures[0], left=figures[1], right=figures[2];
+   const front=cover.querySelector('.native-original-tiles');
+   const initialWidth=front.offsetWidth,initialHeight=front.offsetHeight;
+   const [leftPage,rightPage]=data.pages.slice(1,3);
+   const height=Math.min(stage.clientHeight,stage.clientWidth/2*leftPage.height/leftPage.width,
+    stage.clientWidth/2*rightPage.height/rightPage.width);
+   const leftWidth=height*leftPage.width/leftPage.height,rightWidth=height*rightPage.width/rightPage.height;
+   const shift=(leftWidth-rightWidth)/2+initialWidth/2;
+   const pose=getComputedStyle(cover).transform;
+   cover.getAnimations().forEach(animation=>animation.cancel());
+   const reset=cover.animate([
+    {transform:pose},
+    {transform:`translateX(${shift}px) scale(${rightWidth/initialWidth}, ${height/initialHeight})`}
+   ],{duration:240,easing:'cubic-bezier(.2,.7,.25,1)',fill:'forwards'});
+   opening=reset;
+   try {await reset.finished;} catch {return;}
+   if(!dialog.open||opening!==reset)return;
+   current=1;draw();
+   const leaf=document.createElement('div');
+   leaf.className='original-turning-leaf';
+   leaf.setAttribute('aria-hidden','true');
+   leaf.style.left=right.offsetLeft+'px';
+   leaf.style.top=right.offsetTop+'px';
+   leaf.style.width=rightWidth+'px';leaf.style.height=height+'px';
+   const back=left.querySelector('.native-original-tiles').cloneNode(true);
+   const face=front.cloneNode(true);
+   face.classList.add('original-leaf-front');back.classList.add('original-leaf-back');
+   for(const side of [face,back]){
+    side.style.width='100%';side.style.height='100%';
+    side.querySelectorAll('img').forEach(img=>img.loading='eager');
    }
+   leaf.append(face,back);stage.append(leaf);
+   left.style.visibility='hidden';
+   reset.cancel();
+   const flip=leaf.animate([
+    {transform:'rotateY(0deg)'},{transform:'rotateY(-180deg)'}
+   ],{duration:610,easing:'cubic-bezier(.35,.12,.25,1)',fill:'forwards'});
+   opening=flip;
+   try {await flip.finished;} catch {} finally {
+    leaf.remove();left.style.visibility='';
+    if(opening===flip)opening=null;
+   }
+  }
+  function go(index){
+   if(opening)return;
+   const next=Math.max(0,Math.min(figures.length-1,index));
+   if(current===0&&next===1&&spreadSize()===2&&figures.length>=3&&!reduced.matches){
+    void openCover();return;
+   }
+   current=next;draw();
   }
   function step(direction){
    showPanel(null);
@@ -136,6 +179,7 @@
    host.classList.add('native-spread-open');
    trigger.setAttribute('aria-pressed','true');
    dialog.showModal();observer.observe(stage);draw();enterCover();
+   figures.slice(1,3).forEach(loadPage);
    if(!reduced.matches){
     const rail=dialog.querySelector('.original-rail-right'),to=rail.getBoundingClientRect();
     rail.animate([
@@ -145,6 +189,7 @@
    }
   });
   dialog.addEventListener('close',()=>{
+   opening?.cancel();opening=null;
    observer.disconnect();host.classList.remove('native-spread-open');trigger.setAttribute('aria-pressed','false');showPanel(null);
   });
   states.set(host,dialog);tools.append(trigger);host.append(dialog);
