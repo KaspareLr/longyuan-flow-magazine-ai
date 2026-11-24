@@ -43,7 +43,7 @@
  }
  async function select(index){if(index===selected)return;const token=++sequence;const cover=page.querySelector('.magazines-home-cover');if(!reduced.matches)await cover.animate([{opacity:1,transform:'translateX(0)'},{opacity:0,transform:'translateX(-30px)'}],{duration:200,easing:'ease-in',fill:'forwards'}).finished.catch(()=>{});if(token!==sequence)return;cover.getAnimations().forEach(a=>a.cancel());show(index,true);}
  function filter(category='全部'){
- page.querySelector('.magazines-all-grid').innerHTML=data.magazines.filter(m=>category==='全部'||m.category===category).map(m=>`<a class="magazines-all-card" href="${e(m.href)}"><div class="magazines-card-cover books-library-cover-area"><span class="books-library-volume"><span class="books-library-paper" aria-hidden="true"></span><img class="books-library-cover" src="${e(m.cover)}" alt="《${e(m.title)}》封面" loading="lazy"></span></div><div class="magazines-card-info"><h3>${e(m.title)}</h3><p>${e(m.issue)}</p></div></a>`).join('');
+ page.querySelector('.magazines-all-grid').innerHTML=data.magazines.filter(m=>category==='全部'||m.category===category).map(m=>`<a class="magazines-all-card" href="${e(window.magazineHomeDestination(m.title)||m.href)}"><div class="magazines-card-cover books-library-cover-area"><span class="books-library-volume"><span class="books-library-paper" aria-hidden="true"></span><img class="books-library-cover" src="${e(m.cover)}" alt="《${e(m.title)}》封面" loading="lazy"></span></div><div class="magazines-card-info"><h3>${e(m.title)}</h3><p>${e(m.issue)}</p></div></a>`).join('');
  page.querySelectorAll('[data-magazine-category]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.magazineCategory===category)));
  }
  function expandStory(index){

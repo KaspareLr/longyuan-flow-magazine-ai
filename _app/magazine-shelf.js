@@ -1,7 +1,7 @@
 /* Reuses the discovery shelf RAF, drag, hover-wave, entrance and keyboard engine. */
 const flowShelfData=window.magazineHomePublication.archiveRows
  .slice().sort((a,b)=>b.year-a.year||b.issue-a.issue).slice(0,20)
- .map(item=>({title:window.magazineHomePublication.name,issue:item.label,src:item.cover,url:item.year===2026&&item.issue===9?window.magazineHomePublication.issue:item.url}));
+ .map(item=>({title:window.magazineHomePublication.name,issue:item.label,src:item.cover,url:item.label===window.magazineHomePublication.edition?window.magazineHomePublication.issue:item.url}));
 (() => {
   const root=document.querySelector('.hero-shelf');
   const stage=root.querySelector('.shelf-stage');
