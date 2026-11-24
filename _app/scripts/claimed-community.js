@@ -1,8 +1,8 @@
-window.publicationCommunityRoute=(publication,page='',id='')=>'#/magazine/'+encodeURIComponent(publication)+'?claimed=1'+(page?'&page='+page:'')+(id?'&id='+encodeURIComponent(id):'');
+window.publicationCommunityRoute=(publication,page='',id='')=>page==='membership'?'#/membership/'+encodeURIComponent(publication):'#/magazine/'+encodeURIComponent(publication)+'?claimed=1'+(page?'&page='+page:'')+(id?'&id='+encodeURIComponent(id):'');
 window.octoberCommunityRoute=(page,id)=>publicationCommunityRoute('南风窗',page,id);
 window.renderPublicationMembershipPage=function(publication='南风窗'){
  return `<div class="rd-periodical pe-figma-detail oc-publication">
-  <main class="oc-main"><section class="oc-membership" id="oc-membership">${renderSignedMembership(true,publication==='南风窗'?'':publication)}</section></main>
+  <main class="oc-main"><section class="oc-membership" id="oc-membership">${renderSignedMembership(true,publication)}</section></main>
   ${renderOctoberDock('membership','',publication)}
   ${renderResourceChat()}
  </div>`;

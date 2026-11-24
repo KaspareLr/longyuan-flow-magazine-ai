@@ -18,7 +18,7 @@
   ...row,cover:row.src,issue:Number(row.label.match(/(\d+)\s*期/)?.[1])
  })):window.magazineArchiveData;
  window.magazineHomePublication={name,issue,archiveRows};
- document.querySelector('.mh-dock-member').href='index.html#/magazine/'+encodeURIComponent(name)+'?page=membership';
+ document.querySelector('.mh-dock-member').href='index.html#/membership/'+encodeURIComponent(name);
  if(south){
   document.title=name+' · 刊物首页';
   document.querySelector('#magazine-title').textContent=name;

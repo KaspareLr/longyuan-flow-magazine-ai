@@ -87,7 +87,21 @@
   const listing=window.magazinesHomeData?.magazines.find(m=>m.title===id);
   if(listing)return {...listing,src:listing.cover,issues:[{src:listing.cover,label:listing.issue}]};
  }
- function render(){const raw=location.hash.slice(2).split('?');let type,id;try{[type,id]=raw[0].split('/').map(decodeURIComponent)}catch{return}if(!['magazine','book','club'].includes(type))return;context={};const q=new URLSearchParams(raw[1]);const node=document.getElementById('view-'+type);if(type==='book'){const b=editorialBooks.find(x=>String(x.id)===id);node.innerHTML=b?book(b):'<div class="rd-page"><h1>未找到这本书</h1><a href="#/books">返回图书馆</a></div>';}else{const m=magazineResource(id);node.innerHTML=m?(type==='club'?club(m):magazine(m,q)):'<div class="rd-page"><h1>未找到这本刊</h1><a href="#/magazines">返回期刊馆</a></div>';}}
+ function render(){const raw=location.hash.slice(2).split('?');let type,id;try{[type,id]=raw[0].split('/').map(decodeURIComponent)}catch{return}if(type==='membership'){
+  const branded=['第一财经','南风窗'].includes(id);
+  const view=document.getElementById('view-membership');
+  view.querySelector('.content').style.display=branded?'none':'';
+  const page=view.querySelector('[data-publication-membership]');
+  page.innerHTML=branded?renderPublicationMembershipPage(id):'';
+  if(branded){
+   const reference=id==='第一财经'?window.periodicalReference:window.nanfcIssueReference;
+   const issues=id==='第一财经'?reference.archive.map(a=>({src:a.cover,label:a.issue})):window.nanfcIssues;
+   context={type:'magazine',m:{title:id,issues},issue:issues[0],claimed:true};
+  }
+  return;
+ }
+ document.querySelector('[data-publication-membership]').replaceChildren();
+ if(!['magazine','book','club'].includes(type))return;context={};const q=new URLSearchParams(raw[1]);const node=document.getElementById('view-'+type);if(type==='book'){const b=editorialBooks.find(x=>String(x.id)===id);node.innerHTML=b?book(b):'<div class="rd-page"><h1>未找到这本书</h1><a href="#/books">返回图书馆</a></div>';}else{const m=magazineResource(id);node.innerHTML=m?(type==='club'?club(m):magazine(m,q)):'<div class="rd-page"><h1>未找到这本刊</h1><a href="#/magazines">返回期刊馆</a></div>';}}
  document.addEventListener('click',async e=>{
   const year=e.target.closest('[data-pe-archive-year]');if(year){const selected=year.dataset.peArchiveYear;modal.querySelectorAll('[data-pe-archive-year]').forEach(b=>b.setAttribute('aria-pressed',String(b===year)));let count=0;modal.querySelectorAll('[data-pe-archive-issue]').forEach(item=>{item.hidden=item.dataset.peArchiveIssue!==selected;if(!item.hidden)count++});modal.querySelector('.pe-archive-empty').hidden=count>0;return}
   const issueLink=e.target.closest('.pe-archive-dialog-grid a');if(issueLink){modal.close();}
@@ -97,7 +111,7 @@
   const tool=e.target.closest('[data-rd-tool]');if(tool){showBookTool(tool.dataset.rdTool);return}
   const content=e.target.closest('[data-rd-content]');if(content){openModal(content.dataset.rdContent,`<span class="rd-state">${esc(content.dataset.rdKind)}</span><p>属于《${esc(context.m.title)}》读书会。正式内容将关联本刊期次、领读人和单刊会员权限。</p><p>${content.dataset.rdKind==='活动'?'活动详情包括时间、地点、适合读者、流程、报名状态与结束后的回顾。当前未开放报名。':content.dataset.rdKind==='领读人'?'这里展示领读人的介绍、领读内容、观点、近期活动和关注入口。':'媒体介绍、关联原文与播放内容将在资源接入后展示。'}</p>`);return}
   const a=e.target.closest('[data-rd-action]');if(!a)return;const key=a.dataset.rdAction;
-  if(key==='member'&&['第一财经','南风窗'].includes(context.m?.title)){location.hash=route('magazine',context.m.title,'page=membership');return;}
+  if(key==='member'&&['第一财经','南风窗'].includes(context.m?.title)){location.hash=route('membership',context.m.title);return;}
   if(key==='archive'){
    const m=context.m;const entries=m.title==='第一财经'?window.magazineArchiveData.map(a=>({src:a.cover,label:a.label,href:a.year===2026&&a.issue===9?'portal.html#/article/0?context=magazine&resource='+encodeURIComponent(m.title):a.url})):m.issues.map((a,i)=>({...a,index:i}));
    const latest=Math.max(...entries.map(a=>Number(a.label.match(/\d{4}/)?.[0])||2026));

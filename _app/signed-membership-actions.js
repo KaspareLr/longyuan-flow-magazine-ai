@@ -1,6 +1,6 @@
 /* Membership interactions share the reading demo's local account and benefits state. */
 (()=>{
- const session=clubSession,root='#/magazine/'+encodeURIComponent('南风窗')+'?claimed=1&page=membership';
+ const session=clubSession,root='#/membership/'+encodeURIComponent('南风窗');
  const dialog=document.createElement('dialog');dialog.className='signed-member-dialog';dialog.setAttribute('aria-label','会员方案');document.body.append(dialog);
  function notice(title,body){dialog.innerHTML=`<form method="dialog"><button class="signed-dialog-close" aria-label="关闭弹窗">×</button></form><h2>${title}</h2>${body}`;dialog.showModal();}
  function refresh(){document.querySelectorAll('.signed-membership-content').forEach(el=>{el.outerHTML=renderSignedMembership(el.dataset.membershipPage==='true',el.dataset.membershipPublication);});}
