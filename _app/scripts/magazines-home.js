@@ -33,7 +33,9 @@
   progressFrame=requestAnimationFrame(tick);
  }
  function show(index,animate=false){
-  selected=index;const m=picks[index];const info=page.querySelector('.magazines-home-info'),cover=page.querySelector('.magazines-home-cover');
+  selected=index;
+  try{if(root.classList.contains('active'))history.replaceState({...history.state,clubMagazinePick:index},'');}catch{}
+ const m=picks[index];const info=page.querySelector('.magazines-home-info'),cover=page.querySelector('.magazines-home-cover');
   const publicationHome=window.magazineHomeDestination(m.title);
   const href=publicationHome||'#/magazine/'+encodeURIComponent(m.title)+'?claimed=0';
   info.innerHTML=`<div class="magazines-home-identity"><div class="magazines-home-kicker"><img src="assets/figma-magazines/laurel-left.svg" alt=""><span>编辑推荐</span><img src="assets/figma-magazines/laurel-right.svg" alt=""></div><h1>${e(m.title)}</h1><div class="magazines-home-issue">${m.frequency?`<strong>${e(m.frequency)}</strong>`:''}<span>更新至 ${e(m.issue)}</span></div></div><section class="magazines-editor-note" aria-label="编辑导读"><div><span>编辑导读</span><p>${e(editorNote(m))}</p></div><span class="magazines-editor-divider" aria-hidden="true"></span></section><a class="magazines-home-read" href="${e(href)}">立即查看</a>`;
@@ -52,7 +54,7 @@
   stories.forEach((story,i)=>{const open=i===index;story.classList.toggle('is-featured',open);story.querySelector('.magazines-story-toggle').setAttribute('aria-expanded',String(open));story.querySelector('p').hidden=!open;story.querySelector('.magazines-story-read').hidden=!open;});
  }
  page.addEventListener('click',event=>{const story=event.target.closest('[data-story-select]');if(story)expandStory(Number(story.dataset.storySelect));const pick=event.target.closest('[data-magazine-pick]'),category=event.target.closest('[data-magazine-category]');if(pick)select(Number(pick.dataset.magazinePick));if(category)filter(category.dataset.magazineCategory);});
- let wasActive=false;function entrance(){const active=root.classList.contains('active');if(active&&!wasActive)animateProgress(450);if(!active)cancelAnimationFrame(progressFrame);if(active&&!wasActive&&!reduced.matches){page.querySelector('.magazines-home-cover').animate([{opacity:0,transform:'translateY(32px) scale(.94)'},{opacity:1,transform:'translateY(0) scale(1)'}],{duration:1100,delay:100,fill:'backwards',easing:'cubic-bezier(.2,.8,.2,1)'});[...page.querySelector('.magazines-home-info').children,...page.querySelectorAll('.magazines-home-thumbnails button')].forEach((n,i)=>n.animate([{opacity:0,transform:'translateY(20px)'},{opacity:1,transform:'translateY(0)'}],{duration:800,delay:250+i*90,fill:'backwards',easing:'cubic-bezier(.2,.8,.2,1)'}));}wasActive=active;}
+ let wasActive=false;function entrance(){const active=root.classList.contains('active');if(active&&!wasActive){const saved=history.state?.clubMagazinePick;if(picks[saved]&&saved!==selected)show(saved);animateProgress(450);}if(!active)cancelAnimationFrame(progressFrame);if(active&&!wasActive&&!reduced.matches){page.querySelector('.magazines-home-cover').animate([{opacity:0,transform:'translateY(32px) scale(.94)'},{opacity:1,transform:'translateY(0) scale(1)'}],{duration:1100,delay:100,fill:'backwards',easing:'cubic-bezier(.2,.8,.2,1)'});[...page.querySelector('.magazines-home-info').children,...page.querySelectorAll('.magazines-home-thumbnails button')].forEach((n,i)=>n.animate([{opacity:0,transform:'translateY(20px)'},{opacity:1,transform:'translateY(0)'}],{duration:800,delay:250+i*90,fill:'backwards',easing:'cubic-bezier(.2,.8,.2,1)'}));}wasActive=active;}
  reduced.addEventListener('change',()=>animateProgress());
- show(0);filter();new MutationObserver(entrance).observe(root,{attributes:true,attributeFilter:['class']});entrance();
+ show(root.classList.contains('active')&&picks[history.state?.clubMagazinePick]?history.state.clubMagazinePick:0);filter();new MutationObserver(entrance).observe(root,{attributes:true,attributeFilter:['class']});entrance();
 })();

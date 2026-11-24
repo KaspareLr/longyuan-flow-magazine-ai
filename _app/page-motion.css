@@ -1,2 +1,4 @@
-html:is(.club-motion-boot,.club-motion-pending) body>main{opacity:0}
-@media(prefers-reduced-motion:reduce){html:is(.club-motion-boot,.club-motion-pending) body>main{opacity:1}}
+html:is(.club-motion-boot) body>main{opacity:0}
+@media(prefers-reduced-motion:reduce){html:is(.club-motion-boot) body>main{opacity:1}}
+
+.club-publication-flight{position:fixed;z-index:2000;object-fit:fill;pointer-events:none;border-radius:2px;box-shadow:0 8px 26px #13192135}

@@ -7,14 +7,14 @@
   if(event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
   const link=event.target.closest('a');
   if(!link||link.target==='_blank')return;
-  const destination=link.matches('.magazines-home-cover-link,.magazines-all-card')&&link.getAttribute('href')?.startsWith('magazine-home.html')
+  const destination=link.matches('.magazines-home-cover-link,.magazines-home-read,.magazines-all-card')&&link.getAttribute('href')?.startsWith('magazine-home.html')
    ?link.getAttribute('href')
    :link.hash.startsWith('#/magazine/')&&window.magazineHomeDestination(decodeURIComponent(link.hash.slice('#/magazine/'.length)));
   if(!destination)return;
   event.preventDefault();
   event.stopImmediatePropagation();
-  const image=link.querySelector('img');
-  if(image&&window.longyuanOpenPublication)window.longyuanOpenPublication(image,destination,image.closest('[data-book-tilt],.hinged-cover')||image);
+  const image=link.querySelector('img')||link.closest('.magazines-home-feature')?.querySelector('.magazines-home-cover img');
+  if(window.clubPageMotion)window.clubPageMotion.publicationHome(destination,image);
   else location.assign(destination);
  },true);
 })();

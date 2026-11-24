@@ -50,7 +50,7 @@
   if(!magazine||!source)return;
   const image=source.querySelector('img');
   const home=window.magazineHomeDestination?.(magazine.title);
-  return home?window.longyuanOpenPublication(image,home,source):openPublication(image,'#/magazine/'+encodeURIComponent(magazine.title),source);
+  return home?window.clubPageMotion.publicationHome(home,image):openPublication(image,'#/magazine/'+encodeURIComponent(magazine.title),source);
  };
  document.addEventListener('click',event=>{
   const link=event.target.closest('a[href*="#/magazine/"]');
