@@ -6,9 +6,10 @@
  window.addEventListener('click',event=>{
   if(event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
   const link=event.target.closest('a');
-  if(!link||link.target==='_blank'||!link.hash.startsWith('#/magazine/'))return;
-  const name=decodeURIComponent(link.hash.slice('#/magazine/'.length));
-  const destination=window.magazineHomeDestination(name);
+  if(!link||link.target==='_blank')return;
+  const destination=link.matches('.magazines-home-cover-link')&&Object.values(destinations).includes(link.getAttribute('href'))
+   ?link.getAttribute('href')
+   :link.hash.startsWith('#/magazine/')&&window.magazineHomeDestination(decodeURIComponent(link.hash.slice('#/magazine/'.length)));
   if(!destination)return;
   event.preventDefault();
   event.stopImmediatePropagation();
