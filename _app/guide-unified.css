@@ -27,3 +27,7 @@ body:has(#view-search.active)>.topbar>.nav-island{pointer-events:auto}
 :is(.pe-chat,.ai-workspace) :is(.guide-unified-composer,.guide-unified-welcome) :is(.icon-Arrow_Forward-2,.icon-Link){font-family:reading-guide-icons!important}
 :is(.pe-chat,.ai-workspace) :is(.guide-unified-composer,.guide-unified-welcome) .icon-Arrow_Forward-2:before{content:"\e751"}
 :is(.pe-chat,.ai-workspace) .guide-unified-composer .icon-Link:before{content:"\e6d6"}
+
+@media (forced-colors: none) {
+  .pe-chat .pe-chat-form textarea:focus { outline: none !important; }
+}
