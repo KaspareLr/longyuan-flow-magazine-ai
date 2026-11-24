@@ -3,7 +3,7 @@
  const icon=name=>`<i class="iconfont icon-${name}" aria-hidden="true"></i>`;
  const back=document.querySelector('.portal-back');
  clubNavigation.setBack(back,true);
- back?.addEventListener('click',()=>clubPageMotion.back('index.html#/magazines'));
+ back?.addEventListener('click',()=>clubPageMotion.publicationBack('index.html#/magazines'));
  document.querySelector('.club-account-dialog .club-dialog-close')?.replaceChildren(Object.assign(document.createElement('i'),{className:'iconfont icon-Close'}));
  const publication=new URLSearchParams(location.search).get('publication');
  const south=publication==='nanfc';
