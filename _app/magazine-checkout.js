@@ -38,8 +38,7 @@
      </label>`).join('')}
     </fieldset>
     <p role="alert" data-payment-error hidden></p>
-    <div class="dsu-dialog-actions mh-payment-actions"><button class="qikan-checkout-button is-primary">确定</button>
-     <p class="mh-payment-notice">测试订单 · 无需付款</p></div>
+    <div class="dsu-dialog-actions mh-payment-actions"><button class="qikan-checkout-button is-primary">确定</button></div>
    </form>
    <section data-payment-step="success" hidden>
     <div class="mh-payment-success" aria-hidden="true">✓</div>

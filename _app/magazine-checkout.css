@@ -38,7 +38,6 @@
 .mh-payment-methods label:has(input:checked) .mh-payment-code { display:block; }
 .mh-payment-code svg { display:block;width:100%;height:100%; }
 .qikan-checkout .mh-payment-actions { display:grid;justify-items:center;justify-content:center;gap:6px;margin-top:30px; }
-.qikan-checkout .mh-payment-notice { margin:0;color:#686d77;font-size:12px;line-height:16px; }
 .qikan-checkout-button {
   display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:14px 40px;border:0;border-radius:100px;
   background:#fff;color:#131921;font:700 14px/20px Figtree,"PingFang SC",sans-serif;cursor:pointer;
