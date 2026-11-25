@@ -74,10 +74,16 @@
   const savedArticles=session.read('savedArticles',[]);
   const articleTitle=item=>typeof item==='string'?item:item.title;
   const articleDetails=(title,record)=>{
-   const magazine=record.source||new URLSearchParams((record.route||'').split('?')[1]).get('resource');
-   const article=(magazine?magazineArticles(magazine):magazineArticles())?.find(item=>item.title===title)
-    ||clubSharedContent.articles.find(item=>item.title===title);
-   return {summary:record.summary||article?.excerpt||article?.summary,meta:magazine||article?.source};
+   const resource=new URLSearchParams((record.route||'').split('?')[1]).get('resource');
+   const bookSource=data.books.find(item=>item.id===resource)?.title;
+   const source=record.source||bookSource||resource;
+   const publications=source?[source]:['第一财经','南风窗'];
+   for(const name of publications){
+    const article=magazineArticles(name)?.find(item=>item.title===title);
+    if(article)return {summary:record.summary||article.excerpt||article.summary,meta:name};
+   }
+   const article=[...clubSharedContent.articles,...clubSharedContent.daily].find(item=>item.title===title);
+   return {summary:record.summary||article?.excerpt||article?.summary,meta:source||article?.source};
   };
   const publication=row=>{
    const name=row.id==='dycy202609'?'第一财经':row.title;
@@ -105,7 +111,14 @@
     empty='暂无收藏的文章。';
     break;
    case 'subscription':
-    rows=session.contentRows('subscription').map(row=>publication({...row,meta:subscriptionValidity(row.time)}));
+    rows=session.contentRows('subscription').map(record=>{
+     const row=publication({...record,meta:subscriptionValidity(record.time)});
+     const archive=row.title==='南风窗'?window.nanfcIssues?.map(issue=>issue.src)
+      :row.title==='第一财经'?window.magazineArchiveData?.map(issue=>issue.cover):[];
+     const primaryFile=row.cover?.split('/').pop();
+     const alternate=archive?.find(cover=>cover&&cover.split('/').pop()!==primaryFile);
+     return {...row,alternate};
+    });
     empty='暂无全年订购的期刊。';
     break;
    case 'issue':
@@ -116,26 +129,23 @@
     empty='暂无已购期刊。';
     break;
    case 'article':
-    rows=qikanDSU.readingUnlocks().map(row=>{
-     const title=row.description;
-     const index=savedArticles.findIndex(item=>articleTitle(item)===title);
-     const details=articleDetails(title,row);
-     return {title,route:row.route,index,kind:'owned-article',...details,meta:details.meta||row.amount+' DSU'};
-    });
+    rows=qikanDSU.readingUnlocks().map(row=>({
+     title:row.description,route:row.route,...articleDetails(row.description,row)
+    }));
     empty='暂无已购文章。';
     break;
   }
   return `<nav class="qikan-reading-tabs" aria-label="阅读记录">${readingTabs.map(([key,label])=>`<button type="button" data-reading-tab="${key}" aria-pressed="${readingTab===key}">${label}</button>`).join('')}</nav>
    ${rows.length?`<ul class="qikan-saved-list">${rows.map(row=>{
     const cover=row.cover?`<img class="qikan-saved-cover" src="${esc(row.cover)}" alt="" loading="lazy">`:'';
-    const content=`${cover&&row.kind==='subscription'?`<span class="qikan-subscription-covers">${cover}${cover}</span>`:cover}
+    const content=`${cover&&row.alternate?`<span class="qikan-subscription-covers">${cover}<img class="qikan-saved-cover" src="${esc(row.alternate)}" alt="" loading="lazy"></span>`:cover}
      <span class="qikan-saved-text"><span class="qikan-reading-item-head">
       ${row.type?`<small class="qikan-reading-type">${row.type}</small>`:''}<strong>${esc(row.title)}</strong>
       ${row.summary?`<span class="qikan-reading-summary">${esc(row.summary)}</span>`:''}
      </span>${row.meta?`<small class="qikan-reading-meta">${esc(row.meta)}</small>`:''}</span>`;
     const removal=['book','magazine','article'].includes(row.kind);
     const action=removal?`<button type="button" class="qikan-saved-remove" data-remove-saved="${row.kind}" data-index="${row.index??''}" data-content-id="${esc(row.id)}" aria-label="${row.kind==='article'?'取消收藏':'取消关注'} ${esc(row.title)}">${readingIcon(row.kind==='article'?'star':'mark')}</button>`
-     :row.kind==='owned-article'?`<button type="button" class="qikan-saved-remove" data-reading-save-title="${esc(row.title)}" data-reading-save-route="${esc(row.route)}" data-reading-save-source="${esc(row.meta)}" data-reading-save-summary="${esc(row.summary)}" aria-pressed="${row.index!==-1}" aria-label="收藏 ${esc(row.title)}">${row.index===-1?uiIcon('Star'):readingIcon('star')}</button>`:'';
+     :'';
     const layout=row.kind==='subscription'?'subscription':row.type==='图书'?'book':row.type==='期刊'?'periodical':'article';
     return `<li class="qikan-reading-item qikan-reading-item--${layout}">${row.route?`<a class="qikan-saved-link" href="${esc(row.route)}">${content}</a>`:`<div class="qikan-saved-link">${content}</div>`}${action}</li>`;
    }).join('')}</ul>`:`<p class="qikan-account-empty">${empty}</p>`}`;
@@ -226,16 +236,6 @@
   readingTab=el.dataset.readingTab;
   readingRecordsSection.innerHTML='<h3>阅读记录</h3>'+readingRecords(session.profile);
   readingRecordsSection.querySelector('[aria-pressed=true]').focus({preventScroll:true});
- }
- if(el.dataset.readingSaveTitle){
-  const {readingSaveTitle:title,readingSaveRoute:route,readingSaveSource:source,readingSaveSummary:summary}=el.dataset;
-  const records=session.read('savedArticles',[]);
-  const match=item=>(typeof item==='string'?item:item.title)===title;
-  const saved=records.some(match);
-  session.write('savedArticles',saved?records.filter(item=>!match(item)):[...records,{title,route,source,summary}]);
-  el.setAttribute('aria-pressed',String(!saved));
-  el.innerHTML=saved?uiIcon('Star'):readingIcon('star');
-  toast(saved?'已取消收藏':'已收藏');
  }
  if(el.dataset.removeSaved){
   const kind=el.dataset.removeSaved;
