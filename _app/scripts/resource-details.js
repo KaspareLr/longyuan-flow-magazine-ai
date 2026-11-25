@@ -31,7 +31,7 @@
   if(m.title==='南风窗')m={...m,src:window.nanfcIssueReference.cover,category:'时政综合',issues:window.nanfcIssues};
   if(m.title==='第一财经'){m={...m,issues:window.periodicalReference.archive.map(a=>({src:a.cover,label:a.issue}))};}
   const claimed=q.has('claimed')?q.get('claimed')==='1':publicationState(m).claimed;const index=Math.min(m.issues.length-1,Math.max(0,Math.floor(Number(q.get('issue'))||0)));const issue=m.issues[index];context={type:'magazine',m,issue,claimed};
-  if(q.get('page')==='membership'){location.replace('portal.html#/me?tab=membership');return '';}
+  if(q.get('page')==='membership'){location.replace('portal.html#/membership');return '';}
   if(q.get('claimed')==='1'&&!q.has('issue')){
    location.replace(window.magazineHomeDestination?.(m.title)||'index.html#/magazines');
    return '';
@@ -92,7 +92,7 @@
   if(listing)return {...listing,src:listing.cover,issues:[{src:listing.cover,label:listing.issue}]};
  }
  function render(){const raw=location.hash.slice(2).split('?');let type,id;try{[type,id]=raw[0].split('/').map(decodeURIComponent)}catch{return}if(type==='membership'){
-  location.replace('portal.html#/me?tab=membership');
+  location.replace('portal.html#/membership');
   return;
  }
  document.querySelector('[data-publication-membership]').replaceChildren();

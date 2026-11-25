@@ -12,7 +12,7 @@
     pro:{name:'年度 Pro',price:3599,quota:5000,months:12}
   };
   const planFor = subscription => plans[subscription?.code] || plans['month-auto'];
-  const membershipURL=new URL('portal.html#/me?tab=membership',root).href;
+  const membershipURL=new URL('portal.html#/membership',root).href;
   function addMonths(time,count){
     const end=new Date(time);
     const day=end.getUTCDate();
@@ -312,12 +312,32 @@
       ai:used.reduce((total,row)=>total+(row.type==='ai'?row.amount:0),0),
       articles:used.reduce((total,row)=>total+(row.type==='article'?row.amount:0),0)};
   }
-  function membership(code){
+  function membership(code, period='month'){
     const plan=Object.hasOwn(plans,code)?plans[code]:null;
-    const state=identity(profile())?load(identity(profile())):null;
+    const owner=identity(profile());
+    const state=owner?load(owner):null;
     const current=state&&active(state)?state.subscription:null;
-    if(plan)return `<section class="dsu-section"><a href="#/me?tab=membership">返回会员套餐</a><h2>开通${plan.name}</h2><p>¥${plan.price} · ${plan.quota} DSU · ${plan.months===1?'一个月':'一年'}</p><p>${plan.auto?'模拟自动续费，可在 DSU 账户取消。':'到期后可按需续订。'}</p><button type="button" class="dsu-button dsu-primary" data-dsu-checkout="${code}">确认模拟开通</button></section>`;
-    return `<div class="dsu-panel"><h2>龙源期刊网会员</h2><p>${current?`${planFor(current).name} · 有效至 ${date(current.expires)}`:'开通会员，获得可用于阅读和 AI 问答的 DSU。'}</p><p>以下为 Demo 价格和额度。</p><div class="dsu-membership-grid">${Object.entries(plans).map(([key,item])=>`<section class="dsu-section"><h3>${item.name}</h3><p>¥${item.price} · ${item.quota} DSU</p><a class="dsu-button" href="#/me?tab=membership&amp;plan=${key}">选择套餐</a></section>`).join('')}</div></div>`;
+    const pricing='#/membership';
+    if(plan)return `<section class="dsu-pricing dsu-pricing-checkout">
+      <a href="${pricing}?period=${plan.months===1?'month':'year'}">← 返回套餐比较</a>
+      <header><h1>开通${plan.name}</h1><p>确认所选方案后即可模拟开通。</p></header>
+      <div class="dsu-price-card"><dl><div><dt>会员额度</dt><dd>${plan.quota} DSU</dd></div><div><dt>有效期</dt><dd>${plan.months===1?'一个月':'一年'}</dd></div><div><dt>续费方式</dt><dd>${plan.auto?'到期自动续费，可在 DSU 账户取消':'到期后按需续订'}</dd></div><div><dt>本次模拟支付</dt><dd>¥${plan.price}</dd></div></dl>
+      <button type="button" class="dsu-button dsu-primary" data-dsu-checkout="${code}">${owner?'确认模拟开通':'登录并继续'}</button></div></section>`;
+    const annual=period==='year';
+    const base=annual?'year':'month';
+    const card=(key,title,description)=>{
+      const item=plans[key];
+      return `<article class="dsu-price-card ${key==='pro'?'dsu-price-pro':''}"><h2>${title}</h2><p>${description}</p><div class="dsu-price-amount"><strong>¥${item.price}</strong><span> / ${item.months===1?'月':'年'}</span></div><p class="dsu-price-quota">${item.quota} DSU <small>每${item.months===1?'月':'年'}</small></p>
+      <a class="dsu-button dsu-primary" href="${pricing}?plan=${key}">${key==='pro'?'选择年度 Pro':'选择单次购买'}</a>
+      ${key==='pro'?'<p class="dsu-price-note">按年开通，到期后按需续订</p>':`<a class="dsu-button" href="${pricing}?plan=${key}-auto">选择${annual?'连续包年':'连续包月'}</a>`}</article>`;
+    };
+    return `<section class="dsu-pricing">
+      <header><h1>龙源期刊网会员</h1><p>一份 DSU 额度，自由分配给期刊阅读和 AI 问答。</p><p class="dsu-price-note">以下价格与额度用于演示。</p></header>
+      ${current?`<p class="dsu-pricing-current">当前方案 · ${planFor(current).name} · 有效至 ${date(current.expires)} <a href="#/me?tab=dsu">管理额度</a></p>`:''}
+      <nav class="dsu-billing-switch" aria-label="普通会员计费周期"><a href="${pricing}?period=month" ${annual?'':'aria-current="true"'}>月付</a><a href="${pricing}?period=year" ${annual?'aria-current="true"':''}>年付</a></nav>
+      <div class="dsu-membership-grid">${card(base,'普通会员','适合日常阅读和提问。')}${card('pro','年度 Pro','适合阅读和问答更频繁的读者。')}</div>
+      <section class="dsu-pricing-uses"><h2>DSU 可以用来做什么？</h2><dl><div><dt>解锁文章</dt><dd>按文章标价解锁全文。</dd></div><div><dt>购买期刊</dt><dd>按需选购本期或全年订阅。</dd></div><div><dt>使用阅读向导</dt><dd>提问后查看本次回答的实际消耗。</dd></div></dl><a href="${accountURL}">只想充值？前往 DSU 账户</a></section>
+    </section>`;
   }
   function panel(filter = 'all') {
     const state = load(identity(profile()));
@@ -364,9 +384,9 @@
         </div>
         <div class="dsu-row dsu-plan-actions">
           <p>${member?(plan.autoRenew?'下次模拟续订与额度重置：'+reset:'本期额度有效至 '+reset):'开通后即可使用本月会员额度。'}</p>
-          ${!member?'<a class="dsu-button" href="#/me?tab=membership">查看会员套餐</a>':plan.autoRenew?
+          ${!member?'<a class="dsu-button" href="#/membership">查看会员套餐</a>':plan.autoRenew?
             '<button type="button" class="dsu-button" data-dsu-cancel>取消订阅</button>':
-            '<a class="dsu-button" href="#/me?tab=membership">查看续订方案</a>'}
+            '<a class="dsu-button" href="#/membership">查看续订方案</a>'}
         </div>
       </section>
       <section class="dsu-section dsu-usage"><h3>会员额度用量</h3><p>本月 AI 已用 ${usage.ai} DSU，阅读已用 ${usage.articles} DSU。</p>

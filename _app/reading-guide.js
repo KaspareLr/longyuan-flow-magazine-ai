@@ -93,7 +93,7 @@ function applyGuidePreference(root){
 let wasAccount=false;
 function syncGuideSurface(){
  const portal=document.body.classList.contains('portal-body');
- const account=portal&&document.querySelector('#portal-main')?.dataset.page==='me';
+ const account=portal&&['me','membership'].includes(document.querySelector('#portal-main')?.dataset.page);
  if(account&&!wasAccount)readingGuideCollapsed=true;
  wasAccount=account;
  const preview=portal&&document.body.classList.contains('issue-preview-page');
