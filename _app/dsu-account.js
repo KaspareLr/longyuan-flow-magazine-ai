@@ -543,6 +543,7 @@
   quickMenu.setAttribute('popover','manual');
   quickMenu.setAttribute('aria-label','账户快捷菜单');
   const observedAccounts=new WeakSet();
+  let meterId=0;
   let activeAccount,closeTimer,ignoreFocus=false,menuKey='';
   function closeMenu(){
     clearTimeout(closeTimer);
@@ -645,7 +646,12 @@
       if(!meter){
         meter=document.createElement('span');
         meter.className='dsu-avatar-meter';
-        meter.innerHTML='<svg viewBox="0 0 40 40" aria-hidden="true"><circle class="dsu-avatar-track" cx="20" cy="20" r="18"/><circle class="dsu-avatar-arc" cx="20" cy="20" r="18" pathLength="100"/></svg>';
+        const gradient='dsu-avatar-paint-'+(++meterId);
+        meter.innerHTML=`<svg viewBox="0 0 40 40" aria-hidden="true">
+          <defs><linearGradient id="${gradient}"><stop offset="50%" stop-color="#13c2c2"/><stop offset="50%" stop-color="#2f54eb"/></linearGradient></defs>
+          <circle class="dsu-avatar-track" cx="20" cy="20" r="18"/>
+          <circle class="dsu-avatar-arc" cx="20" cy="20" r="18" pathLength="100" style="stroke:url(#${gradient})"/>
+        </svg>`;
         avatar.before(meter);meter.prepend(avatar);
       }
       meter.style.setProperty('--dsu-remaining',ring);

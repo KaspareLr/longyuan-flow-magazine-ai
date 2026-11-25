@@ -1,30 +1,33 @@
 /* The three periodical entry points share the same navigation island. */
 body > :is(.site-header,.topbar) > .qikan-nav {
   box-sizing:border-box;
-  background:rgba(255,255,255,.9);
+  background:rgba(255,255,255,.8);
+  border:1px solid #ffffffc9;
+  border-radius:20px;
+  box-shadow:0 7px 30px #252a3508,inset 0 1px #fff9;
   backdrop-filter:blur(100px);
   -webkit-backdrop-filter:blur(100px);
   display:grid;
-  grid-template-columns:125px minmax(0,1fr) auto;
+  grid-template-columns:138px auto auto;
   align-items:center;
   flex:none;
-  width:min(620px,calc(100vw - 124px));
-  max-width:none;
+  width:max-content;
+  max-width:calc(100vw - 32px);
   min-width:0;
   min-height:54px;
   margin:0;
-  padding:10px 12px;
-  gap:0 20px;
+  padding:10px;
+  gap:0 40px;
 }
 body > :is(.site-header,.topbar) > .qikan-nav > .brand {
   width:auto;
   min-width:0;
-  margin:0;
+  margin:0 40px 0 0;
   padding:0;
 }
 body > :is(.site-header,.topbar) > .qikan-nav > .brand img {
   display:block;
-  width:125px;
+  width:98px;
   height:32px;
   object-fit:contain;
   object-position:left center;
@@ -40,11 +43,14 @@ body > :is(.site-header,.topbar) > .qikan-nav nav {
   min-width:0;
   margin:0;
   padding:0;
-  gap:16px;
+  gap:20px;
   overflow-x:auto;
   scrollbar-width:none;
 }
-body > :is(.site-header,.topbar) > .qikan-nav nav a { flex:none; min-width:0; white-space:nowrap; }
+body > :is(.site-header,.topbar) > .qikan-nav nav a { flex:none; min-width:0; white-space:nowrap; font-size:14px; font-weight:500;
+ line-height:20px; padding:0; color:#909399; background:none; box-shadow:none; }
+body > :is(.site-header,.topbar) > .qikan-nav nav a:is(.active,[aria-current="page"],:hover) { color:#131921; }
+body > :is(.site-header,.topbar) > .qikan-nav nav a:is(.active,[aria-current="page"]) { font-weight:700; }
 body > :is(.site-header,.topbar) > .qikan-nav :is(.login,.nav-login) {
   grid-column:3;
   grid-row:1;
@@ -53,7 +59,9 @@ body > :is(.site-header,.topbar) > .qikan-nav :is(.login,.nav-login) {
   width:auto;
   max-width:100%;
   margin:0;
-  padding:0 0 0 14px;
+  padding:0 10px 0 40px;
+  min-height:20px;height:20px;border:0;border-inline-start:1px solid #d8dadd;
+  background:none;color:#131921;font-size:14px;font-weight:500;line-height:20px;
   white-space:nowrap;
 }
 @media(max-width:760px) {
@@ -65,6 +73,7 @@ body > :is(.site-header,.topbar) > .qikan-nav :is(.login,.nav-login) {
     min-height:0;
     border-radius:18px;
   }
+  body > :is(.site-header,.topbar) > .qikan-nav > .brand { margin:0; }
   body > :is(.site-header,.topbar) > .qikan-nav > .brand img { width:min(100%,110px); height:28px; }
   body > :is(.site-header,.topbar) > .qikan-nav nav {
     grid-column:1/-1;
@@ -74,19 +83,26 @@ body > :is(.site-header,.topbar) > .qikan-nav :is(.login,.nav-login) {
   }
   body > :is(.site-header,.topbar) > .qikan-nav :is(.login,.nav-login) {
     grid-column:2;
-    padding-left:10px;
+    padding:0 0 0 10px;
+    min-height:32px;
   }
 }
 body > :is(.site-header,.topbar) > .qikan-nav .is-signed-in {
   display:inline-flex;
   align-items:center;
-  gap:6px;
-  height:32px;
+  gap:10px;
+  height:24px;
 }
-.qikan-nav .club-account-avatar { flex:none; width:28px; height:28px; object-fit:cover; border-radius:50%; }
-.qikan-nav .club-account-name { max-width:64px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.qikan-nav .club-account-avatar { flex:none; width:22px; height:22px; object-fit:cover; border-radius:50%; }
+.qikan-nav .club-account-name { max-width:80px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 @media(max-width:760px) {
-  .qikan-nav .club-account-avatar { width:24px; height:24px; }
+  body > :is(.site-header,.topbar) > .qikan-nav nav a { font-size:12px; }
+  body > :is(.site-header,.topbar) > .qikan-nav .is-signed-in { height:32px;gap:6px; }
 }
+
+.qikan-nav .dsu-avatar-meter { width:24px;height:24px; }
+.qikan-nav .dsu-avatar-meter svg { inset:0;width:24px;height:24px; }
+.qikan-nav .dsu-avatar-meter circle { stroke-width:3.33; }
+.qikan-nav .dsu-avatar-track { stroke:#e4e7ed; }
 
 body.portal-body:has(.portal-reader.night) > .site-header > .qikan-nav { background:#292f36ed; }
