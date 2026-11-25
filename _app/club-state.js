@@ -28,7 +28,16 @@
   if(personalPreview){fixture.set(key,value);return;}
   try{localStorage.setItem('club-demo:'+key,JSON.stringify(value))}catch{}
  };
- const state=window.clubSession={personalPreview,get profile(){return qikanAccountAvatar(read('profile',null),read,write)},get membership(){return read('membership',null)},read,write,
+ const contentKey=()=>{const p=read('profile',null);return 'reading-content:'+ (p?.dsuId||p?.email||p?.nickname||'guest');};
+ const contentRows=kind=>read(contentKey(),[]).filter(row=>row.kind===kind);
+ function recordContent(kind,id,details){
+  const storage=contentKey();
+  const rows=read(storage,[]).filter(row=>row.kind!==kind||row.id!==id);
+  if(details)rows.unshift({...details,kind,id,time:Date.now()});
+  write(storage,rows);
+  window.dispatchEvent(new Event('reading-content-change'));
+ }
+ const state=window.clubSession={personalPreview,contentRows,recordContent,get profile(){return qikanAccountAvatar(read('profile',null),read,write)},get membership(){return read('membership',null)},read,write,
   update(profile){profile={...profile,dsuId:profile.dsuId||(profile.email?.trim().toLowerCase()||profile.nickname.trim().toLowerCase()),avatar:profile.avatar};profile=qikanAccountAvatar(profile,read,write);write('profile',profile);if(!personalPreview)try{localStorage.setItem('club-demo:nickname',profile.nickname)}catch{};refresh();window.dispatchEvent(new Event('club-session-change'))},
   logout(){write('profile',null);if(!personalPreview)try{localStorage.removeItem('club-demo:nickname')}catch{};refresh();window.dispatchEvent(new Event('club-session-change'))},
   member(plan){write('membership',{...plan,expires:'2027-10-15',started:'2026-10-15'});window.dispatchEvent(new Event('club-session-change'))},

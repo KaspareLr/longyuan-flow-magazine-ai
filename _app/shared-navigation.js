@@ -2,6 +2,8 @@
 (()=>{
  const running=new WeakMap();
  const exiting=new WeakMap();
+ const mobile=matchMedia('(max-width:760px)');
+ const backControls=new Map();
  let pendingExit;
  const enterDuration=680, exitDuration=420;
  const enterEase='cubic-bezier(.22,1,.36,1)';
@@ -16,7 +18,18 @@
 
  window.clubNavigation={setBack(back,visible,updateLayout){
   if(!back)return;
-  if(back.hidden===!visible){updateLayout?.();return;}
+  backControls.set(back,{visible,updateLayout});
+  visible=visible&&mobile.matches;
+  if(!mobile.matches){
+   exiting.get(back)?.remove();
+   exiting.delete(back);
+   running.get(back)?.cancel();
+   running.get(back.parentElement.querySelector('.nav-shell,.nav-island'))?.cancel();
+   back.hidden=true;
+   updateLayout?.(false);
+   return;
+  }
+  if(back.hidden===!visible){updateLayout?.(visible);return;}
   const header=back.parentElement,island=header.querySelector('.nav-shell,.nav-island');
   const before=island.getBoundingClientRect(), oldBack=back.getBoundingClientRect();
   const reduced=matchMedia('(prefers-reduced-motion:reduce)').matches;
@@ -24,7 +37,7 @@
   exiting.delete(back);
   for(const el of [back,island]){running.get(el)?.cancel();running.delete(el)}
   back.hidden=!visible;
-  updateLayout?.();
+  updateLayout?.(visible);
   if(reduced)return;
   const after=island.getBoundingClientRect();
   const easing=visible?enterEase:exitEase;
@@ -68,4 +81,10 @@
   if(animation)pendingExit=animation.finally(()=>{pendingExit=null;});
   return pendingExit;
  }};
+ mobile.addEventListener('change',()=>{
+  for(const [back,options] of backControls){
+   if(back.isConnected)window.clubNavigation.setBack(back,options.visible,options.updateLayout);
+   else backControls.delete(back);
+  }
+ });
 })();

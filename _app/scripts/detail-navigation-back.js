@@ -9,7 +9,7 @@
   if(type==='topic'&&id)fallback='#/topics';
   if(type==='book'&&id)fallback='#/books';
   if(type==='magazine'&&id&&!q.has('page')&&q.get('club')!=='1'&&(q.get('claimed')==='0'||(q.get('claimed')!=='1'&&decodeURIComponent(id)!=='南风窗')))fallback='#/magazines';
-  back.dataset.fallback=fallback||'';window.clubNavigation.setBack(back,!!fallback,()=>header.classList.toggle('has-detail-back',!!fallback));
+  back.dataset.fallback=fallback||'';window.clubNavigation.setBack(back,!!fallback,visible=>header.classList.toggle('has-detail-back',visible));
  }
  back.onclick=()=>{if(back.dataset.fallback)window.clubPageMotion.back(back.dataset.fallback);};
  window.addEventListener('hashchange',sync);sync();

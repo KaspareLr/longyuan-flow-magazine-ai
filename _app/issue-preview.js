@@ -135,6 +135,7 @@
    issue:'2026 年第 09 期',success:'模拟购买成功',
    onPaid(){
     sessionPurchases.add(guidePurchaseKey());
+    window.clubSession?.recordContent('issue','dycy202609',{title:'第一财经 · 2026年09期',route:'portal.html#/article/0?context=magazine&resource='+encodeURIComponent('第一财经')});
     refreshGuideAccess();
    }
   });

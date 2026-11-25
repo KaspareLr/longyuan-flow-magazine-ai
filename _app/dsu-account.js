@@ -286,7 +286,15 @@
   async function purchaseArticle(button){
     if(!signedIn()||button.disabled)return false;
     button.disabled=true;
-    try{await charge('article',button.dataset.title,articlePrice,button.dataset.dsuArticle);return true;}
+    try{
+      await change(state=>{
+        const article=button.dataset.dsuArticle;
+        if(unlocked(state,article))return;
+        applyCharge(state,'article',button.dataset.title,articlePrice,article);
+        state.records[0].route=location.hash;
+      });
+      return true;
+    }
     catch{showInsufficient();return false;}
     finally{button.disabled=false;}
   }
@@ -375,7 +383,7 @@
     const spent = walletSpent(state), limit = state.walletLimit;
     const reset = member ? date(plan.expires) : '';
     return `<div class="dsu-panel dsu-subscriptions">
-      <header class="dsu-row"><div><h2>DSU 订阅与用量</h2><p>1 DSU = 1 元人民币 · ${state.sample||state.usageDemoSeeded?'含演示数据':'本地演示'}</p></div>
+      <header class="dsu-row"><div><h2>会员与 DSU</h2><p>1 DSU = 1 元人民币 · ${state.sample||state.usageDemoSeeded?'含演示数据':'本地演示'}</p><a href="#/membership">查看平台会员套餐</a></div>
         ${!plan&&!state.balance&&!state.records.length?'<button type="button" class="dsu-button" data-dsu-sample>载入演示数据</button>':''}</header>
       <section class="dsu-summary">
         <div class="dsu-row">
@@ -484,7 +492,8 @@
 
   window.qikanDSU = {
     page(a) { return window.qikanArticleRoutes?.[articleId(a)]; },
-    panel, membership, summary, spendAI, signedIn, accountURL, membershipURL, articleId, articlePrice, aiPrice,
+    panel, membership, summary,
+    readingUnlocks(){const owner=identity(profile());return owner?load(owner).records.filter(row=>row.type==='article'&&row.article):[];}, spendAI, signedIn, accountURL, membershipURL, articleId, articlePrice, aiPrice,
     canRead(a) {
       const owner=identity(profile()),article=articleId(a);
       if(!owner)return false;

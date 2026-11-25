@@ -77,14 +77,25 @@
  function archive(year){const rows=archiveRows.filter(a=>a.year===Number(year)).sort((a,b)=>b.issue-a.issue);yearTabs.querySelectorAll('button').forEach(b=>{const active=Number(b.dataset.year)===Number(year);b.setAttribute('aria-selected',String(active));b.tabIndex=active?0:-1;});const grid=document.querySelector('#archive-grid');grid.setAttribute('aria-labelledby','archive-year-'+year);grid.innerHTML=rows.map((a,i)=>{const current=a.label===edition;return `<a class="mh-issue" href="${current?issue:a.url}" ${current?'':'target="_blank" rel="noopener"'} aria-label="阅读${name}${e(a.label)}"><img src="${e(a.cover)}" alt="${name}${e(a.label)}封面" loading="lazy"><strong>${e(a.label)}</strong></a>`;}).join('');}
  yearTabs.addEventListener('click',event=>{const tab=event.target.closest('[data-year]');if(tab)archive(tab.dataset.year);});
  yearTabs.addEventListener('keydown',event=>{const tabs=[...yearTabs.querySelectorAll('button')],index=tabs.indexOf(document.activeElement);if(index<0)return;let next;if(event.key==='ArrowRight')next=(index+1)%tabs.length;else if(event.key==='ArrowLeft')next=(index-1+tabs.length)%tabs.length;else if(event.key==='Home')next=0;else if(event.key==='End')next=tabs.length-1;else return;event.preventDefault();archive(tabs[next].dataset.year);tabs[next].focus();});archive(years[0]);
- const followKey='magazine-home:follow:'+(listing?name:south?'nanfc':'yimagazine');
- let following=false;try{following=localStorage.getItem(followKey)==='true';}catch{}
- const follow=document.querySelector('#mh-follow');function syncFollow(){follow.setAttribute('aria-pressed',String(following));follow.textContent=following?'已关注':'关注';}syncFollow();
+ const homeRoute='magazine-home.html'+location.search;
+ const follow=document.querySelector('#mh-follow');
+ function syncFollow(){
+  const following=clubSession.contentRows('follow').some(row=>row.id===name);
+  follow.setAttribute('aria-pressed',String(following));follow.textContent=following?'已关注':'关注';
+ }
+ syncFollow();
+ window.addEventListener('club-session-change',syncFollow);
  let timer;function toast(text){const t=document.querySelector('.mh-toast');t.textContent=text;t.classList.add('visible');clearTimeout(timer);timer=setTimeout(()=>t.classList.remove('visible'),2200);}
- follow.addEventListener('click',()=>{following=!following;try{localStorage.setItem(followKey,String(following));}catch{}syncFollow();toast(following?'已关注《'+name+'》':'已取消关注');});
+ follow.addEventListener('click',()=>{
+  if(!clubSession.profile){clubSession.login();return;}
+  const next=follow.getAttribute('aria-pressed')!=='true';
+  clubSession.recordContent('follow',name,next?{title:name,route:homeRoute}:null);
+  syncFollow();toast(next?'已关注《'+name+'》':'已取消关注');
+ });
  if(!listing)window.magazineCheckout.mount(document.querySelector('#mh-subscribe'),document.querySelector('#mh-subscribe-dialog'),{
   title:'订阅《'+name+'》全年', product:'全年电子版', price,
-  issue:south?'订阅后一年内更新的电子版':'2026 年第 11 期至 2027 年第 10 期',success:'模拟订阅成功'
+  issue:south?'订阅后一年内更新的电子版':'2026 年第 11 期至 2027 年第 10 期',success:'模拟订阅成功',
+  onPaid(){clubSession.recordContent('subscription',name,{title:name,route:homeRoute,term:south?'一年内更新的电子版':'2026 年第 11 期至 2027 年第 10 期'});}
  });
  const dialog=document.querySelector('#mh-share-dialog'),input=document.querySelector('#mh-share-url');document.querySelector('#mh-share').addEventListener('click',async()=>{if(matchMedia('(max-width:760px)').matches&&navigator.share){try{await navigator.share({title:name+' · 刊物首页',url:location.href});return;}catch(error){if(error.name==='AbortError')return;}}input.value=location.href.split('#')[0];dialog.showModal();});
  document.querySelector('#mh-close-share').addEventListener('click',()=>dialog.close());document.querySelector('#mh-copy').addEventListener('click',async()=>{input.select();try{await navigator.clipboard.writeText(input.value);toast('链接已复制');}catch{toast('请复制已选中的链接');}});
