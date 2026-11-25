@@ -168,17 +168,35 @@ body:has(.qikan-account) { background:#fff; }
  box-shadow:0 2px 6px #0000001a;cursor:pointer
 }
 .qikan-reading-tabs button[aria-pressed=true]{background:#131921;color:#fff;box-shadow:none}
-.qikan-reading-records .qikan-saved-list li{padding-block:20px;border-top:0;border-bottom:1px solid #e4e7ed}
-.qikan-reading-records .qikan-saved-link:has(img){align-items:stretch}
-.qikan-reading-records .qikan-saved-cover{box-shadow:0 8px 16px #21212112}
-.qikan-reading-records .qikan-saved-text{display:flex;flex-direction:column;gap:4px}
-.qikan-reading-records .qikan-saved-text strong{font-size:20px;line-height:32px}
-.qikan-reading-records .qikan-saved-text small{font-size:12px;white-space:normal}
-.qikan-reading-records .qikan-saved-link:has(img) strong+small{margin-top:auto}
-.qikan-reading-summary{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;color:#606266;font-size:14px}
-.qikan-reading-records .qikan-saved-remove{border-radius:50%;box-shadow:0 2px 6px #0000001a}
-.qikan-reading-records .qikan-saved-remove .icon-StarFill{color:#c25d00}
+.qikan-reading-records .qikan-saved-list .qikan-reading-item {
+ gap:20px;padding-block:20px;border-top:0;border-bottom:1px solid #e4e7ed;
+}
+.qikan-reading-records .qikan-saved-link { gap:20px;align-self:stretch;align-items:stretch; }
+.qikan-reading-records .qikan-saved-cover {
+ width:88px;height:119px;aspect-ratio:auto;align-self:start;
+ box-shadow:0 8px 16px #21212112;
+}
+.qikan-reading-records .qikan-reading-item--book .qikan-saved-cover { height:132px; }
+.qikan-reading-records .qikan-saved-text { display:flex;flex:1;flex-direction:column;justify-content:space-between;gap:12px; }
+.qikan-reading-records .qikan-reading-item-head { display:grid;min-width:0; }
+.qikan-reading-records .qikan-saved-text strong { font-size:20px;line-height:32px;font-weight:700; }
+.qikan-reading-records .qikan-saved-text small { font-size:12px;line-height:20px;color:#686d77;white-space:normal; }
+.qikan-reading-records .qikan-saved-text .qikan-reading-type { line-height:16px;margin-bottom:4px; }
+.qikan-reading-records .qikan-reading-item--article .qikan-saved-text { gap:20px; }
+.qikan-reading-summary {
+ display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;
+ color:#686d77;font-size:14px;line-height:20px;overflow-wrap:anywhere;
+}
+.qikan-reading-records .qikan-saved-remove {
+ width:46px;height:46px;border-radius:50%;background:#fff;box-shadow:0 2px 6px #0000001a;
+}
+.qikan-reading-records .qikan-saved-remove:hover { background:#f5f7fa; }
+.qikan-reading-icon { display:block;max-width:none; }
+.qikan-reading-resume-arrow { display:grid;place-items:center;width:32px;height:32px;flex:none; }
 @media(max-width:760px){
- .qikan-reading-tabs button{min-height:44px;padding-inline:12px}
- .qikan-reading-records .qikan-saved-text strong{font-size:17px;line-height:26px}
+ .qikan-reading-tabs button { min-height:44px;padding-inline:12px; }
+ .qikan-reading-records .qikan-saved-list .qikan-reading-item,.qikan-reading-records .qikan-saved-link { gap:12px; }
+ .qikan-reading-records .qikan-saved-cover { width:64px;height:87px; }
+ .qikan-reading-records .qikan-reading-item--book .qikan-saved-cover { height:96px; }
+ .qikan-reading-records .qikan-saved-text strong { font-size:17px;line-height:26px; }
 }
