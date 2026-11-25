@@ -3,6 +3,24 @@
   const root = new URL('.', document.currentScript.src);
   const accountURL = new URL('portal.html#/me?tab=dsu', root).href;
   const minimum = 100, monthlyPrice = 99, monthlyQuota = 300, articlePrice = 1, aiPrice = 3;
+  // Demo prices and quotas can be changed together without changing payment flows.
+  const plans = {
+    month:{name:'月度会员',price:99,quota:300,months:1},
+    'month-auto':{name:'连续包月',price:99,quota:300,months:1,auto:true},
+    year:{name:'年度会员',price:999,quota:3600,months:12},
+    'year-auto':{name:'连续包年',price:999,quota:3600,months:12,auto:true},
+    pro:{name:'年度 Pro',price:3599,quota:5000,months:12}
+  };
+  const planFor = subscription => plans[subscription?.code] || plans['month-auto'];
+  const membershipURL=new URL('portal.html#/me?tab=membership',root).href;
+  function addMonths(time,count){
+    const end=new Date(time);
+    const day=end.getUTCDate();
+    end.setUTCDate(1);end.setUTCMonth(end.getUTCMonth()+count);
+    const last=new Date(end);last.setUTCMonth(last.getUTCMonth()+1,0);
+    end.setUTCDate(Math.min(day,last.getUTCDate()));
+    return end.getTime();
+  }
   const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const profile = () => window.clubSession?.profile;
   const identity = p => p?.dsuId || (p && (p.email?.trim().toLowerCase() || p.nickname.trim().toLowerCase()));
@@ -33,17 +51,16 @@
     const plan = state.subscription;
     const now = Date.now();
     if (plan?.autoRenew && plan.expires <= now) {
-      const day = plan.day || new Date(plan.start).getUTCDate();
       do {
         plan.start = plan.expires;
-        plan.expires = nextMonth(plan.start, day);
+        plan.expires = addMonths(plan.start,planFor(plan).months);
       } while (plan.expires <= now);
       plan.used = 0;
     }
     return state;
   }
   const active = state => state.subscription?.expires > Date.now();
-  const remaining = state => active(state) ? monthlyQuota - state.subscription.used : 0;
+  const remaining = state => active(state) ? Math.max(0,planFor(state.subscription).quota-state.subscription.used) : 0;
   const walletSpent = state => {
     const current = month(Date.now());
     return state.records.reduce((total, record) =>
@@ -85,17 +102,6 @@
 
   function charge(type, description, amount, article) {
     return change(state => applyCharge(state,type,description,amount,article));
-  }
-
-  const repeatableIssueArticle = article => /^dycy202609\d{2}$/.test(article);
-  const pageUnlocks=new Map();
-  function unlockIssueArticle(owner,article,title) {
-    if(!owner||identity(profile())!==owner)throw Error('账号已切换，请重试。');
-    const state=structuredClone(load(owner));
-    applyCharge(state,'article',title,articlePrice,article);
-    const articles=pageUnlocks.get(owner)||new Set();
-    articles.add(article);
-    pageUnlocks.set(owner,articles);
   }
 
   function loadSample(state) {
@@ -269,23 +275,50 @@
     </form>`;
   }
 
-  function purchaseArticle(button) {
-    if (!signedIn()) return Promise.resolve(false);
-    const article=button.dataset.dsuArticle,title=button.dataset.title,owner=identity(profile());
-    return confirm({
-      article:title,label:`支付 ${articlePrice} DSU`,
-      submit:()=>repeatableIssueArticle(article)?unlockIssueArticle(owner,article,title):charge('article',title,articlePrice,article)
+  function showInsufficient(){
+    if(dialog.open)return;
+    dialog.classList.remove('dsu-dialog-article');
+    dialog.innerHTML=`<div class="dsu-settings-form"><header><h2 id="dsu-dialog-title">可用 DSU 不足</h2></header><div class="dsu-actions"><button type="button" class="dsu-button" data-cancel>关闭</button><a class="dsu-button" href="${accountURL}">充值 DSU</a><a class="dsu-button dsu-primary" href="${membershipURL}">查看会员套餐</a></div></div>`;
+    dialog.querySelector('[data-cancel]').onclick=()=>dialog.close();
+    dialog.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>dialog.close()));
+    dialog.showModal();
+  }
+  async function purchaseArticle(button){
+    if(!signedIn()||button.disabled)return false;
+    button.disabled=true;
+    try{await charge('article',button.dataset.title,articlePrice,button.dataset.dsuArticle);return true;}
+    catch{showInsufficient();return false;}
+    finally{button.disabled=false;}
+  }
+  async function spendAI(question,operation){
+    await change(state=>{
+      applyCharge(state,'ai',question,1);
+      const row=state.records[0];
+      row.operation=operation;
+      const previous=state.records.find((r,i)=>i>0&&r.operation===operation);
+      if(previous){
+        for(const key of ['amount','quota','wallet'])row[key]+=previous[key];
+        state.records.splice(state.records.indexOf(previous),1);
+      }
     });
   }
-
-  function confirmAI(question) {
-    if (!signedIn()) return Promise.resolve(false);
-    return confirm({
-      title:'发送 AI 问询', message:`${question} · ${aiPrice} DSU`, label:`支付 ${aiPrice} DSU 并发送`,
-      accountLink:true, submit:() => charge('ai', question, aiPrice)
-    });
+  function summary(){
+    const owner=identity(profile());
+    const state=owner?load(owner):{balance:0,records:[]};
+    const quota=active(state)?planFor(state.subscription).quota:0;
+    const left=remaining(state);
+    const used=state.records.filter(row=>month(row.time)===month(Date.now()));
+    return {left,quota,wallet:walletAvailable(state),available:left+walletAvailable(state),
+      ai:used.reduce((total,row)=>total+(row.type==='ai'?row.amount:0),0),
+      articles:used.reduce((total,row)=>total+(row.type==='article'?row.amount:0),0)};
   }
-
+  function membership(code){
+    const plan=Object.hasOwn(plans,code)?plans[code]:null;
+    const state=identity(profile())?load(identity(profile())):null;
+    const current=state&&active(state)?state.subscription:null;
+    if(plan)return `<section class="dsu-section"><a href="#/me?tab=membership">返回会员套餐</a><h2>开通${plan.name}</h2><p>¥${plan.price} · ${plan.quota} DSU · ${plan.months===1?'一个月':'一年'}</p><p>${plan.auto?'模拟自动续费，可在 DSU 账户取消。':'到期后可按需续订。'}</p><button type="button" class="dsu-button dsu-primary" data-dsu-checkout="${code}">确认模拟开通</button></section>`;
+    return `<div class="dsu-panel"><h2>龙源期刊网会员</h2><p>${current?`${planFor(current).name} · 有效至 ${date(current.expires)}`:'开通会员，获得可用于阅读和 AI 问答的 DSU。'}</p><p>以下为 Demo 价格和额度。</p><div class="dsu-membership-grid">${Object.entries(plans).map(([key,item])=>`<section class="dsu-section"><h3>${item.name}</h3><p>¥${item.price} · ${item.quota} DSU</p><a class="dsu-button" href="#/me?tab=membership&amp;plan=${key}">选择套餐</a></section>`).join('')}</div></div>`;
+  }
   function panel(filter = 'all') {
     const state = load(identity(profile()));
     if (active(state) && !state.usageDemoSeeded) {
@@ -311,11 +344,13 @@
           <div class="dsu-record-copy"><span class="dsu-record-type">${record.type==='article'?'解锁文章':'AI对话'}</span><strong>${esc(record.description)}</strong></div>
           <b>−${record.amount} DSU</b><small class="dsu-record-source">${esc(source)}</small></li>`;
           }).join('')}</ul></section>`).join(''):'<p>暂无此类消费记录。</p>'}</section>`;
+    const usage=summary();
     const member = active(state), plan = state.subscription;
     const cycle = member ? state.records.filter(record => record.time >= plan.start) : [];
     const used = member ? plan.used : 0;
     const category = type => cycle.filter(record => record.type === type).reduce((total, record) => total + record.quota, 0);
-    const percent = used / monthlyQuota * 100;
+    const quota=member?planFor(plan).quota:monthlyQuota;
+    const percent = used / quota * 100;
     const walletEnabled = state.walletEnabled !== false;
     const spent = walletSpent(state), limit = state.walletLimit;
     const reset = member ? date(plan.expires) : '';
@@ -325,19 +360,19 @@
       <section class="dsu-summary">
         <div class="dsu-row">
           <div><h3>可用 DSU</h3><strong>${remaining(state)+walletAvailable(state)} <small>DSU</small></strong><p class="dsu-available-sources">会员剩余 ${remaining(state)} · 充值可用 ${walletAvailable(state)}</p></div>
-          <div class="dsu-plan"><span class="dsu-tag">${member?'月度会员':'尚未订阅'}</span><p>¥${monthlyPrice}/月 · 每月 ${monthlyQuota} DSU</p></div>
+          <div class="dsu-plan"><span class="dsu-tag">${member?planFor(plan).name:'尚未订阅'}</span><p>${member?planFor(plan).quota+' DSU / 周期':'按需选择会员套餐'}</p></div>
         </div>
         <div class="dsu-row dsu-plan-actions">
           <p>${member?(plan.autoRenew?'下次模拟续订与额度重置：'+reset:'本期额度有效至 '+reset):'开通后即可使用本月会员额度。'}</p>
-          ${!member?'<button type="button" class="dsu-button" data-dsu-member>模拟开通会员</button>':plan.autoRenew?
+          ${!member?'<a class="dsu-button" href="#/me?tab=membership">查看会员套餐</a>':plan.autoRenew?
             '<button type="button" class="dsu-button" data-dsu-cancel>取消订阅</button>':
-            '<button type="button" class="dsu-button" data-dsu-renew>开启模拟自动续订</button>'}
+            '<a class="dsu-button" href="#/me?tab=membership">查看续订方案</a>'}
         </div>
       </section>
-      <section class="dsu-section dsu-usage"><h3>会员额度用量</h3>
+      <section class="dsu-section dsu-usage"><h3>会员额度用量</h3><p>本月 AI 已用 ${usage.ai} DSU，阅读已用 ${usage.articles} DSU。</p>
         <div class="dsu-usage-progress">
-        <div class="dsu-row"><p>已用 <b>${used} / ${monthlyQuota} DSU</b></p><span class="dsu-tag">${percent.toFixed(1)}%</span></div>
-        <div class="dsu-progress" aria-hidden="true"><span style="width:${category('article')/monthlyQuota*100}%"></span><span style="width:${category('ai')/monthlyQuota*100}%"></span></div>
+        <div class="dsu-row"><p>已用 <b>${used} / ${quota} DSU</b></p><span class="dsu-tag">${percent.toFixed(1)}%</span></div>
+        <div class="dsu-progress" aria-hidden="true"><span style="width:${category('article')/quota*100}%"></span><span style="width:${category('ai')/quota*100}%"></span></div>
         <div class="dsu-legend"><span>文章阅读 ${category('article')} DSU</span><span>AI 问询 ${category('ai')} DSU</span></div></div>
       </section>
       <section class="dsu-section dsu-wallet"><h3>充值余额</h3><div class="dsu-wallet-card">
@@ -352,6 +387,22 @@
   }
 
   document.addEventListener('click', async event => {
+    const checkout=event.target.closest('[data-dsu-checkout]');
+    if(checkout){
+      if(!signedIn()||checkout.disabled)return;
+      const code=checkout.dataset.dsuCheckout,plan=plans[code];
+      if(!plan)return;
+      checkout.disabled=true;
+      try{
+        await change(state=>{
+          const start=Date.now();
+          const used=active(state)?state.subscription.used:0;
+          state.subscription={code,start,expires:addMonths(start,plan.months),used,autoRenew:Boolean(plan.auto)};
+        });
+        location.hash='#/me?tab=dsu';
+      }finally{checkout.disabled=false;}
+      return;
+    }
     const button = event.target.closest('[data-dsu-article],[data-dsu-recharge],[data-dsu-member],[data-dsu-wallet],[data-dsu-limit],[data-dsu-renew],[data-dsu-cancel],[data-dsu-sample],[data-dsu-history]');
     if (!button) return;
     if (button.hasAttribute('data-dsu-article')) {
@@ -413,11 +464,11 @@
 
   window.qikanDSU = {
     page(a) { return window.qikanArticleRoutes?.[articleId(a)]; },
-    panel, confirmAI, articleId, articlePrice, aiPrice,
+    panel, membership, summary, spendAI, signedIn, accountURL, membershipURL, articleId, articlePrice, aiPrice,
     canRead(a) {
       const owner=identity(profile()),article=articleId(a);
       if(!owner)return false;
-      return repeatableIssueArticle(article)?Boolean(pageUnlocks.get(owner)?.has(article)):unlocked(load(owner),article);
+      return unlocked(load(owner),article);
     },
     gate(a, preview) {
       return `<div class="dsu-gate">
@@ -425,7 +476,7 @@
         <section class="dsu-reading-unlock" aria-label="全文解锁">
           <div class="dsu-reading-divider" aria-hidden="true"><i class="iconfont icon-Lock"></i></div>
           <h2>解锁全文</h2>
-          <p>${repeatableIssueArticle(articleId(a))?'解锁后可在当前页面会话阅读。':'解锁后可以随时回来阅读。'}</p>
+          <p>解锁后可以随时回来阅读。</p>
           <button type="button" class="dsu-button dsu-reading-button" data-dsu-article="${esc(articleId(a))}" data-title="${esc(a.title)}">用 ${articlePrice} DSU 解锁全文</button>
         </section>
       </div>`;

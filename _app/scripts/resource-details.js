@@ -31,12 +31,12 @@
   if(m.title==='南风窗')m={...m,src:window.nanfcIssueReference.cover,category:'时政综合',issues:window.nanfcIssues};
   if(m.title==='第一财经'){m={...m,issues:window.periodicalReference.archive.map(a=>({src:a.cover,label:a.issue}))};}
   const claimed=q.has('claimed')?q.get('claimed')==='1':publicationState(m).claimed;const index=Math.min(m.issues.length-1,Math.max(0,Math.floor(Number(q.get('issue'))||0)));const issue=m.issues[index];context={type:'magazine',m,issue,claimed};
+  if(q.get('page')==='membership'){location.replace('portal.html#/me?tab=membership');return '';}
   if(m.title==='第一财经'&&(q.has('page')||claimed)){
    context.claimed=true;
 
    return q.has('page')?window.renderOctoberCommunity(q.get('page'),q.get('id'),m.title):window.renderClaimedPublication(m);
   }
-  if(m.title==='南风窗'&&q.get('page')==='membership'){context.claimed=true;return window.renderOctoberCommunity('membership',q.get('id'),m.title);}
   if(m.title==='南风窗'&&(q.get('club')==='1'||(claimed&&q.has('issue')&&!q.has('page')))){context.claimed=true;return window.renderOctoberClaimedIssue(m,issue);}
   if(!claimed)return window.renderOrdinaryPeriodical(m,issue);
   if(m.title==='南风窗')return q.has('page')?window.renderOctoberCommunity(q.get('page'),q.get('id')):window.renderClaimedPublication(m);
@@ -88,16 +88,7 @@
   if(listing)return {...listing,src:listing.cover,issues:[{src:listing.cover,label:listing.issue}]};
  }
  function render(){const raw=location.hash.slice(2).split('?');let type,id;try{[type,id]=raw[0].split('/').map(decodeURIComponent)}catch{return}if(type==='membership'){
-  const branded=['第一财经','南风窗'].includes(id);
-  const view=document.getElementById('view-membership');
-  view.querySelector('.content').style.display=branded?'none':'';
-  const page=view.querySelector('[data-publication-membership]');
-  page.innerHTML=branded?renderPublicationMembershipPage(id):'';
-  if(branded){
-   const reference=id==='第一财经'?window.periodicalReference:window.nanfcIssueReference;
-   const issues=id==='第一财经'?reference.archive.map(a=>({src:a.cover,label:a.issue})):window.nanfcIssues;
-   context={type:'magazine',m:{title:id,issues},issue:issues[0],claimed:true};
-  }
+  location.replace('portal.html#/me?tab=membership');
   return;
  }
  document.querySelector('[data-publication-membership]').replaceChildren();

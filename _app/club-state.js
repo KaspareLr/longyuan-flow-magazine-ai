@@ -7,7 +7,7 @@
   const articleRoute='#/article/0?context=magazine&resource='+encodeURIComponent('第一财经')+'&full=1';
   const day=new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Shanghai'}).format(new Date());
   fixture.set('profile',{nickname:'林间读者',dsuId:'personal-preview',avatar:'assets/account-avatars/avatar-04.png',
-   email:'reader@example.com',city:'上海',bio:'喜欢从一篇报道开始，读懂日常生活中的变化。',interests:['商业观察','文学','城市生活'],role:'reader'});
+   email:'reader@example.com',city:'上海',bio:'喜欢从一篇报道开始，读懂日常生活中的变化。',interests:['商业观察','文学','城市生活'],role:'reader',publicationRights:[{name:'第一财经',expires:'2027-09-30'},{name:'南风窗',expires:'2027-06-30'}]});
   fixture.set('membership',{label:'年度读友',started:'2026-11-01',expires:'2027-11-01',price:198});
   fixture.set('qikan-reading-history',[
    {title:'你睡得好吗？', route:articleRoute, day},

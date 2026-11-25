@@ -160,3 +160,11 @@
 @media(max-width:760px) {
   .dsu-filters .dsu-filter { min-height:44px; }
 }
+
+.dsu-membership-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px}
+.dsu-membership-grid .dsu-section{margin:0}
+.pe-guide-heading .ai-dsu-avatar{position:relative;flex:none;display:grid;place-items:center;width:48px;height:48px;border-radius:50%;background:conic-gradient(#3154dc var(--dsu-remaining,0%),#e4e7ef 0);z-index:2}
+.ai-dsu-avatar .pe-guide-avatar{width:42px;height:42px;border-radius:50%}
+.ai-dsu-popover{display:none;position:absolute;inset:100% auto auto 0;min-width:204px;padding:12px;border:1px solid #e4e7ef;border-radius:14px;background:#fff;color:#131921;box-shadow:0 6px 18px #13192120}
+.ai-dsu-avatar:is(:hover,:focus-within) .ai-dsu-popover{display:block}.ai-dsu-popover p,.ai-dsu-receipt{margin:6px 0;font-size:12px}.ai-dsu-popover a,.ai-dsu-receipt a{text-decoration:underline}
+body.issue-full-page:has(.dsu-gate) > .demo-reading-widget,.frontpage-shared-topic,.home-discovery-topics,.oc-feature[data-topic-static],a[href="#/topics"],a[href="index.html#/topics"],a[href*="#/topic-generate"],a[href*="#/topic/"],.mh-dock-member[hidden]{display:none!important}
