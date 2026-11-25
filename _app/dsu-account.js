@@ -319,7 +319,7 @@
     const used=state.records.filter(row=>month(row.time)===month(Date.now()));
     return {left,quota,wallet:walletAvailable(state),available:left+walletAvailable(state),
       ai:used.reduce((total,row)=>total+(row.type==='ai'?row.amount:0),0),
-      articles:used.reduce((total,row)=>total+(row.type==='article'?row.amount:0),0)};
+      articles:used.reduce((total,row)=>total+(purchaseTypes.has(row.type)?row.amount:0),0)};
   }
   function membership(code, period='month'){
     const plan=Object.hasOwn(plans,code)?plans[code]:null;
@@ -364,27 +364,48 @@
       <footer class="dsu-pricing-foot"><p>价格与额度用于演示。</p><a href="${accountURL}">前往 DSU 账户充值</a></footer>
     </section>`;
   }
+  const purchaseTypes=new Set(['article','issue','subscription','purchase']);
+  function usageType(record){
+    if(purchaseTypes.has(record.type))return 'purchase';
+    if(record.type==='ai')return 'ai';
+  }
   function quotaUsage(state){
     const member=active(state),plan=state.subscription;
     const quota=member?planFor(plan).quota:0;
     const used=member?plan.used:0;
-    const cycle=member?state.records.filter(record=>record.time>=plan.start):[];
-    const category=type=>cycle.filter(record=>record.type===type).reduce((total,record)=>total+(Number(record.quota)||0),plan?.usageCarry?.[type]||0);
-    const article=Math.min(used,category('article'));
-    const ai=Math.min(used-article,category('ai'));
-    return {used,quota,percent:quota?used/quota*100:0,article,ai,unclassified:used-article-ai};
+    let remaining=used;
+    const totals={purchase:0,ai:0};
+    function count(kind,amount){
+      if(!kind||!remaining)return;
+      const recorded=Math.min(remaining,Math.max(0,Number(amount)||0));
+      totals[kind]+=recorded;
+      remaining-=recorded;
+    }
+    if(member){
+      for(const record of state.records){
+        if(record.time>=plan.start)count(usageType(record),record.quota);
+      }
+      count('purchase',plan.usageCarry?.purchase??plan.usageCarry?.article);
+      count('ai',plan.usageCarry?.ai);
+      // Older accounts carried the used total but did not persist its split.
+      if(remaining){
+        const previous=state.records.filter(record=>record.time<plan.start).sort((a,b)=>b.time-a.time);
+        for(const record of previous)count(usageType(record),record.quota);
+      }
+    }
+    return {used,quota,percent:quota?used/quota*100:0,...totals,missing:remaining};
   }
   function quotaSegments(usage){
     const scale=Math.max(usage.used,usage.quota,1);
-    return [['article',usage.article],['ai',usage.ai],['unclassified',usage.unclassified]]
-      .map(([kind,amount])=>`<span data-usage="${kind}" style="width:${amount/scale*100}%"></span>`).join('');
+    return ['purchase','ai']
+      .map(kind=>`<span data-usage="${kind}" style="width:${usage[kind]/scale*100}%"></span>`).join('');
   }
   function panel(filter = 'all') {
     const state = load(identity(profile()));
     if (active(state) && !state.usageDemoSeeded) {
       queueMicrotask(()=>change(populateUsageDemo).catch(()=>{}));
     }
-    const records = state.records.filter(record => filter === 'all' || record.type === filter);
+    const records = state.records.filter(record => filter === 'all' || usageType(record) === (filter==='article'?'purchase':filter));
     const groups = new Map();
     const dayFormat = new Intl.DateTimeFormat('zh-CN',{dateStyle:'long',timeZone:'Asia/Shanghai'});
     const timeFormat = new Intl.DateTimeFormat('zh-CN',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Shanghai'});
@@ -395,19 +416,19 @@
     }
     const ledger = `<section class="dsu-section dsu-ledger" id="dsu-ledger"><header class="dsu-row"><h3>消费流水</h3>
         ${state.sample&&!state.sampleHistory?'<button type="button" class="dsu-button" data-dsu-history>补充样例流水</button>':''}
-        <nav class="dsu-filters" aria-label="消费类型">${[['all','全部'],['article','解锁文章'],['ai','AI对话']].map(([id,label]) =>
+        <nav class="dsu-filters" aria-label="消费类型">${[['all','全部'],['article','购买'],['ai','AI对话']].map(([id,label]) =>
           `<a class="dsu-button dsu-filter" href="#/me?tab=dsu&amp;view=usage&amp;filter=${id}" ${filter===id?'aria-current="page"':''}>${label}</a>`).join('')}</nav></header>
         ${records.length ? [...groups].map(([day,rows])=>`<section class="dsu-record-day"><h4>${day}</h4>
           <ul class="dsu-records">${rows.map(record=>{
           const source = (record.example?'样例 · ':'')+[record.quota && '会员额度 '+record.quota,record.wallet && '充值余额 '+record.wallet].filter(Boolean).join(' + ')+' DSU';
           return `<li title="${esc(source)}"><time datetime="${new Date(record.time).toISOString()}">${timeFormat.format(record.time)}</time>
-          <div class="dsu-record-copy"><span class="dsu-record-type">${record.type==='article'?'解锁文章':'AI对话'}</span><strong>${esc(record.description)}</strong></div>
+          <div class="dsu-record-copy"><span class="dsu-record-type">${usageType(record)==='purchase'?'购买':'AI 对话'}</span><strong>${esc(record.description)}</strong></div>
           <b>−${record.amount} DSU</b><small class="dsu-record-source">${esc(source)}</small></li>`;
           }).join('')}</ul></section>`).join(''):'<p>暂无此类消费记录。</p>'}</section>`;
     const usage=summary();
     const member = active(state), plan = state.subscription;
     const totals=quotaUsage(state);
-    const {used,quota,percent,article,ai,unclassified}=totals;
+    const {used,quota,percent,purchase,ai,missing}=totals;
     const walletEnabled = state.walletEnabled !== false;
     const spent = walletSpent(state), limit = state.walletLimit;
     const reset = member ? date(plan.expires) : '';
@@ -426,11 +447,11 @@
             '<button type="button" class="dsu-button" data-dsu-renew>续费</button>'}
         </div>
       </section>
-      <section class="dsu-section dsu-usage"><h3>会员额度用量</h3><p>本月 AI 已用 ${usage.ai} DSU，阅读已用 ${usage.articles} DSU。</p>
+      <section class="dsu-section dsu-usage"><h3>会员额度用量</h3><p>本月 AI 对话已用 ${usage.ai} DSU，购买已用 ${usage.articles} DSU。</p>
         <div class="dsu-usage-progress">
         <div class="dsu-row"><p>已用 <b>${used} / ${quota} DSU</b></p><span class="dsu-tag">${percent.toFixed(1)}%</span></div>
-        <div class="dsu-progress" aria-hidden="true">${quotaSegments(totals)}</div>
-        <div class="dsu-legend"><span>文章阅读 ${article} DSU</span><span>AI 问询 ${ai} DSU</span>${unclassified?`<span>未分类用量 ${unclassified} DSU</span>`:''}</div></div>
+        <div class="dsu-progress" style="--usage-total:${Math.min(percent,100)}%" aria-hidden="true">${quotaSegments(totals)}</div>
+        <div class="dsu-legend"><span>购买消耗 ${purchase} DSU</span><span>AI 对话 ${ai} DSU</span></div>${missing?'<p class="dsu-usage-history-note">部分历史流水缺失。</p>':''}</div>
       </section>
       <section class="dsu-section dsu-wallet"><h3>充值余额</h3><div class="dsu-wallet-card">
         <div class="dsu-row dsu-wallet-setting"><div><p class="dsu-wallet-setting-label">使用充值余额</p><p class="dsu-wallet-hint">会员额度用完后，从充值余额扣费。</p></div>
@@ -466,9 +487,9 @@
             state.subscription.expires=addMonths(state.subscription.expires,plan.months);
             return;
           }
-          const {used,article,ai}=quotaUsage(state);
+          const {used,purchase,ai}=quotaUsage(state);
           state.subscription={code,start,expires:addMonths(start,plan.months),used,autoRenew:Boolean(plan.auto),
-            usageCarry:{article,ai}};
+            usageCarry:{purchase,ai}};
         }),
         onDone:()=>{location.hash='#/me?tab=dsu';}
       });
@@ -626,13 +647,13 @@
     if(activeAccount&&!activeAccount.isConnected)closeMenu();
     const state=load(identity(owner));
     const totals=quotaUsage(state);
-    const {used,quota,percent,article,ai,unclassified}=totals;
+    const {used,quota,percent,purchase,ai,missing}=totals;
     const quotaLeft=remaining(state),available=quotaLeft+walletAvailable(state);
     const ring=quota?Math.min(100,Math.max(0,100*quotaLeft/quota)):available?100:0;
     const plan=active(state)?state.subscription:null;
     const planName=plan?planFor(plan).name:'尚未订阅';
     const expiry=plan?new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Shanghai',dateStyle:'short'}).format(plan.expires).replaceAll('-','.'):'';
-    const nextKey=JSON.stringify([owner.avatar,owner.nickname,planName,expiry,used,quota,article,ai]);
+    const nextKey=JSON.stringify([owner.avatar,owner.nickname,planName,expiry,used,quota,purchase,ai,missing]);
     if(nextKey!==menuKey){
       menuKey=nextKey;
       const avatarURL=new URL(owner.avatar,root);
@@ -644,8 +665,8 @@
       </div>
       <div class="dsu-menu-usage">
        <div class="dsu-menu-usage-line"><p>已用 <b>${used} / ${quota} DSU</b></p><span>${percent.toFixed(1)}%</span></div>
-       <div class="dsu-menu-progress" aria-hidden="true">${quotaSegments(totals)}</div>
-       <div class="dsu-menu-legend"><span>购买消耗</span><span>AI 对话</span>${unclassified?`<span>未分类用量 ${unclassified} DSU</span>`:''}</div>
+       <div class="dsu-menu-progress" style="--usage-total:${Math.min(percent,100)}%" aria-hidden="true">${quotaSegments(totals)}</div>
+       <div class="dsu-menu-legend"><span>购买消耗</span><span>AI 对话</span></div>${missing?'<p class="dsu-usage-history-note">部分历史流水缺失。</p>':''}
       </div>
       <div class="dsu-menu-links">${links.map(([tab,label])=>`<a href="${esc(new URL('portal.html#/me?tab='+tab,root))}">${label}<img src="${esc(arrow)}" alt=""></a>`).join('')}</div>
       <div class="dsu-menu-links"><button type="button" data-avatar-signout>退出登录</button></div>`;

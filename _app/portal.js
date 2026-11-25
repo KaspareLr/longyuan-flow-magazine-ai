@@ -155,7 +155,7 @@
      :'';
     const layout=row.kind==='subscription'?'subscription':row.type==='图书'?'book':row.type==='期刊'?'periodical':'article';
     return `<li class="qikan-reading-item qikan-reading-item--${layout}">${row.route?`<a class="qikan-saved-link" href="${esc(row.route)}">${content}</a>`:`<div class="qikan-saved-link">${content}</div>`}${action}</li>`;
-   }).join('')}</ul>`:`<p class="qikan-account-empty">${empty}</p>`}`;
+   }).join('')}</ul>`:`<div class="qikan-reading-empty"><img src="https://kasparelr.github.io/agentui-shared-images/objects/1a/1a5b5705c9764e9fc5ab0701c25364283b086be3520091b79c6dc3114340e617.png" width="144" height="96" alt=""><p class="qikan-account-empty">${empty}</p></div>`}`;
  }
  function recordReading(a){
   if(!session.profile||document.body.classList.contains('issue-preview-page')||main.querySelector('.dsu-gate'))return;

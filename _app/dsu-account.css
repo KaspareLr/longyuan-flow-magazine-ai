@@ -16,7 +16,6 @@
 .dsu-progress { display:flex; height:9px; background:#dce3ec; border-radius:8px; overflow:hidden; margin-block:12px; }
 .dsu-progress span { background:#255290; }
 .dsu-progress [data-usage=ai] { background:#278376; }
-.dsu-progress [data-usage=unclassified] { background:#64748b; }
 .dsu-actions { display:flex; flex-wrap:wrap; align-items:center; gap:10px; }
 .dsu-button { display:inline-flex; align-items:center; justify-content:center; min-height:44px; padding:8px 14px; border-radius:12px; border:1px solid #e4e7ed; background:#fff; color:#131921; text-decoration:none; font-family:inherit; font-size:14px; line-height:20px; font-weight:500; cursor:pointer; box-sizing:border-box; }
 .dsu-primary,.dsu-button[aria-current="page"] { color:#fff; background:#131921; border-color:#131921; }
@@ -61,7 +60,6 @@
 .dsu-legend { display:flex; flex-wrap:wrap; gap:8px 16px; font-size:14px; }
 .dsu-legend span::before { content:''; display:inline-block; width:9px; height:9px; border-radius:3px; background:#255290; margin-inline-end:6px; }
 .dsu-legend span:nth-child(2)::before { background:#278376; }
-.dsu-legend span:nth-child(3)::before { background:#64748b; }
 .dsu-wallet-balance { border-top:1px solid #dce1e8; margin:16px 0; padding-top:16px; }
 .dsu-wallet-balance b { font-size:28px; line-height:36px; font-variant-numeric:tabular-nums; }
 .dsu-wallet-balance b span { font-size:14px; line-height:20px; font-weight:600; }
@@ -188,12 +186,10 @@
 .dsu-menu-progress { display:flex;height:9px;margin-top:12px;border-radius:8px;overflow:hidden;background:#dce3ec; }
 .dsu-menu-progress span:first-child { background:#2f54eb; }
 .dsu-menu-progress [data-usage=ai] { background:#13c2c2; }
-.dsu-menu-progress [data-usage=unclassified] { background:#64748b; }
 .dsu-menu-legend { display:flex;flex-wrap:wrap;gap:4px 20px;min-height:32px;padding-top:8px;font-size:12px;line-height:20px;box-sizing:border-box; }
 .dsu-menu-legend span { display:flex;align-items:center;gap:2px; }
 .dsu-menu-legend span::before { content:"";width:9px;height:9px;border-radius:50%;background:#2f54eb; }
 .dsu-menu-legend span:nth-child(2)::before { background:#13c2c2; }
-.dsu-menu-legend span:nth-child(3)::before { background:#64748b; }
 .dsu-menu-links { padding-block:10px;border-top:1px solid #f0f2f5; }
 .dsu-menu-links :is(a,button) {
  display:flex;align-items:center;justify-content:space-between;box-sizing:border-box;
@@ -244,3 +240,6 @@ body.issue-full-page:has(.dsu-gate) > .demo-reading-widget,.frontpage-shared-top
 .dsu-pricing-checkout dd{margin:0;text-align:right}
 @media(max-width:650px){.dsu-pricing{padding:28px 16px 52px}.dsu-pricing .dsu-membership-grid{grid-template-columns:1fr}.dsu-plan-description{min-height:0}}
 @media(min-width:651px){.dsu-pricing-comparison .dsu-price-card{display:grid;grid-template-rows:subgrid;grid-row:span 6;row-gap:10px}}
+
+.dsu-progress,.dsu-menu-progress { background:linear-gradient(90deg,#8c9bb0 var(--usage-total,0%),#dce3ec var(--usage-total,0%)); }
+.dsu-usage-history-note { margin:4px 0 0;color:#606266;font-size:12px;line-height:18px; }
