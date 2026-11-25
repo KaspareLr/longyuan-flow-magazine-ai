@@ -62,6 +62,14 @@
    </section>
    <section class="qikan-reading-records"><h3>阅读记录</h3>${readingRecords(profile)}</section>`;
  }
+ function subscriptionValidity(time){
+  if(!Number.isFinite(time))return '一年有效期';
+  const start=new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).format(time);
+  const [year,month,day]=start.split('-').map(Number);
+  const end=new Date(Date.UTC(year+1,month-1,day));
+  if(end.getUTCMonth()!==month-1)end.setUTCDate(0);
+  return '有效期：'+start.replaceAll('-','.')+'-'+end.toISOString().slice(0,10).replaceAll('-','.');
+ }
  function readingRecords(profile){
   const savedArticles=session.read('savedArticles',[]);
   const articleTitle=item=>typeof item==='string'?item:item.title;
@@ -97,7 +105,7 @@
     empty='暂无收藏的文章。';
     break;
    case 'subscription':
-    rows=session.contentRows('subscription').map(row=>publication({...row,meta:'一年有效期'}));
+    rows=session.contentRows('subscription').map(row=>publication({...row,meta:subscriptionValidity(row.time)}));
     empty='暂无全年订购的期刊。';
     break;
    case 'issue':
@@ -119,7 +127,8 @@
   }
   return `<nav class="qikan-reading-tabs" aria-label="阅读记录">${readingTabs.map(([key,label])=>`<button type="button" data-reading-tab="${key}" aria-pressed="${readingTab===key}">${label}</button>`).join('')}</nav>
    ${rows.length?`<ul class="qikan-saved-list">${rows.map(row=>{
-    const content=`${row.cover?`<img class="qikan-saved-cover" src="${esc(row.cover)}" alt="" loading="lazy">`:''}
+    const cover=row.cover?`<img class="qikan-saved-cover" src="${esc(row.cover)}" alt="" loading="lazy">`:'';
+    const content=`${cover&&row.kind==='subscription'?`<span class="qikan-subscription-covers">${cover}${cover}</span>`:cover}
      <span class="qikan-saved-text"><span class="qikan-reading-item-head">
       ${row.type?`<small class="qikan-reading-type">${row.type}</small>`:''}<strong>${esc(row.title)}</strong>
       ${row.summary?`<span class="qikan-reading-summary">${esc(row.summary)}</span>`:''}
@@ -127,7 +136,7 @@
     const removal=['book','magazine','article'].includes(row.kind);
     const action=removal?`<button type="button" class="qikan-saved-remove" data-remove-saved="${row.kind}" data-index="${row.index??''}" data-content-id="${esc(row.id)}" aria-label="${row.kind==='article'?'取消收藏':'取消关注'} ${esc(row.title)}">${readingIcon(row.kind==='article'?'star':'mark')}</button>`
      :row.kind==='owned-article'?`<button type="button" class="qikan-saved-remove" data-reading-save-title="${esc(row.title)}" data-reading-save-route="${esc(row.route)}" data-reading-save-source="${esc(row.meta)}" data-reading-save-summary="${esc(row.summary)}" aria-pressed="${row.index!==-1}" aria-label="收藏 ${esc(row.title)}">${row.index===-1?uiIcon('Star'):readingIcon('star')}</button>`:'';
-    const layout=row.type==='图书'?'book':row.type==='期刊'?'periodical':'article';
+    const layout=row.kind==='subscription'?'subscription':row.type==='图书'?'book':row.type==='期刊'?'periodical':'article';
     return `<li class="qikan-reading-item qikan-reading-item--${layout}">${row.route?`<a class="qikan-saved-link" href="${esc(row.route)}">${content}</a>`:`<div class="qikan-saved-link">${content}</div>`}${action}</li>`;
    }).join('')}</ul>`:`<p class="qikan-account-empty">${empty}</p>`}`;
  }

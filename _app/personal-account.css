@@ -200,3 +200,15 @@ body:has(.qikan-account) { background:#fff; }
  .qikan-reading-records .qikan-reading-item--book .qikan-saved-cover { height:96px; }
  .qikan-reading-records .qikan-saved-text strong { font-size:17px;line-height:26px; }
 }
+
+.qikan-subscription-covers { display:flex;align-items:flex-end;align-self:flex-start;flex:none; }
+.qikan-reading-records .qikan-subscription-covers .qikan-saved-cover { align-self:auto; }
+.qikan-reading-records .qikan-subscription-covers .qikan-saved-cover + .qikan-saved-cover {
+ width:74px;height:100px;margin-inline-start:-54px;
+}
+.qikan-reading-records .qikan-reading-item--subscription .qikan-saved-text strong { font-size:16px;line-height:28px; }
+@media(max-width:760px){
+ .qikan-reading-records .qikan-subscription-covers .qikan-saved-cover + .qikan-saved-cover {
+  width:54px;height:73px;margin-inline-start:-40px;
+ }
+}
