@@ -43,7 +43,7 @@
   <button class="qikan-account-logout" type="button" data-logout>退出登录</button>
  </section>`;
  let panel='';
- if(accountTab==='dsu')panel=qikanDSU.panel(['article','ai'].includes(params.get('filter'))?params.get('filter'):'all');
+ if(accountTab==='dsu')panel=qikanDSU.panel(['article','ai'].includes(params.get('filter'))?params.get('filter'):'all',params.get('view'));
  else if(accountTab==='profile')panel=`<h2>基本信息</h2><form class="portal-profile-form" id="profile-form"><div class="qikan-profile-avatar"><span>头像</span>${avatar}</div><label><span class="qikan-field-label">昵称 <small data-profile-count="nickname">${p.nickname.length} / 20</small></span><input name="nickname" value="${esc(p.nickname)}" maxlength="20" required></label><label><span class="qikan-field-label">所在城市 <small data-profile-count="city">${(p.city||'').length} / 30</small></span><input name="city" value="${esc(p.city||'')}" maxlength="30"></label><label class="full">邮箱<input type="email" name="email" autocomplete="email" value="${esc(p.email||'')}" placeholder="reader@example.com"></label><label class="full"><span class="qikan-field-label">个人简介 <small data-profile-count="bio">${(p.bio||'').length} / 160</small></span><textarea name="bio" maxlength="160">${esc(p.bio||'')}</textarea><small>一句话，介绍你的阅读世界。</small></label><label class="full">阅读兴趣<input name="interests" value="${esc((p.interests||[]).join('、'))}" placeholder="文学、生活、历史"></label><button class="button dark full">保存修改</button><p class="portal-form-status full" role="status"></p></form>`;
  else panel=readingOverview(p);
  return `<div class="qikan-account" data-account-tab="${esc(accountTab)}">
@@ -74,6 +74,14 @@
   const savedArticles=session.read('savedArticles',[]);
   const articleTitle=item=>typeof item==='string'?item:item.title;
   const articleDetails=(title,record)=>{
+   const topic=window.natureTopicData;
+   const topicIndex=topic?.articles.findIndex(item=>record.article===qikanDSU.articleId(item)||item.title===title)??-1;
+   if(topicIndex>=0){
+    const item=topic.articles[topicIndex];
+    const query=new URLSearchParams({context:'magazine',resource:item.magazineName,topic:topic.id,full:'1'});
+    return {summary:record.summary||item.summary,meta:[item.magazineName,item.issueLabel].filter(Boolean).join(' · '),
+     route:record.route||href('article/'+topicIndex+'?'+query)};
+   }
    const resource=new URLSearchParams((record.route||'').split('?')[1]).get('resource');
    const bookSource=data.books.find(item=>item.id===resource)?.title;
    const source=record.source||bookSource||resource;

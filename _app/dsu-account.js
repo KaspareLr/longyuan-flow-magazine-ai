@@ -400,7 +400,7 @@
     return ['purchase','ai']
       .map(kind=>`<span data-usage="${kind}" style="width:${usage[kind]/scale*100}%"></span>`).join('');
   }
-  function panel(filter = 'all') {
+  function panel(filter = 'all', view) {
     const state = load(identity(profile()));
     if (active(state) && !state.usageDemoSeeded) {
       queueMicrotask(()=>change(populateUsageDemo).catch(()=>{}));
@@ -416,51 +416,55 @@
     }
     const ledger = `<section class="dsu-section dsu-ledger" id="dsu-ledger"><header class="dsu-row"><h3>消费流水</h3>
         ${state.sample&&!state.sampleHistory?'<button type="button" class="dsu-button" data-dsu-history>补充样例流水</button>':''}
-        <nav class="dsu-filters" aria-label="消费类型">${[['all','全部'],['article','购买'],['ai','AI对话']].map(([id,label]) =>
+        <nav class="dsu-filters" aria-label="消费类型">${[['all','全部'],['article','购买记录'],['ai','AI对话']].map(([id,label]) =>
           `<a class="dsu-button dsu-filter" href="#/me?tab=dsu&amp;view=usage&amp;filter=${id}" ${filter===id?'aria-current="page"':''}>${label}</a>`).join('')}</nav></header>
         ${records.length ? [...groups].map(([day,rows])=>`<section class="dsu-record-day"><h4>${day}</h4>
           <ul class="dsu-records">${rows.map(record=>{
           const source = (record.example?'样例 · ':'')+[record.quota && '会员额度 '+record.quota,record.wallet && '充值余额 '+record.wallet].filter(Boolean).join(' + ')+' DSU';
           return `<li title="${esc(source)}"><time datetime="${new Date(record.time).toISOString()}">${timeFormat.format(record.time)}</time>
-          <div class="dsu-record-copy"><span class="dsu-record-type">${usageType(record)==='purchase'?'购买':'AI 对话'}</span><strong>${esc(record.description)}</strong></div>
+          <div class="dsu-record-copy"><span class="dsu-record-type">${({article:'解锁文章',issue:'购买单期',subscription:'订阅期刊',purchase:'购买',ai:'AI 对话'})[record.type]||'DSU'}</span><strong>${esc(record.description)}</strong></div>
           <b>−${record.amount} DSU</b><small class="dsu-record-source">${esc(source)}</small></li>`;
           }).join('')}</ul></section>`).join(''):'<p>暂无此类消费记录。</p>'}</section>`;
-    const usage=summary();
-    const member = active(state), plan = state.subscription;
-    const totals=quotaUsage(state);
-    const {used,quota,percent,purchase,ai,missing}=totals;
-    const walletEnabled = state.walletEnabled !== false;
-    const spent = walletSpent(state), limit = state.walletLimit;
-    const reset = member ? date(plan.expires) : '';
-    return `<div class="dsu-panel dsu-subscriptions">
-      <header class="dsu-row"><div><h2>会员与 DSU</h2><p>${state.sample||state.usageDemoSeeded?'含演示数据':'本地演示'}</p><a href="#/membership">查看平台会员套餐</a></div>
-        ${!plan&&!state.balance&&!state.records.length?'<button type="button" class="dsu-button" data-dsu-sample>载入演示数据</button>':''}</header>
-      <section class="dsu-summary">
-        <div class="dsu-row">
-          <div><h3>可用 DSU</h3><strong>${remaining(state)+walletAvailable(state)} <small>DSU</small></strong><p class="dsu-available-sources">会员剩余 ${remaining(state)} · 充值可用 ${walletAvailable(state)}</p></div>
-          <div class="dsu-plan"><span class="dsu-tag">${member?planFor(plan).name:'尚未订阅'}</span><p>${member?planFor(plan).quota+' DSU / 周期':'按需选择会员套餐'}</p></div>
+    const member=active(state),plan=state.subscription,totals=quotaUsage(state);
+    const {used,quota,percent,missing}=totals;
+    const walletEnabled=state.walletEnabled!==false;
+    const spent=walletSpent(state),limit=state.walletLimit;
+    const planManagement=member&&view==='plan';
+    const walletManagement=view==='wallet';
+    const expiry=member?'本期额度有效至 '+date(plan.expires):'开通会员后可使用套餐额度。';
+    return `<div class="dsu-panel dsu-subscriptions dsu-account-overview">
+      <header class="dsu-account-title"><h2>DSU 订阅与用量</h2><p>会员额度与充值余额</p></header>
+      <section class="dsu-summary dsu-account-card" aria-label="当前套餐">
+        <div><p class="dsu-card-label">当前套餐</p>
+          <strong>${member?`<a href="#/me?tab=dsu${planManagement?'':'&amp;view=plan'}" aria-label="管理${esc(planFor(plan).name)}">${esc(planFor(plan).name)}</a>`:'尚未订阅'}</strong>
+          <p class="dsu-card-detail">${expiry}</p>
         </div>
-        <div class="dsu-row dsu-plan-actions">
-          <p>${member?(plan.autoRenew?'下次续订与额度重置：'+reset:'本期额度有效至 '+reset):'开通后即可使用会员额度。'}</p>
-          ${!member?'<a class="dsu-button" href="#/membership">查看会员套餐</a>':plan.autoRenew?
-            '<button type="button" class="dsu-button" data-dsu-cancel>取消订阅</button>':
+        <a class="dsu-button" href="#/membership">查看套餐</a>
+        ${planManagement?`<div class="dsu-account-card-settings dsu-actions">
+          ${plan.autoRenew?'<button type="button" class="dsu-button" data-dsu-cancel>取消订阅</button>':
             '<button type="button" class="dsu-button" data-dsu-renew>续费</button>'}
-        </div>
+        </div>`:''}
       </section>
-      <section class="dsu-section dsu-usage"><h3>会员额度用量</h3><p>本月 AI 对话已用 ${usage.ai} DSU，购买已用 ${usage.articles} DSU。</p>
+      <section class="dsu-section dsu-usage"><h3>会员额度用量</h3>
         <div class="dsu-usage-progress">
         <div class="dsu-row"><p>已用 <b>${used} / ${quota} DSU</b></p><span class="dsu-tag">${percent.toFixed(1)}%</span></div>
         <div class="dsu-progress" style="--usage-total:${Math.min(percent,100)}%" aria-hidden="true">${quotaSegments(totals)}</div>
-        <div class="dsu-legend"><span>购买消耗 ${purchase} DSU</span><span>AI 对话 ${ai} DSU</span></div>${missing?'<p class="dsu-usage-history-note">部分历史流水缺失。</p>':''}</div>
+        <div class="dsu-legend"><span title="${totals.purchase} DSU">购买消耗</span><span title="${totals.ai} DSU">AI 对话</span></div>
+        ${missing?'<p class="dsu-usage-history-note">部分历史流水缺失。</p>':''}</div>
       </section>
-      <section class="dsu-section dsu-wallet"><h3>充值余额</h3><div class="dsu-wallet-card">
-        <div class="dsu-row dsu-wallet-setting"><div><p class="dsu-wallet-setting-label">使用充值余额</p><p class="dsu-wallet-hint">会员额度用完后，从充值余额扣费。</p></div>
-        <button type="button" class="dsu-switch" role="switch" aria-label="使用充值余额" aria-checked="${walletEnabled}" data-dsu-wallet><span class="dsu-switch-track" aria-hidden="true"></span></button></div>
-        <div class="dsu-row dsu-wallet-balance"><div><p class="dsu-wallet-label">当前余额</p><b>${state.balance} <span>DSU</span></b></div><div class="dsu-actions">
-          <button type="button" class="dsu-button" data-dsu-limit>设置消费上限</button>
-          <button type="button" class="dsu-button dsu-primary" data-dsu-recharge>充值</button></div></div>
-        <p class="dsu-wallet-spending"><span>本月已消费 <small>（${month(Date.now())}）</small></span> <b>${spent} DSU</b> <span>/ ${limit == null?'不限':limit+' DSU'}</span></p>
-        <p class="dsu-wallet-minimum">单笔 ${minimum} DSU 起充</p></div></section>
+      <section class="dsu-section dsu-wallet"><h3>充值额度</h3><div class="dsu-wallet-card dsu-account-card">
+        <div><p class="dsu-card-label">当前余额</p>
+          <strong><a href="#/me?tab=dsu${walletManagement?'':'&amp;view=wallet'}" aria-label="管理充值余额">${walletAvailable(state)} DSU 可用</a></strong>
+          <p class="dsu-card-detail">单笔 ${minimum} DSU 起充</p>
+        </div>
+        <button type="button" class="dsu-button" data-dsu-recharge>购买额度</button>
+        ${walletManagement?`<div class="dsu-account-card-settings">
+         <div class="dsu-row"><p>使用充值余额</p><button type="button" class="dsu-switch" role="switch" aria-label="使用充值余额" aria-checked="${walletEnabled}" data-dsu-wallet><span class="dsu-switch-track" aria-hidden="true"></span></button></div>
+         <div class="dsu-row"><p>账户余额 ${state.balance} DSU · 本月消费 ${spent} / ${limit==null?'不限':limit+' DSU'}</p>
+           <button type="button" class="dsu-button" data-dsu-limit>设置消费上限</button></div>
+        </div>`:''}
+      </div></section>
+      ${!plan&&!state.balance&&!state.records.length?'<div><button type="button" class="dsu-button" data-dsu-sample>载入演示数据</button></div>':''}
       ${ledger}</div>`;
   }
 
@@ -659,6 +663,7 @@
       const avatarURL=new URL(owner.avatar,root);
       const links=[['overview','我的阅读'],['profile','基本信息'],['dsu','会员与 DSU']];
       const arrow=new URL('assets/figma-identity/account-menu-arrow.svg',root);
+      const flash=new URL('assets/figma-identity/account-plan-flash.svg',root);
       quickMenu.innerHTML=`<div class="dsu-menu-profile">
        <img src="${esc(avatarURL)}" class="dsu-menu-avatar" width="40" height="40" alt="">
        <div><strong>${esc(owner.nickname)}</strong><p><span>${esc(planName)}</span>${expiry?`<span>有效期至：${expiry}</span>`:''}</p></div>
@@ -669,6 +674,7 @@
        <div class="dsu-menu-legend"><span>购买消耗</span><span>AI 对话</span></div>${missing?'<p class="dsu-usage-history-note">部分历史流水缺失。</p>':''}
       </div>
       <div class="dsu-menu-links">${links.map(([tab,label])=>`<a href="${esc(new URL('portal.html#/me?tab='+tab,root))}">${label}<img src="${esc(arrow)}" alt=""></a>`).join('')}</div>
+      <div class="dsu-menu-links dsu-menu-plan-link"><a href="${esc(membershipURL)}">会员套餐<img src="${esc(flash)}" alt=""></a></div>
       <div class="dsu-menu-links"><button type="button" data-avatar-signout>退出登录</button></div>`;
     }
     for(const avatar of document.querySelectorAll('header .club-account-avatar')){

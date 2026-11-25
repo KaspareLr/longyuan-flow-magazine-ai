@@ -84,6 +84,9 @@
 
 .magazine-home .mh-actions .mh-subscribe {
  min-height: 48px;
+ border-radius: 999px;
+ background:#fff;
+ font-weight:600;
  padding-inline: 22px;
  border: 1px solid #e4e7ed;
 }
