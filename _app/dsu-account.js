@@ -56,6 +56,7 @@
         plan.expires = addMonths(plan.start,planFor(plan).months);
       } while (plan.expires <= now);
       plan.used = 0;
+      delete plan.usageCarry;
     }
     return state;
   }
@@ -368,8 +369,15 @@
     const quota=member?planFor(plan).quota:0;
     const used=member?plan.used:0;
     const cycle=member?state.records.filter(record=>record.time>=plan.start):[];
-    const category=type=>cycle.filter(record=>record.type===type).reduce((total,record)=>total+record.quota,0);
-    return {used,quota,percent:quota?used/quota*100:0,article:category('article'),ai:category('ai')};
+    const category=type=>cycle.filter(record=>record.type===type).reduce((total,record)=>total+(Number(record.quota)||0),plan?.usageCarry?.[type]||0);
+    const article=Math.min(used,category('article'));
+    const ai=Math.min(used-article,category('ai'));
+    return {used,quota,percent:quota?used/quota*100:0,article,ai,unclassified:used-article-ai};
+  }
+  function quotaSegments(usage){
+    const scale=Math.max(usage.used,usage.quota,1);
+    return [['article',usage.article],['ai',usage.ai],['unclassified',usage.unclassified]]
+      .map(([kind,amount])=>`<span data-usage="${kind}" style="width:${amount/scale*100}%"></span>`).join('');
   }
   function panel(filter = 'all') {
     const state = load(identity(profile()));
@@ -398,7 +406,8 @@
           }).join('')}</ul></section>`).join(''):'<p>暂无此类消费记录。</p>'}</section>`;
     const usage=summary();
     const member = active(state), plan = state.subscription;
-    const {used,quota,percent,article,ai}=quotaUsage(state);
+    const totals=quotaUsage(state);
+    const {used,quota,percent,article,ai,unclassified}=totals;
     const walletEnabled = state.walletEnabled !== false;
     const spent = walletSpent(state), limit = state.walletLimit;
     const reset = member ? date(plan.expires) : '';
@@ -420,8 +429,8 @@
       <section class="dsu-section dsu-usage"><h3>会员额度用量</h3><p>本月 AI 已用 ${usage.ai} DSU，阅读已用 ${usage.articles} DSU。</p>
         <div class="dsu-usage-progress">
         <div class="dsu-row"><p>已用 <b>${used} / ${quota} DSU</b></p><span class="dsu-tag">${percent.toFixed(1)}%</span></div>
-        <div class="dsu-progress" aria-hidden="true"><span style="width:${quota?article/quota*100:0}%"></span><span style="width:${quota?ai/quota*100:0}%"></span></div>
-        <div class="dsu-legend"><span>文章阅读 ${article} DSU</span><span>AI 问询 ${ai} DSU</span></div></div>
+        <div class="dsu-progress" aria-hidden="true">${quotaSegments(totals)}</div>
+        <div class="dsu-legend"><span>文章阅读 ${article} DSU</span><span>AI 问询 ${ai} DSU</span>${unclassified?`<span>未分类用量 ${unclassified} DSU</span>`:''}</div></div>
       </section>
       <section class="dsu-section dsu-wallet"><h3>充值余额</h3><div class="dsu-wallet-card">
         <div class="dsu-row dsu-wallet-setting"><div><p class="dsu-wallet-setting-label">使用充值余额</p><p class="dsu-wallet-hint">会员额度用完后，从充值余额扣费。</p></div>
@@ -457,8 +466,9 @@
             state.subscription.expires=addMonths(state.subscription.expires,plan.months);
             return;
           }
-          const used=active(state)?state.subscription.used:0;
-          state.subscription={code,start,expires:addMonths(start,plan.months),used,autoRenew:Boolean(plan.auto)};
+          const {used,article,ai}=quotaUsage(state);
+          state.subscription={code,start,expires:addMonths(start,plan.months),used,autoRenew:Boolean(plan.auto),
+            usageCarry:{article,ai}};
         }),
         onDone:()=>{location.hash='#/me?tab=dsu';}
       });
@@ -615,7 +625,8 @@
     }
     if(activeAccount&&!activeAccount.isConnected)closeMenu();
     const state=load(identity(owner));
-    const {used,quota,percent,article,ai}=quotaUsage(state);
+    const totals=quotaUsage(state);
+    const {used,quota,percent,article,ai,unclassified}=totals;
     const quotaLeft=remaining(state),available=quotaLeft+walletAvailable(state);
     const ring=quota?Math.min(100,Math.max(0,100*quotaLeft/quota)):available?100:0;
     const plan=active(state)?state.subscription:null;
@@ -633,8 +644,8 @@
       </div>
       <div class="dsu-menu-usage">
        <div class="dsu-menu-usage-line"><p>已用 <b>${used} / ${quota} DSU</b></p><span>${percent.toFixed(1)}%</span></div>
-       <div class="dsu-menu-progress" aria-hidden="true"><span style="width:${quota?article/quota*100:0}%"></span><span style="width:${quota?ai/quota*100:0}%"></span></div>
-       <div class="dsu-menu-legend"><span>购买消耗</span><span>AI 对话</span></div>
+       <div class="dsu-menu-progress" aria-hidden="true">${quotaSegments(totals)}</div>
+       <div class="dsu-menu-legend"><span>购买消耗</span><span>AI 对话</span>${unclassified?`<span>未分类用量 ${unclassified} DSU</span>`:''}</div>
       </div>
       <div class="dsu-menu-links">${links.map(([tab,label])=>`<a href="${esc(new URL('portal.html#/me?tab='+tab,root))}">${label}<img src="${esc(arrow)}" alt=""></a>`).join('')}</div>
       <div class="dsu-menu-links"><button type="button" data-avatar-signout>退出登录</button></div>`;
