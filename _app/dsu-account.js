@@ -327,8 +327,9 @@
     const state=owner?load(owner):null;
     const current=state&&active(state)?state.subscription:null;
     const pricing='#/membership';
+    const buyQuota='<button type="button" class="dsu-button" data-dsu-recharge>购买额度</button>';
     if(plan)return `<section class="dsu-pricing dsu-pricing-checkout">
-      <a href="${pricing}?period=${plan.months===1?'month':'year'}">← 返回套餐比较</a>
+      <div class="dsu-row"><a href="${pricing}?period=${plan.months===1?'month':'year'}">← 返回套餐比较</a>${buyQuota}</div>
       <header><h1>开通${plan.name}</h1><p>核对套餐信息后选择支付方式。</p></header>
       <div class="dsu-price-card"><dl><div><dt>会员额度</dt><dd>${plan.quota} DSU</dd></div><div><dt>有效期</dt><dd>${plan.months===1?'一个月':'一年'}</dd></div><div><dt>续费方式</dt><dd>${plan.auto?'到期自动续费，可在 DSU 账户取消':'到期后按需续订'}</dd></div><div><dt>应付金额</dt><dd>${plan.price} DSU</dd></div></dl>
       <button type="button" class="dsu-button dsu-primary" data-dsu-checkout="${code}">${owner?'继续支付':'登录并继续'}</button></div></section>`;
@@ -361,7 +362,7 @@
       <header><h1>龙源期刊网会员</h1><p>用 DSU 阅读文章、选购期刊和使用 AI 问答。</p></header>
       ${current?`<p class="dsu-pricing-current">当前方案 · ${planFor(current).name} · 有效至 ${date(current.expires)} <a href="#/me?tab=dsu">管理额度</a></p>`:''}
       <div class="dsu-membership-grid">${card(base,'普通会员','适合日常阅读和提问。')}${card('pro','年度 Pro','更高的年度额度，适合频繁阅读和问答。')}</div>
-      <footer class="dsu-pricing-foot"><p>价格与额度用于演示。</p><a href="${accountURL}">前往 DSU 账户充值</a></footer>
+      <footer class="dsu-pricing-foot">${buyQuota}</footer>
     </section>`;
   }
   const purchaseTypes=new Set(['article','issue','subscription','purchase']);

@@ -1,0 +1,51 @@
+dialog.qikan-auth-dialog {
+  box-sizing:border-box;width:min(440px,calc(100vw - 24px));max-height:calc(100dvh - 32px);
+  margin:auto;padding:36px 24px 24px;border:1px solid #ffffffd9;border-radius:28px;
+  background:#fff;color:#131921;font-family:Figtree,"PingFang SC",sans-serif;overscroll-behavior:contain;
+  box-shadow:0 12px 44px #1319211a;overflow:auto;
+}
+.qikan-auth-dialog::backdrop { background:#13192126;backdrop-filter:blur(5px); }
+.qikan-auth-close {
+  position:absolute;inset:8px 8px auto auto;display:grid;place-items:center;width:40px;height:40px;
+  padding:0;border:0;border-radius:50%;background:#f5f7fa;color:#606266;font:24px/1 Figtree,sans-serif;cursor:pointer;
+}
+.qikan-auth-dialog #qikan-auth-title {
+  margin:0 32px 0 0;padding:0;color:#131921;font-size:clamp(28px,6vw,36px);font-weight:400;line-height:1.2;
+}
+.qikan-auth-dialog .qikan-auth-description { margin:8px 0 24px;color:#606266;font-size:14px;line-height:20px; }
+.qikan-auth-tabs {
+  display:flex;gap:4px;margin:0 0 24px;padding:4px;border-radius:100px;background:#f5f7fa;box-shadow:0 2px 6px #0000000a;
+}
+.qikan-auth-tabs button {
+  flex:1;min-height:40px;padding:0 16px;border:0;border-radius:100px;background:transparent;
+  color:#606266;font:500 14px/20px Figtree,sans-serif;cursor:pointer;
+}
+.qikan-auth-tabs button[aria-pressed=true] { background:#131921;color:white;font-weight:700; }
+.qikan-auth-dialog .qikan-auth-form { display:grid;gap:16px;margin:0; }
+.qikan-auth-dialog .qikan-auth-form label { display:grid;gap:8px;color:#606266;font-size:12px;line-height:16px;font-weight:400; }
+.qikan-auth-dialog .qikan-auth-form input {
+  box-sizing:border-box;width:100%;min-width:0;height:52px;padding:12px 16px;border:1px solid #e4e7ed;
+  border-radius:20px;background:#f8f9fb;color:#131921;font:400 16px/24px Figtree,"PingFang SC",sans-serif;
+}
+.qikan-auth-dialog .qikan-auth-form input:focus { background:#fff; }
+.qikan-auth-password { display:block;position:relative; }
+.qikan-auth-dialog .qikan-auth-password input { padding-inline-end:68px; }
+.qikan-auth-dialog :is([data-auth-password],[data-auth-mode=reset]) { cursor:pointer; }
+.qikan-auth-password button {
+  position:absolute;inset:4px 4px auto auto;min-width:48px;min-height:44px;padding:0 8px;border:0;
+  border-radius:22px;background:transparent;color:#606266;font:500 12px/20px Figtree,sans-serif;
+}
+.qikan-auth-dialog .qikan-auth-submit {
+  min-height:48px;width:100%;padding:12px 16px;border:0;border-radius:100px;
+  background:#131921;color:#fff;font:700 14px/20px Figtree,sans-serif;cursor:pointer;
+}
+.qikan-auth-dialog .qikan-auth-submit:disabled { opacity:.65;cursor:wait; }
+.qikan-auth-dialog .qikan-auth-error { margin:0;color:#a02626;font-size:13px;line-height:20px; }
+.qikan-auth-error:empty { display:none; }
+.qikan-auth-links { display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px 12px;margin-top:16px; }
+.qikan-auth-links :is(a,button) {
+  display:inline-flex;align-items:center;min-height:36px;padding:0;border:0;background:none;
+  color:#465972;font:500 13px/20px Figtree,sans-serif;text-decoration:underline;text-underline-offset:3px;cursor:pointer;
+}
+.qikan-auth-dialog :focus-visible { outline:2px solid #435b78;outline-offset:3px; }
+.qikan-auth-dialog .qikan-auth-recovery { padding:14px;border-radius:12px;background:#f5f7fa;color:#131921;overflow-wrap:anywhere; }
