@@ -32,7 +32,7 @@
   cover.alt=name+edition+'封面';
   document.querySelector('#mh-share-dialog p').textContent='把《'+name+'》分享给同样好奇世界的人。';
  }
- document.querySelector('#mh-subscribe').textContent='全年订购：￥'+price.toFixed(2);
+ document.querySelector('#mh-subscribe').textContent='全年订购 · '+price.toFixed(2)+' DSU';
  if(listing){
   document.querySelector('#picks').remove();
   document.querySelector('#archive').hidden=true;

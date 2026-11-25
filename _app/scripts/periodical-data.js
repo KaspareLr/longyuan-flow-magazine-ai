@@ -267,84 +267,84 @@ window.periodicalReference = {
       "url": "https://www.qikan.com.cn/magdetails/FCA181E7-8364-4982-B4E5-998A7DB89FE4/2026/3.html",
       "cover": "https://img.resource.qikan.cn/qkimages/b5c9/b5c9202603-z.jpg",
       "issue": "2026年03期",
-      "price": "¥16.89"
+      "price": "16.89 DSU"
     },
     {
       "title": "第一财经",
       "url": "https://www.qikan.com.cn/magdetails/BE43497A-FCCC-49C3-8E79-5A58E8632CB4/2026/9.html",
       "cover": "https://img.resource.qikan.cn/qkimages/dycy/dycy202609-z.jpg",
       "issue": "2026年09期",
-      "price": "¥18.00"
+      "price": "18.00 DSU"
     },
     {
       "title": "财经",
       "url": "https://www.qikan.com.cn/magdetails/6A6449DB-32C3-40DD-9DA5-083425BE2BB9/2025/27.html",
       "cover": "https://img.resource.qikan.cn/qkimages/caij/caij202527-z.jpg",
       "issue": "2025年27期",
-      "price": "¥20.00"
+      "price": "20.00 DSU"
     },
     {
       "title": "证券市场周刊",
       "url": "https://www.qikan.com.cn/magdetails/C0F4014B-B677-4DCC-B48B-B1FE4D602A45/2025/48.html",
       "cover": "https://img.resource.qikan.cn/qkimages/zqzk/zqzk202548-z.jpg",
       "issue": "2025年48期",
-      "price": "¥15.00"
+      "price": "15.00 DSU"
     },
     {
       "title": "中国经济周刊",
       "url": "https://www.qikan.com.cn/magdetails/4A07226A-70B4-41A8-B61A-3A45A4E09FEC/2026/17.html",
       "cover": "https://img.resource.qikan.cn/qkimages/zjzk/zjzk202617-z.jpg",
       "issue": "2026年17期",
-      "price": "¥12.00"
+      "price": "12.00 DSU"
     },
     {
       "title": "21世纪商业评论",
       "url": "https://www.qikan.com.cn/magdetails/F12631E4-1687-4E3E-A695-9BACD93C3B42/2026/9.html",
       "cover": "https://img.resource.qikan.cn/qkimages/sjpl/sjpl202609-z.jpg",
       "issue": "2026年09期",
-      "price": "¥6.00"
+      "price": "6.00 DSU"
     },
     {
       "title": "商界",
       "url": "https://www.qikan.com.cn/magdetails/D93BF9D9-9F31-4FB3-BE8D-62DFDDBD1233/2026/9.html",
       "cover": "https://img.resource.qikan.cn/qkimages/shji/shji202609-z.jpg",
       "issue": "2026年09期",
-      "price": "¥12.00"
+      "price": "12.00 DSU"
     },
     {
       "title": "中欧商业评论",
       "url": "https://www.qikan.com.cn/magdetails/35D122EF-6C5F-4B63-9661-8902842D7AF9/2026/1.html",
       "cover": "https://img.resource.qikan.cn/qkimages/zosy/zosy202601-z.jpg",
       "issue": "2026年01期",
-      "price": "¥48.00"
+      "price": "48.00 DSU"
     },
     {
       "title": "银行家",
       "url": "https://www.qikan.com.cn/magdetails/F01142E6-1054-4E93-842E-EA7AA69F2837/2026/7.html",
       "cover": "https://img.resource.qikan.cn/qkimages/yhji/yhji202607-z.jpg",
       "issue": "2026年07期",
-      "price": "¥48.00"
+      "price": "48.00 DSU"
     },
     {
       "title": "董事会",
       "url": "https://www.qikan.com.cn/magdetails/E4FE18F8-5783-4BA7-99C2-F8525D67EA02/2026/7.html",
       "cover": "https://img.resource.qikan.cn/qkimages/dons/dons202607-z.jpg",
       "issue": "2026年07期",
-      "price": "¥24.00"
+      "price": "24.00 DSU"
     },
     {
       "title": "债券",
       "url": "https://www.qikan.com.cn/magdetails/AD7E4919-4C22-47C2-8E8F-9080A30923DE/2026/7.html",
       "cover": "https://img.resource.qikan.cn/qkimages/zaiq/zaiq202607-z.jpg",
       "issue": "2026年07期",
-      "price": "¥15.60"
+      "price": "15.60 DSU"
     },
     {
       "title": "新财富",
       "url": "https://www.qikan.com.cn/magdetails/E4B9F301-BBA2-4A25-9323-5A7807F5A12A/2026/9.html",
       "cover": "https://img.resource.qikan.cn/qkimages/xicf/xicf202609-z.jpg",
       "issue": "2026年09期",
-      "price": "¥18.00"
+      "price": "18.00 DSU"
     }
   ],
   "archive": [

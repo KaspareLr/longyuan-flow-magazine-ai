@@ -69,7 +69,7 @@ document.addEventListener('change',event=>{if(!event.target.matches('.oc-members
 
 document.addEventListener('click',event=>{
  const period=event.target.closest('[data-oc-member-period]');
- if(period){const root=period.closest('.oc-member-split');root.querySelectorAll('[data-oc-member-period]').forEach(b=>{const selected=b===period;b.setAttribute('aria-pressed',String(selected));b.querySelector('i').className='iconfont icon-'+(selected?'Check':'UnSelect');});root.querySelector('[data-oc-member-name]').textContent=period.dataset.label+'会员';root.querySelector('[data-oc-member-price]').textContent='¥'+(Number(period.dataset.price)/100).toFixed(2);root.querySelector('[data-oc-member-duration]').textContent='有效期'+period.dataset.days+'天 · 支付成功后生效';return;}
+ if(period){const root=period.closest('.oc-member-split');root.querySelectorAll('[data-oc-member-period]').forEach(b=>{const selected=b===period;b.setAttribute('aria-pressed',String(selected));b.querySelector('i').className='iconfont icon-'+(selected?'Check':'UnSelect');});root.querySelector('[data-oc-member-name]').textContent=period.dataset.label+'会员';root.querySelector('[data-oc-member-price]').textContent=(Number(period.dataset.price)/100).toFixed(2)+' DSU';root.querySelector('[data-oc-member-duration]').textContent='有效期'+period.dataset.days+'天 · 支付成功后生效';return;}
  const toggle=event.target.closest('[data-oc-redeem-toggle]'),cancel=event.target.closest('[data-oc-redeem-cancel]');
  if(!toggle&&!cancel)return;
  const panel=(toggle||cancel).closest('.oc-member-redeem'),button=panel.querySelector('[data-oc-redeem-toggle]'),form=panel.querySelector('form');

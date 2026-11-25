@@ -173,7 +173,6 @@
 .ai-dsu-receipt{margin:6px 0;font-size:12px}.ai-dsu-receipt a{text-decoration:underline}
 body.issue-full-page:has(.dsu-gate) > .demo-reading-widget,.frontpage-shared-topic,.home-discovery-topics,.oc-feature[data-topic-static],a[href="#/topics"],a[href="index.html#/topics"],a[href*="#/topic-generate"],a[href*="#/topic/"],.home-discovery-clubs,a[href$="?claimed=1"],a[href*="?claimed=1&page="],a[href*="#/club/"]{display:none!important}
 
-.magazine-home .mh-subscription-dock:not(:has(.mh-button)){display:none}
 
 .dsu-pricing{max-width:940px;margin:0 auto;padding:56px 24px 90px;color:#131921}
 .dsu-pricing>header{text-align:center;margin-bottom:26px}

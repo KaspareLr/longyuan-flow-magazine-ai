@@ -82,41 +82,11 @@
  .magazine-home .mh-actions .mh-button.mh-account-action{flex-basis:80px;width:80px}
 }
 
-/* Figma 677:3638 */
-body.magazine-home { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
-.magazine-home .mh-subscription-dock {
- position: fixed;
- left: 50%;
- bottom: max(20px, env(safe-area-inset-bottom));
- transform: translateX(-50%);
- z-index: 100;
- display: flex;
- align-items: center;
- gap: 40px;
- max-width: calc(100% - 24px);
- padding: 10px;
- border: 1px solid #ffffffc9;
- border-radius: 100px;
- background: #ffffff6e;
- backdrop-filter: blur(100px);
- box-shadow: 0 7px 30px #252a3508, inset 0 1px #fff9;
-}
-.magazine-home .mh-subscription-dock .mh-button {
+.magazine-home .mh-actions .mh-subscribe {
  min-height: 48px;
- font: 700 14px/20px Figtree, "PingFang SC", sans-serif;
- box-shadow: none;
-}
-.magazine-home .mh-subscription-dock .mh-dock-subscribe {
- padding: 14px 32px;
+ padding-inline: 22px;
  border: 1px solid #e4e7ed;
 }
-.magazine-home .mh-subscription-dock .mh-dock-member {
- gap: 4px;
- padding: 12px 24px 12px 18px;
-}
-.magazine-home .mh-dock-member img { display: block; flex: none; }
-@media(max-width:460px) {
- .magazine-home .mh-subscription-dock { gap: 10px; }
- .magazine-home .mh-subscription-dock .mh-dock-subscribe { padding-inline: 14px; }
- .magazine-home .mh-subscription-dock .mh-dock-member { padding-inline: 10px 14px; }
+@media(max-width:400px){
+ .magazine-home .mh-actions .mh-subscribe{flex:none;padding-inline:14px}
 }

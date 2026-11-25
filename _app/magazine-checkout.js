@@ -2,7 +2,7 @@
 (()=>{
  const escape=value=>String(value).replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
  function mount(trigger,subscription,{title,product,price,issue,success,onPaid}){
-  const amount='¥'+price.toFixed(2);
+  const amount=price.toFixed(2)+' DSU';
   subscription.classList.add('qikan-checkout');
   subscription.setAttribute('aria-labelledby','mh-subscribe-title');
   subscription.innerHTML=`  <div class="mh-dialog-head">

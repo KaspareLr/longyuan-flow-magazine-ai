@@ -200,7 +200,7 @@
           value="${amount?minimum:limit??''}" ${amount?'required':'placeholder="不限"'} aria-describedby="dsu-dialog-field-hint dsu-dialog-status" autofocus>
           <span aria-hidden="true">${amount?'元':'DSU'}</span>
         </div>
-        <p id="dsu-dialog-field-hint">${amount?`单笔 ¥${minimum} 起充`:'留空表示不限'}</p>
+        <p id="dsu-dialog-field-hint">${amount?`单笔 ${minimum} DSU 起充`:'留空表示不限'}</p>
       </div>`:''}
       <p id="dsu-dialog-status" role="status" class="dsu-error"></p>
       <footer class="dsu-dialog-actions">
@@ -329,13 +329,13 @@
     if(plan)return `<section class="dsu-pricing dsu-pricing-checkout">
       <a href="${pricing}?period=${plan.months===1?'month':'year'}">← 返回套餐比较</a>
       <header><h1>开通${plan.name}</h1><p>确认所选方案后即可模拟开通。</p></header>
-      <div class="dsu-price-card"><dl><div><dt>会员额度</dt><dd>${plan.quota} DSU</dd></div><div><dt>有效期</dt><dd>${plan.months===1?'一个月':'一年'}</dd></div><div><dt>续费方式</dt><dd>${plan.auto?'到期自动续费，可在 DSU 账户取消':'到期后按需续订'}</dd></div><div><dt>本次模拟支付</dt><dd>¥${plan.price}</dd></div></dl>
+      <div class="dsu-price-card"><dl><div><dt>会员额度</dt><dd>${plan.quota} DSU</dd></div><div><dt>有效期</dt><dd>${plan.months===1?'一个月':'一年'}</dd></div><div><dt>续费方式</dt><dd>${plan.auto?'到期自动续费，可在 DSU 账户取消':'到期后按需续订'}</dd></div><div><dt>本次模拟支付</dt><dd>${plan.price} DSU</dd></div></dl>
       <button type="button" class="dsu-button dsu-primary" data-dsu-checkout="${code}">${owner?'确认模拟开通':'登录并继续'}</button></div></section>`;
     const annual=period==='year';
     const base=annual?'year':'month';
     const card=(key,title,description)=>{
       const item=plans[key];
-      return `<article class="dsu-price-card ${key==='pro'?'dsu-price-pro':''}"><h2>${title}</h2><p>${description}</p><div class="dsu-price-amount"><strong>¥${item.price}</strong><span> / ${item.months===1?'月':'年'}</span></div><p class="dsu-price-quota">${item.quota} DSU <small>每${item.months===1?'月':'年'}</small></p>
+      return `<article class="dsu-price-card ${key==='pro'?'dsu-price-pro':''}"><h2>${title}</h2><p>${description}</p><div class="dsu-price-amount"><strong>${item.price} DSU</strong><span> / ${item.months===1?'月':'年'}</span></div><p class="dsu-price-quota">${item.quota} DSU <small>每${item.months===1?'月':'年'}</small></p>
       <a class="dsu-button dsu-primary" href="${pricing}?plan=${key}">${key==='pro'?'选择年度 Pro':'选择单次购买'}</a>
       ${key==='pro'?'<p class="dsu-price-note">按年开通，到期后按需续订</p>':`<a class="dsu-button" href="${pricing}?plan=${key}-auto">选择${annual?'连续包年':'连续包月'}</a>`}</article>`;
     };
@@ -383,7 +383,7 @@
     const spent = walletSpent(state), limit = state.walletLimit;
     const reset = member ? date(plan.expires) : '';
     return `<div class="dsu-panel dsu-subscriptions">
-      <header class="dsu-row"><div><h2>会员与 DSU</h2><p>1 DSU = 1 元人民币 · ${state.sample||state.usageDemoSeeded?'含演示数据':'本地演示'}</p><a href="#/membership">查看平台会员套餐</a></div>
+      <header class="dsu-row"><div><h2>会员与 DSU</h2><p>${state.sample||state.usageDemoSeeded?'含演示数据':'本地演示'}</p><a href="#/membership">查看平台会员套餐</a></div>
         ${!plan&&!state.balance&&!state.records.length?'<button type="button" class="dsu-button" data-dsu-sample>载入演示数据</button>':''}</header>
       <section class="dsu-summary">
         <div class="dsu-row">
@@ -410,7 +410,7 @@
           <button type="button" class="dsu-button" data-dsu-limit>设置消费上限</button>
           <button type="button" class="dsu-button dsu-primary" data-dsu-recharge>模拟充值</button></div></div>
         <p class="dsu-wallet-spending"><span>本月已消费 <small>（${month(Date.now())}）</small></span> <b>${spent} DSU</b> <span>/ ${limit == null?'不限':limit+' DSU'}</span></p>
-        <p class="dsu-wallet-minimum">单笔 ¥${minimum} 起充</p></div></section>
+        <p class="dsu-wallet-minimum">单笔 ${minimum} DSU 起充</p></div></section>
       ${ledger}</div>`;
   }
 
@@ -466,7 +466,7 @@
     if (button.matches('[data-dsu-renew],[data-dsu-cancel]')) {
       const enable = button.hasAttribute('data-dsu-renew');
       await confirm({title:enable?'开启模拟自动续订':'取消订阅', label:enable?'确认开启模拟续订':'确认取消订阅',
-        message:enable?`续订时模拟开启 ¥${monthlyPrice} 的下一周期，并重置为 ${monthlyQuota} DSU。`:'本期剩余额度可用至到期，到期后停止续订。',
+        message:enable?`续订时模拟开启 ${monthlyPrice} DSU 的下一周期，并重置为 ${monthlyQuota} DSU。`:'本期剩余额度可用至到期，到期后停止续订。',
         submit:() => change(state => {
           if (!active(state)) throw Error('当前会员已到期。');
           state.subscription.autoRenew = enable;
@@ -481,7 +481,7 @@
           state.balance += amount;
         })});
     } else {
-      await confirm({title:'开通月度会员', message:`¥${monthlyPrice} · ${monthlyQuota} DSU · 到期后模拟自动续订，可随时取消。`, label:'确认模拟开通',
+      await confirm({title:'开通月度会员', message:`${monthlyPrice} DSU · ${monthlyQuota} DSU · 到期后模拟自动续订，可随时取消。`, label:'确认模拟开通',
         submit:() => change(state => {
           if (active(state)) throw Error('当前月度会员仍在有效期内。');
           const start = Date.now(), day = new Date(start).getUTCDate();
