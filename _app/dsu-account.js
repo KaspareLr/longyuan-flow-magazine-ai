@@ -187,20 +187,20 @@
   dialog.setAttribute('aria-labelledby', 'dsu-dialog-title');
   document.body.append(dialog);
 
-  function confirm({title, message, label, submit, amount = false, limit = undefined, accountLink = false, article = null}) {
+  function confirm({title, message, label, submit, limit = undefined, accountLink = false, article = null}) {
     if (dialog.open) return Promise.resolve(false);
     dialog.classList.toggle('dsu-dialog-article',Boolean(article));
-    const hasField=amount||limit!==undefined;
+    const hasField=limit!==undefined;
     dialog.innerHTML = article ? articleConfirmation(article, label) : `<form class="dsu-settings-form" novalidate>
       <header><h2 id="dsu-dialog-title">${esc(title)}</h2><p class="dsu-dialog-message">${esc(message)}</p></header>
       ${hasField?`<div class="dsu-dialog-field">
-        <label for="dsu-settings-value">${amount?'充值金额':'消费上限'}</label>
+        <label for="dsu-settings-value">消费上限</label>
         <div class="dsu-number-field">
-          <input id="dsu-settings-value" type="number" inputmode="numeric" name="${amount?'amount':'limit'}" min="${amount?minimum:0}" max="1000000" step="1"
-          value="${amount?minimum:limit??''}" ${amount?'required':'placeholder="不限"'} aria-describedby="dsu-dialog-field-hint dsu-dialog-status" autofocus>
-          <span aria-hidden="true">${amount?'元':'DSU'}</span>
+          <input id="dsu-settings-value" type="number" inputmode="numeric" name="limit" min="0" max="1000000" step="1"
+          value="${limit??''}" placeholder="不限" aria-describedby="dsu-dialog-field-hint dsu-dialog-status" autofocus>
+          <span aria-hidden="true">DSU</span>
         </div>
-        <p id="dsu-dialog-field-hint">${amount?`单笔 ${minimum} DSU 起充`:'留空表示不限'}</p>
+        <p id="dsu-dialog-field-hint">留空表示不限</p>
       </div>`:''}
       <p id="dsu-dialog-status" role="status" class="dsu-error"></p>
       <footer class="dsu-dialog-actions">
@@ -328,9 +328,9 @@
     const pricing='#/membership';
     if(plan)return `<section class="dsu-pricing dsu-pricing-checkout">
       <a href="${pricing}?period=${plan.months===1?'month':'year'}">← 返回套餐比较</a>
-      <header><h1>开通${plan.name}</h1><p>确认所选方案后即可模拟开通。</p></header>
-      <div class="dsu-price-card"><dl><div><dt>会员额度</dt><dd>${plan.quota} DSU</dd></div><div><dt>有效期</dt><dd>${plan.months===1?'一个月':'一年'}</dd></div><div><dt>续费方式</dt><dd>${plan.auto?'到期自动续费，可在 DSU 账户取消':'到期后按需续订'}</dd></div><div><dt>本次模拟支付</dt><dd>${plan.price} DSU</dd></div></dl>
-      <button type="button" class="dsu-button dsu-primary" data-dsu-checkout="${code}">${owner?'确认模拟开通':'登录并继续'}</button></div></section>`;
+      <header><h1>开通${plan.name}</h1><p>核对套餐信息后选择支付方式。</p></header>
+      <div class="dsu-price-card"><dl><div><dt>会员额度</dt><dd>${plan.quota} DSU</dd></div><div><dt>有效期</dt><dd>${plan.months===1?'一个月':'一年'}</dd></div><div><dt>续费方式</dt><dd>${plan.auto?'到期自动续费，可在 DSU 账户取消':'到期后按需续订'}</dd></div><div><dt>应付金额</dt><dd>${plan.price} DSU</dd></div></dl>
+      <button type="button" class="dsu-button dsu-primary" data-dsu-checkout="${code}">${owner?'继续支付':'登录并继续'}</button></div></section>`;
     const annual=period==='year';
     const base=annual?'year':'month';
     const currentCode=current?(current.code||'month-auto'):'';
@@ -407,10 +407,10 @@
           <div class="dsu-plan"><span class="dsu-tag">${member?planFor(plan).name:'尚未订阅'}</span><p>${member?planFor(plan).quota+' DSU / 周期':'按需选择会员套餐'}</p></div>
         </div>
         <div class="dsu-row dsu-plan-actions">
-          <p>${member?(plan.autoRenew?'下次模拟续订与额度重置：'+reset:'本期额度有效至 '+reset):'开通后即可使用本月会员额度。'}</p>
+          <p>${member?(plan.autoRenew?'下次续订与额度重置：'+reset:'本期额度有效至 '+reset):'开通后即可使用会员额度。'}</p>
           ${!member?'<a class="dsu-button" href="#/membership">查看会员套餐</a>':plan.autoRenew?
             '<button type="button" class="dsu-button" data-dsu-cancel>取消订阅</button>':
-            '<a class="dsu-button" href="#/membership">查看续订方案</a>'}
+            '<button type="button" class="dsu-button" data-dsu-renew>续费</button>'}
         </div>
       </section>
       <section class="dsu-section dsu-usage"><h3>会员额度用量</h3><p>本月 AI 已用 ${usage.ai} DSU，阅读已用 ${usage.articles} DSU。</p>
@@ -424,30 +424,43 @@
         <button type="button" class="dsu-switch" role="switch" aria-label="使用充值余额" aria-checked="${walletEnabled}" data-dsu-wallet><span class="dsu-switch-track" aria-hidden="true"></span></button></div>
         <div class="dsu-row dsu-wallet-balance"><div><p class="dsu-wallet-label">当前余额</p><b>${state.balance} <span>DSU</span></b></div><div class="dsu-actions">
           <button type="button" class="dsu-button" data-dsu-limit>设置消费上限</button>
-          <button type="button" class="dsu-button dsu-primary" data-dsu-recharge>模拟充值</button></div></div>
+          <button type="button" class="dsu-button dsu-primary" data-dsu-recharge>充值</button></div></div>
         <p class="dsu-wallet-spending"><span>本月已消费 <small>（${month(Date.now())}）</small></span> <b>${spent} DSU</b> <span>/ ${limit == null?'不限':limit+' DSU'}</span></p>
         <p class="dsu-wallet-minimum">单笔 ${minimum} DSU 起充</p></div></section>
       ${ledger}</div>`;
   }
 
   document.addEventListener('click', async event => {
-    const checkout=event.target.closest('[data-dsu-checkout]');
+    const checkout=event.target.closest('[data-dsu-checkout],[data-dsu-renew]');
     if(checkout){
-      if(!signedIn()||checkout.disabled)return;
-      const code=checkout.dataset.dsuCheckout,plan=plans[code];
+      if(!signedIn())return;
+      const owner=identity(profile());
+      const renewal=checkout.hasAttribute('data-dsu-renew');
+      const code=renewal?(load(owner).subscription?.code||'month-auto'):checkout.dataset.dsuCheckout;
+      const plan=plans[code];
       if(!plan)return;
-      checkout.disabled=true;
-      try{
-        await change(state=>{
+      window.magazineCheckout.open({
+        title:renewal?'会员续费':'支付会员订单',
+        product:plan.name,
+        issue:plan.months===1?'一个月':'一年',
+        price:plan.price,
+        success:renewal?'续费成功':'会员开通成功',
+        onPaid:()=>change(state=>{
+          if(identity(profile())!==owner)throw Error('账号已切换，请重新提交订单。');
           const start=Date.now();
+          if(renewal){
+            if(!active(state)||planFor(state.subscription)!==plan)throw Error('会员状态已更新，请重新提交订单。');
+            state.subscription.expires=addMonths(state.subscription.expires,plan.months);
+            return;
+          }
           const used=active(state)?state.subscription.used:0;
           state.subscription={code,start,expires:addMonths(start,plan.months),used,autoRenew:Boolean(plan.auto)};
-        });
-        location.hash='#/me?tab=dsu';
-      }finally{checkout.disabled=false;}
+        }),
+        onDone:()=>{location.hash='#/me?tab=dsu';}
+      });
       return;
     }
-    const button = event.target.closest('[data-dsu-article],[data-dsu-recharge],[data-dsu-member],[data-dsu-wallet],[data-dsu-limit],[data-dsu-renew],[data-dsu-cancel],[data-dsu-sample],[data-dsu-history]');
+    const button = event.target.closest('[data-dsu-article],[data-dsu-recharge],[data-dsu-wallet],[data-dsu-limit],[data-dsu-cancel],[data-dsu-sample],[data-dsu-history]');
     if (!button) return;
     if (button.hasAttribute('data-dsu-article')) {
       if (await purchaseArticle(button)) window.dispatchEvent(new CustomEvent('dsu-article-unlocked', {detail:button}));
@@ -460,7 +473,7 @@
       return;
     }
     if (button.hasAttribute('data-dsu-sample')) {
-      await confirm({title:'载入演示数据', message:'将为当前空白账户模拟月度会员、充值余额和文章、AI 消费。', label:'确认载入演示数据',
+      await confirm({title:'载入演示数据', message:'将为当前空白账户载入会员、余额和消费记录样例。', label:'确认载入演示数据',
         submit:() => change(loadSample)});
       return;
     }
@@ -479,31 +492,23 @@
         })});
       return;
     }
-    if (button.matches('[data-dsu-renew],[data-dsu-cancel]')) {
-      const enable = button.hasAttribute('data-dsu-renew');
-      await confirm({title:enable?'开启模拟自动续订':'取消订阅', label:enable?'确认开启模拟续订':'确认取消订阅',
-        message:enable?`续订时模拟开启 ${monthlyPrice} DSU 的下一周期，并重置为 ${monthlyQuota} DSU。`:'本期剩余额度可用至到期，到期后停止续订。',
-        submit:() => change(state => {
-          if (!active(state)) throw Error('当前会员已到期。');
-          state.subscription.autoRenew = enable;
+    if (button.hasAttribute('data-dsu-cancel')) {
+      await confirm({title:'取消订阅',label:'确认取消订阅',
+        message:'本期剩余额度可用至到期，到期后停止续订。',
+        submit:()=>change(state=>{
+          if(!active(state))throw Error('当前会员已到期。');
+          state.subscription.autoRenew=false;
         })});
       return;
     }
-    if (button.hasAttribute('data-dsu-recharge')) {
-      await confirm({title:'充值 DSU', message:'充值金额按 1 元兑换 1 DSU 计算。', label:'确认模拟充值', amount:true,
-        submit:form => change(state => {
-          const amount = form.elements.amount.valueAsNumber;
-          if (!Number.isSafeInteger(amount) || amount < minimum || amount > 1000000) throw Error(`请输入 ${minimum} 至 1000000 元之间的整数。`);
-          state.balance += amount;
-        })});
-    } else {
-      await confirm({title:'开通月度会员', message:`${monthlyPrice} DSU · ${monthlyQuota} DSU · 到期后模拟自动续订，可随时取消。`, label:'确认模拟开通',
-        submit:() => change(state => {
-          if (active(state)) throw Error('当前月度会员仍在有效期内。');
-          const start = Date.now(), day = new Date(start).getUTCDate();
-          state.subscription = {start, day, expires:nextMonth(start,day), used:0, autoRenew:true};
-        })});
-    }
+    const owner=identity(profile());
+    window.magazineCheckout.open({
+      title:'充值 DSU',product:'DSU 余额',minimum,success:'充值成功',
+      onPaid:amount=>change(state=>{
+        if(identity(profile())!==owner)throw Error('账号已切换，请重新提交订单。');
+        state.balance+=amount;
+      })
+    });
   });
 
   window.qikanDSU = {

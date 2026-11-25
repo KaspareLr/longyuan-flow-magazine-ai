@@ -64,3 +64,10 @@
   .qikan-checkout { margin: auto auto 12px; padding-bottom: max(24px,env(safe-area-inset-bottom)); }
   .qikan-checkout-button { padding-inline: 16px; }
 }
+
+.mh-payment-amount { display:grid; gap:8px; margin:16px 0; font-weight:600; }
+.mh-payment-amount span { display:flex; align-items:center; gap:8px; }
+.mh-payment-amount input { min-width:0; width:100%; padding:10px 12px; border:1px solid #dce0e6; border-radius:12px; font:inherit; }
+.qikan-checkout [data-payment-step=confirm] { margin-top:20px; text-align:center; }
+.qikan-checkout [data-payment-error] { color:#9a3329; }
+.qikan-checkout .qikan-checkout-button:disabled { cursor:wait; opacity:.65; }

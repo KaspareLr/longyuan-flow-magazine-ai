@@ -118,7 +118,7 @@
    <button type="button" class="button" data-issue-purchase aria-haspopup="dialog">购买本期：48.00 DSU</button>
    <a class="button dark" href="portal.html#/membership"><img src="assets/magazine-home/member-dock.svg" alt="" width="24" height="24">成为会员</a>
   </nav>
-  <dialog class="issue-purchase-dialog"></dialog>${rows.map(item=>{const full=fullArticle(item);return `<article class="issue-preview-article" id="issue-preview-${item.index}" data-preview-index="${item.index}"><header class="portal-article-head"><span class="club-overline">${String(item.index+1).padStart(2,'0')} · ${esc(item.group)}</span><h1>${esc(item.title)}</h1><div class="portal-article-meta">${full?.authors?.length?`<span>${esc(full.authors.join(' / '))}</span>`:''}<span>${esc(a.resource)} · 2026年09期</span></div></header><div class="issue-preview-excerpt portal-prose">${previewBody(item)}</div><footer class="issue-preview-bottom"><a class="button" href="portal.html#/article/${item.index}?context=magazine&resource=${encodeURIComponent(a.rid)}&full=1">继续阅读全文</a></footer></article>`;}).join('')}</section></div>`;
+  ${rows.map(item=>{const full=fullArticle(item);return `<article class="issue-preview-article" id="issue-preview-${item.index}" data-preview-index="${item.index}"><header class="portal-article-head"><span class="club-overline">${String(item.index+1).padStart(2,'0')} · ${esc(item.group)}</span><h1>${esc(item.title)}</h1><div class="portal-article-meta">${full?.authors?.length?`<span>${esc(full.authors.join(' / '))}</span>`:''}<span>${esc(a.resource)} · 2026年09期</span></div></header><div class="issue-preview-excerpt portal-prose">${previewBody(item)}</div><footer class="issue-preview-bottom"><a class="button" href="portal.html#/article/${item.index}?context=magazine&resource=${encodeURIComponent(a.rid)}&full=1">继续阅读全文</a></footer></article>`;}).join('')}</section></div>`;
  },
  mount(a,params){
   const preview=api.isPreview(a,params);if(params.get('full')==='1'&&a.rid==='第一财经'){try{localStorage.setItem('magazine-home:last-read',JSON.stringify({index:a.index}));}catch{}}document.body.classList.toggle('issue-preview-page',preview);document.body.classList.toggle('issue-full-page',a.context==='magazine'&&params.get('full')==='1');
@@ -128,19 +128,16 @@
   directoryState=null;
   if(!preview)return;
   document.body.append(document.querySelector('.issue-purchase-entry'));
-  const purchaseDialog=document.querySelector('.issue-purchase-dialog');
   const purchase=document.querySelector('[data-issue-purchase]');
-  window.magazineCheckout.mount(purchase,purchaseDialog,{
+  window.magazineCheckout.mount(purchase,{
    title:'购买《第一财经》本期',product:'单期电子版',price:48,
-   issue:'2026 年第 09 期',success:'模拟购买成功',
+   issue:'2026 年第 09 期',success:'购买成功',
    onPaid(){
     sessionPurchases.add(guidePurchaseKey());
     window.clubSession?.recordContent('issue','dycy202609',{title:'第一财经 · 2026年09期',route:'portal.html#/article/0?context=magazine&resource='+encodeURIComponent('第一财经')});
     refreshGuideAccess();
-   }
-  });
-  purchaseDialog.addEventListener('close',()=>{
-   if(hasGuideAccess())document.querySelector('[data-issue-mode=jev]')?.focus({preventScroll:true});
+   },
+   onDone(){document.querySelector('[data-issue-mode=jev]')?.focus({preventScroll:true});}
   });
   refreshGuideAccess();
   document.querySelectorAll('.issue-toc-slot .reader-toc-article').forEach(link=>{link.title=link.querySelector('strong')?.textContent||'';});

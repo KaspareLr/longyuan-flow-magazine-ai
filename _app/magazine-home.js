@@ -92,9 +92,9 @@
   clubSession.recordContent('follow',name,next?{title:name,route:homeRoute}:null);
   syncFollow();toast(next?'已关注《'+name+'》':'已取消关注');
  });
- if(!listing)window.magazineCheckout.mount(document.querySelector('#mh-subscribe'),document.querySelector('#mh-subscribe-dialog'),{
+ if(!listing)window.magazineCheckout.mount(document.querySelector('#mh-subscribe'),{
   title:'订阅《'+name+'》全年', product:'全年电子版', price,
-  issue:south?'订阅后一年内更新的电子版':'2026 年第 11 期至 2027 年第 10 期',success:'模拟订阅成功',
+  issue:south?'订阅后一年内更新的电子版':'2026 年第 11 期至 2027 年第 10 期',success:'订阅成功',
   onPaid(){clubSession.recordContent('subscription',name,{title:name,route:homeRoute,term:south?'一年内更新的电子版':'2026 年第 11 期至 2027 年第 10 期'});}
  });
  const dialog=document.querySelector('#mh-share-dialog'),input=document.querySelector('#mh-share-url');document.querySelector('#mh-share').addEventListener('click',async()=>{if(matchMedia('(max-width:760px)').matches&&navigator.share){try{await navigator.share({title:name+' · 刊物首页',url:location.href});return;}catch(error){if(error.name==='AbortError')return;}}input.value=location.href.split('#')[0];dialog.showModal();});
