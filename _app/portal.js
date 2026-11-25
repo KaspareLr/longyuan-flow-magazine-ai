@@ -53,7 +53,7 @@
  </div>`;
  }
  function readingOverview(profile){
-  const section=(heading,body)=>`<section class="qikan-account-recent"><h3>${heading}</h3>${body}</section>`;
+  const section=(heading,body,featured=false)=>`<section class="qikan-account-recent${featured?' qikan-reading-featured':''}"><h3>${heading}</h3>${body}</section>`;
   const rows=(items,empty)=>items.length?`<ul class="qikan-reading-rows">${items.map(item=>`<li>${item.route?`<a href="${esc(item.route)}">${esc(item.title)}</a>`:`<strong>${esc(item.title)}</strong>`}${item.meta?`<small>${esc(item.meta)}</small>`:''}</li>`).join('')}</ul>`:`<p class="qikan-account-empty">${empty}</p>`;
   const purchases=[
    ...session.contentRows('subscription').map(row=>({...row,meta:'全年订阅 · '+row.term})),
@@ -63,10 +63,12 @@
   const uniqueReading=[...new Map(reading.slice().reverse().map(row=>[row.route,row])).values()].reverse();
   const notes=session.read('book-learning-notes',[]).map(note=>({title:note.text||note.quote||'阅读笔记',meta:data.books.find(b=>b.id===note.bookId)?.title,route:note.bookId?href('book/'+note.bookId):''}));
   return '<h2>我的阅读</h2>'+
-   section('继续阅读',rows(uniqueReading.slice(0,8).map(row=>({...row,meta:row.day})),'暂无阅读记录。'))+
+   section('继续阅读',rows(uniqueReading.slice(0,8).map(row=>({...row,meta:row.day})),'暂无阅读记录。'),true)+
+   '<div class="qikan-reading-publications">'+
    section('关注的刊物',rows(session.contentRows('follow'),'暂无关注。'))+
    section('订购的期刊',rows(purchases,'暂无订阅或单期购买。'))+
    section('已拥有的刊物',rows((profile.publicationRights||[]).map(row=>({title:row.name,meta:'到期 '+row.expires})),'暂无继承的刊物权益。'))+
+   '</div>'+
    section('我的收藏',savedPanel())+
    section('已解锁文章',rows(qikanDSU.readingUnlocks().map(row=>({title:row.description,route:row.route,meta:row.amount+' DSU'})),'暂无解锁记录。'))+
    section('阅读笔记',rows(notes,'暂无阅读笔记。'));

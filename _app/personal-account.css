@@ -155,8 +155,28 @@ body:has(.qikan-account) { background:#fff; }
   .qikan-saved-remove { border-radius:50%; background:#f5f7fa; }
 }
 
-.qikan-reading-rows{display:grid;list-style:none;padding:0;margin:0;gap:0}
-.qikan-reading-rows li{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 16px;padding:10px 0;border-bottom:1px solid #eef0f3}
+.qikan-reading-rows{display:grid;list-style:none;padding:0;margin:0}
+.qikan-reading-rows li{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 16px;padding:10px 0}
+.qikan-reading-rows li+li{border-top:1px solid #e4e7ed}
+.qikan-reading-rows :is(a,strong){min-width:0;overflow-wrap:anywhere;font-weight:550}
 .qikan-reading-rows a:hover{text-decoration:underline}
-.qikan-reading-rows small{color:#606266;font-size:13px}
-.qikan-account[data-account-tab=overview] .portal-account-panel .qikan-account-recent{margin-top:24px}
+.qikan-reading-rows small{font-variant-numeric:tabular-nums}
+.qikan-account[data-account-tab=overview] .portal-account-panel .qikan-account-recent{
+ margin-top:24px;padding:20px;border:1px solid #e4e7ed;border-radius:18px;gap:10px;min-width:0
+}
+.qikan-account[data-account-tab=overview] .qikan-account-recent>h3{font-size:18px;line-height:26px;font-weight:650}
+.qikan-account[data-account-tab=overview] .qikan-reading-featured{background:#f3f5f8}
+.qikan-reading-featured .qikan-reading-rows li:first-child{
+ background:white;border-radius:12px;padding:14px;margin-bottom:4px
+}
+.qikan-reading-featured .qikan-reading-rows li:first-child+li{border-top:0}
+.qikan-reading-featured .qikan-reading-rows li:first-child a{font-weight:700}
+.qikan-reading-publications{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.qikan-account[data-account-tab=overview] .qikan-reading-publications h3{font-size:16px}
+@media(max-width:950px){
+ .qikan-reading-publications{grid-template-columns:1fr;margin-top:24px}
+ .qikan-account[data-account-tab=overview] .portal-account-panel .qikan-reading-publications .qikan-account-recent{margin-top:0}
+}
+@media(max-width:760px){
+ .qikan-account[data-account-tab=overview] .portal-account-panel .qikan-account-recent{padding:14px}
+}

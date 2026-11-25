@@ -177,24 +177,38 @@ body.issue-full-page:has(.dsu-gate) > .demo-reading-widget,.frontpage-shared-top
 .dsu-pricing{max-width:940px;margin:0 auto;padding:56px 24px 90px;color:#131921}
 .dsu-pricing>header{text-align:center;margin-bottom:26px}
 .dsu-pricing h1{margin:0 0 12px;font-size:clamp(32px,5vw,56px);letter-spacing:-.03em}
-.dsu-pricing header p,.dsu-price-card>p,.dsu-pricing-uses dd{color:#606266;margin:0 0 10px}
+.dsu-pricing header p,.dsu-price-card>p{color:#606266;margin:0 0 10px}
 .dsu-pricing .dsu-price-note{font-size:13px;color:#686d77}
-.dsu-billing-switch{display:flex;width:max-content;gap:4px;margin:0 auto 24px;padding:4px;border-radius:24px;background:#eef0f4}
-.dsu-billing-switch a{min-width:74px;text-align:center;padding:8px 16px;border-radius:20px}
+.dsu-billing-switch{display:flex;width:max-content;gap:4px;margin:0;padding:4px;border-radius:24px;background:#eef0f4}
+.dsu-billing-switch a{min-width:52px;text-align:center;padding:8px 10px;font-size:13px;border-radius:20px}
 .dsu-billing-switch a[aria-current]{background:white;box-shadow:0 1px 4px #13192116;font-weight:650}
 .dsu-pricing .dsu-membership-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
 .dsu-price-card{padding:26px;border:1px solid #dfe3e8;border-radius:24px;background:white;display:flex;flex-direction:column;gap:10px}
-.dsu-price-pro{background:#f3f5f9;border-color:#bdc5d0}
+.dsu-price-pro{background:linear-gradient(155deg,#fff 8%,#eef3fa 100%);border-color:#bbcbe0}
 .dsu-price-card h2{margin:0}.dsu-price-card .dsu-button{text-align:center}
 .dsu-price-amount strong{font-size:38px;font-variant-numeric:tabular-nums}
 .dsu-price-card .dsu-price-quota{font-weight:700;color:#131921;margin-bottom:12px}
 .dsu-price-quota small{font-weight:400;color:#606266}
 .dsu-pricing-current{text-align:center;margin-bottom:18px}
-.dsu-pricing-current a,.dsu-pricing-uses>a{text-decoration:underline}
-.dsu-pricing-uses{margin-top:36px;padding-top:24px;border-top:1px solid #e4e7ed}
-.dsu-pricing-uses dl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-.dsu-pricing-uses dt{font-weight:650}
+.dsu-pricing-comparison > header{margin-bottom:36px}
+.dsu-plan-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;min-height:44px}
+.dsu-plan-head h2{font-size:24px;line-height:1.25}
+.dsu-plan-cycle{color:#505b6c;font-size:13px}
+.dsu-plan-description{min-height:2lh}
+.dsu-plan-actions{display:grid;gap:8px;margin-bottom:16px}
+.dsu-plan-actions .dsu-button{min-height:44px;border-radius:999px}
+.dsu-plan-actions .dsu-current-plan{background:#eef0f4;color:#394554}
+.dsu-price-amount{overflow-wrap:anywhere}
+.dsu-price-amount span{color:#505b6c;font-size:14px}
+.dsu-plan-features{list-style:none;display:grid;gap:14px;margin:4px 0 0;padding:18px 0 0;border-top:1px solid #dfe3e8}
+.dsu-plan-features li{display:flex;align-items:baseline;gap:12px}
+.dsu-plan-features li>span{color:#4d627d}
+.dsu-plan-features small{display:block;color:#586271;margin-top:2px}
+.dsu-pricing-current a,.dsu-pricing-foot a{text-decoration:underline}
+.dsu-pricing-foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px 16px;margin-top:20px;font-size:13px;color:#505b6c}
+.dsu-pricing-foot p{margin:0}
 .dsu-pricing-checkout{max-width:580px}.dsu-pricing-checkout>header{margin-top:24px}
 .dsu-pricing-checkout dl>div{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid #e4e7ed}
 .dsu-pricing-checkout dd{margin:0;text-align:right}
-@media(max-width:650px){.dsu-pricing{padding:28px 16px 52px}.dsu-pricing .dsu-membership-grid,.dsu-pricing-uses dl{grid-template-columns:1fr}}
+@media(max-width:650px){.dsu-pricing{padding:28px 16px 52px}.dsu-pricing .dsu-membership-grid{grid-template-columns:1fr}.dsu-plan-description{min-height:0}}
+@media(min-width:651px){.dsu-pricing-comparison .dsu-price-card{display:grid;grid-template-rows:subgrid;grid-row:span 6;row-gap:10px}}

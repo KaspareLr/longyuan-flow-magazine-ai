@@ -333,18 +333,34 @@
       <button type="button" class="dsu-button dsu-primary" data-dsu-checkout="${code}">${owner?'确认模拟开通':'登录并继续'}</button></div></section>`;
     const annual=period==='year';
     const base=annual?'year':'month';
+    const currentCode=current?(current.code||'month-auto'):'';
+    const uses=[
+      ['解锁文章','按篇解锁，继续阅读全文'],
+      ['购买期刊','选购单期或全年订阅'],
+      ['阅读向导与可信问答','按实际使用量消耗 DSU']
+    ];
+    const billing=`<nav class="dsu-billing-switch" aria-label="普通会员计费周期"><a href="${pricing}?period=month" ${annual?'':'aria-current="true"'}>月付</a><a href="${pricing}?period=year" ${annual?'aria-current="true"':''}>年付</a></nav>`;
     const card=(key,title,description)=>{
       const item=plans[key];
-      return `<article class="dsu-price-card ${key==='pro'?'dsu-price-pro':''}"><h2>${title}</h2><p>${description}</p><div class="dsu-price-amount"><strong>${item.price} DSU</strong><span> / ${item.months===1?'月':'年'}</span></div><p class="dsu-price-quota">${item.quota} DSU <small>每${item.months===1?'月':'年'}</small></p>
-      <a class="dsu-button dsu-primary" href="${pricing}?plan=${key}">${key==='pro'?'选择年度 Pro':'选择单次购买'}</a>
-      ${key==='pro'?'<p class="dsu-price-note">按年开通，到期后按需续订</p>':`<a class="dsu-button" href="${pricing}?plan=${key}-auto">选择${annual?'连续包年':'连续包月'}</a>`}</article>`;
+      const pro=key==='pro';
+      const cycle=item.months===1?'月':'年';
+      const action=(code,label)=>currentCode===code
+        ? '<a class="dsu-button dsu-current-plan" href="#/me?tab=dsu">当前套餐 · 管理</a>'
+        : `<a class="dsu-button ${code===key?'dsu-primary':''}" href="${pricing}?plan=${code}">${label}</a>`;
+      return `<article class="dsu-price-card ${pro?'dsu-price-pro':''}">
+        <div class="dsu-plan-head"><h2>${title}</h2>${pro?'<span class="dsu-plan-cycle">仅年付</span>':billing}</div>
+        <p class="dsu-plan-description">${description}</p>
+        <div class="dsu-plan-actions">${action(key,pro?'选择年度 Pro':'开通'+item.name)}${pro?'':action(key+'-auto','选择连续包'+cycle)}</div>
+        <div class="dsu-price-amount"><strong>${item.price.toLocaleString('zh-CN')}</strong><span> DSU / ${cycle}</span></div>
+        <p class="dsu-price-quota">每${cycle}获得 <strong>${item.quota.toLocaleString('zh-CN')} DSU</strong></p>
+        <ul class="dsu-plan-features">${uses.map(([name,detail])=>`<li><span aria-hidden="true">✓</span><div><strong>${name}</strong><small>${detail}</small></div></li>`).join('')}</ul>
+      </article>`;
     };
-    return `<section class="dsu-pricing">
-      <header><h1>龙源期刊网会员</h1><p>一份 DSU 额度，自由分配给期刊阅读和 AI 问答。</p><p class="dsu-price-note">以下价格与额度用于演示。</p></header>
+    return `<section class="dsu-pricing dsu-pricing-comparison">
+      <header><h1>龙源期刊网会员</h1><p>用 DSU 阅读文章、选购期刊和使用 AI 问答。</p></header>
       ${current?`<p class="dsu-pricing-current">当前方案 · ${planFor(current).name} · 有效至 ${date(current.expires)} <a href="#/me?tab=dsu">管理额度</a></p>`:''}
-      <nav class="dsu-billing-switch" aria-label="普通会员计费周期"><a href="${pricing}?period=month" ${annual?'':'aria-current="true"'}>月付</a><a href="${pricing}?period=year" ${annual?'aria-current="true"':''}>年付</a></nav>
-      <div class="dsu-membership-grid">${card(base,'普通会员','适合日常阅读和提问。')}${card('pro','年度 Pro','适合阅读和问答更频繁的读者。')}</div>
-      <section class="dsu-pricing-uses"><h2>DSU 可以用来做什么？</h2><dl><div><dt>解锁文章</dt><dd>按文章标价解锁全文。</dd></div><div><dt>购买期刊</dt><dd>按需选购本期或全年订阅。</dd></div><div><dt>使用阅读向导</dt><dd>提问后查看本次回答的实际消耗。</dd></div></dl><a href="${accountURL}">只想充值？前往 DSU 账户</a></section>
+      <div class="dsu-membership-grid">${card(base,'普通会员','适合日常阅读和提问。')}${card('pro','年度 Pro','更高的年度额度，适合频繁阅读和问答。')}</div>
+      <footer class="dsu-pricing-foot"><p>价格与额度用于演示。</p><a href="${accountURL}">前往 DSU 账户充值</a></footer>
     </section>`;
   }
   function panel(filter = 'all') {
