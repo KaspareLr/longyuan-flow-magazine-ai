@@ -12,7 +12,7 @@
  const chapterNames=b=>clubBookContents.flatten(b).map(item=>item.title);
  const chapterLink=(b,i)=>href('article/'+i+'?context=book&resource='+encodeURIComponent(b.id));
  const magazineArticles=(rid='第一财经')=>window.academicJournalArticles?.[rid]||(rid==='南风窗'?window.nanfcIssueReference:rid==='十月少年文学'?window.octoberIssueReference:periodicalReference)?.groups.flatMap((g,gi)=>g.articles.map(a=>({...a,group:g.title,groupIndex:gi})));
- let route='',routeId='',params=new URLSearchParams(),filter='全部',accountTab='overview',toastTimer;
+ let route='',routeId='',params=new URLSearchParams(),filter='全部',accountTab='overview',readingTab='follow',toastTimer;
  function toast(t){const el=document.querySelector('.toast');el.textContent=t;el.classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('visible'),2400)}
  function modal(title,html){document.querySelector('#portal-dialog-content').innerHTML=`<span class="club-overline">LONGYUAN READING CLUB</span><h2 id="portal-dialog-title">${esc(title)}</h2>${html}`;document.querySelector('#portal-dialog').showModal()}
  const title=(en,cn,description)=>`<header class="portal-heading"><div><span class="club-overline">${en}</span><h1>${cn}</h1></div><p>${description}</p></header>`;
@@ -31,7 +31,7 @@
  function membership(){return qikanDSU.membership(params.get('plan'),params.get('period'));}
  function my(){if(!session.profile)return title('MY READING SPACE','你的阅读，<br><em>值得好好收藏。</em>','登录后管理个人资料、查看会员、收藏内容，把每天的阅读留在这里。')+`<div class="portal-empty"><h2>欢迎加入龙源读书会</h2><p>设置一个昵称，即可体验完整的个人空间。</p><button class="button dark" data-club-login>登录</button></div>`;const p=session.profile,m=session.membership;
  const tabs=[['overview','Book','我的阅读'],['profile','user_s','基本信息'],['dsu','Wallet','会员与 DSU']];
- const metrics=[['阅读天数',new Set(session.read('qikan-reading-history',[]).map(row=>row.day)).size],['我的收藏',session.read('savedBooks',[]).length+session.read('savedArticles',[]).length],['可用 DSU',qikanDSU.summary().available]];
+ const metrics=[['阅读天数',new Set(session.read('qikan-reading-history',[]).map(row=>row.day)).size],['我的收藏',session.read('savedArticles',[]).length],['可用 DSU',qikanDSU.summary().available]];
  const stats=`<div class="qikan-account-stats">${metrics.map(([label,value])=>`<div><strong>${value}</strong><span>${label}</span></div>`).join('')}</div>`;
  const avatar=`<img class="qikan-account-avatar" src="${esc(p.avatar||'assets/default-avatars/author-1.png')}" alt="">`;
  const tabLink=([key,icon,label])=>`<a href="#/me?tab=${key}" ${accountTab===key?'aria-current="page"':''}>${uiIcon(icon)}<span>${label}</span></a>`;
@@ -52,40 +52,60 @@
   <div class="portal-account">${side}<section class="portal-account-panel">${panel}</section></div>
  </div>`;
  }
+ const readingTabs=[['follow','我的关注'],['saved','我的收藏'],['subscription','我的订购'],['issue','已购期刊'],['article','已购文章']];
  function readingOverview(profile){
-  const section=(heading,body,featured=false)=>`<section class="qikan-account-recent${featured?' qikan-reading-featured':''}"><h3>${heading}</h3>${body}</section>`;
-  const rows=(items,empty)=>items.length?`<ul class="qikan-reading-rows">${items.map(item=>`<li>${item.route?`<a href="${esc(item.route)}">${esc(item.title)}</a>`:`<strong>${esc(item.title)}</strong>`}${item.meta?`<small>${esc(item.meta)}</small>`:''}</li>`).join('')}</ul>`:`<p class="qikan-account-empty">${empty}</p>`;
-  const purchases=[
-   ...session.contentRows('subscription').map(row=>({...row,meta:'全年订阅 · '+row.term})),
-   ...session.contentRows('issue').map(row=>({...row,meta:'单期购买'}))
-  ].sort((a,b)=>b.time-a.time);
-  const reading=session.read('qikan-reading-history',[]);
-  const uniqueReading=[...new Map(reading.slice().reverse().map(row=>[row.route,row])).values()].reverse();
-  const notes=session.read('book-learning-notes',[]).map(note=>({title:note.text||note.quote||'阅读笔记',meta:data.books.find(b=>b.id===note.bookId)?.title,route:note.bookId?href('book/'+note.bookId):''}));
-  return '<h2>我的阅读</h2>'+
-   section('继续阅读',rows(uniqueReading.slice(0,8).map(row=>({...row,meta:row.day})),'暂无阅读记录。'),true)+
-   '<div class="qikan-reading-publications">'+
-   section('关注的刊物',rows(session.contentRows('follow'),'暂无关注。'))+
-   section('订购的期刊',rows(purchases,'暂无订阅或单期购买。'))+
-   section('已拥有的刊物',rows((profile.publicationRights||[]).map(row=>({title:row.name,meta:'到期 '+row.expires})),'暂无继承的刊物权益。'))+
-   '</div>'+
-   section('我的收藏',savedPanel())+
-   section('已解锁文章',rows(qikanDSU.readingUnlocks().map(row=>({title:row.description,route:row.route,meta:row.amount+' DSU'})),'暂无解锁记录。'))+
-   section('阅读笔记',rows(notes,'暂无阅读笔记。'));
+  const recent=session.read('qikan-reading-history',[])[0];
+  return `<h2>我的阅读</h2>
+   <section class="qikan-reading-resume"><h3>继续上次的阅读</h3>
+    ${recent?`<a class="qikan-account-recent-link" href="${esc(recent.route)}"><span><strong>${esc(recent.title)}</strong><small>上次读于 ${esc(recent.day.replaceAll('-','/'))} · 继续阅读</small></span>${uiIcon('Arrow_Forward')}</a>`:'<p class="qikan-account-empty">暂无阅读记录。</p>'}
+   </section>
+   <section class="qikan-reading-records"><h3>阅读记录</h3>${readingRecords(profile)}</section>`;
  }
- function savedPanel(){
-  const books=session.read('savedBooks',[]).map((id,index)=>({index,item:data.books.find(b=>b.id===id)}));
-  const articles=session.read('savedArticles',[]);
-  const rows=[
-   ...books.filter(({item})=>item).map(({item,index})=>({index,kind:'book',title:item.title,cover:item.cover,source:item.author||item.publisher,link:href('book/'+item.id)})),
-   ...articles.map((item,index)=>({index,kind:'article',title:typeof item==='string'?item:item.title,cover:item.cover,source:item.source,link:typeof item==='string'?'':item.route}))
-  ];
-  return (rows.length?`<ul class="qikan-saved-list">${rows.map(row=>{
-   const type=row.kind==='book'?'图书':'文章';
-   const content=`${row.cover?`<img class="qikan-saved-cover" src="${esc(row.cover)}" alt="" loading="lazy">`:''}<span class="qikan-saved-text"><small>${type}</small><strong>${esc(row.title)}</strong>${row.source?`<small>${esc(row.source)}</small>`:''}</span>`;
-   return `<li>${row.link?`<a class="qikan-saved-link" href="${esc(row.link)}">${content}</a>`:`<div class="qikan-saved-link">${content}</div>`}
-   <button type="button" class="qikan-saved-remove" data-remove-saved="${row.kind}" data-index="${row.index}" aria-label="取消收藏 ${esc(row.title)}">${uiIcon(row.kind==='book'?'mark_Fill':'StarFill')}</button></li>`;
-  }).join('')}</ul>`:'<p class="qikan-account-empty">暂无收藏。</p>');
+ function readingRecords(profile){
+  const publication=row=>{
+   const name=row.id==='dycy202609'?'第一财经':row.title;
+   const cover=name==='第一财经'?window.periodicalReference?.cover:name==='南风窗'?window.nanfcIssueReference?.cover:'';
+   return {...row,cover:row.cover||cover,type:'期刊'};
+  };
+  let rows,empty;
+  switch(readingTab){
+   case 'follow': {
+    const books=session.read('savedBooks',[]).flatMap((id,index)=>{
+     const item=data.books.find(b=>b.id===id);
+     return item?[{index,kind:'book',type:'图书',title:item.title,cover:item.cover,meta:item.author||item.publisher,route:href('book/'+id)}]:[];
+    });
+    rows=[...books,...session.contentRows('follow').map(row=>publication({...row,kind:'magazine',meta:row.edition}))];
+    empty='暂无关注的图书或期刊。';
+    break;
+   }
+   case 'saved':
+    rows=session.read('savedArticles',[]).map((item,index)=>typeof item==='string'
+     ? {title:item,index,kind:'article'}
+     : {title:item.title,index,kind:'article',route:item.route,meta:item.source,summary:item.summary});
+    empty='暂无收藏的文章。';
+    break;
+   case 'subscription':
+    rows=session.contentRows('subscription').map(row=>publication({...row,meta:row.term}));
+    empty='暂无全年订购的期刊。';
+    break;
+   case 'issue':
+    rows=[
+     ...session.contentRows('issue').map(row=>publication({...row,meta:row.edition||'单期购买'})),
+     ...(profile.publicationRights||[]).map(row=>publication({title:row.name,meta:'继承权益 · 到期 '+row.expires}))
+    ];
+    empty='暂无已购期刊。';
+    break;
+   case 'article':
+    rows=qikanDSU.readingUnlocks().map(row=>({title:row.description,route:row.route,meta:row.amount+' DSU'}));
+    empty='暂无已购文章。';
+    break;
+  }
+  return `<nav class="qikan-reading-tabs" aria-label="阅读记录">${readingTabs.map(([key,label])=>`<button type="button" data-reading-tab="${key}" aria-pressed="${readingTab===key}">${label}</button>`).join('')}</nav>
+   ${rows.length?`<ul class="qikan-saved-list">${rows.map(row=>{
+    const content=`${row.cover?`<img class="qikan-saved-cover" src="${esc(row.cover)}" alt="" loading="lazy">`:''}<span class="qikan-saved-text">${row.type?`<small>${row.type}</small>`:''}<strong>${esc(row.title)}</strong>${row.summary?`<span class="qikan-reading-summary">${esc(row.summary)}</span>`:''}${row.meta?`<small>${esc(row.meta)}</small>`:''}</span>`;
+    const action=row.kind?`<button type="button" class="qikan-saved-remove" data-remove-saved="${row.kind}" data-index="${row.index??''}" data-content-id="${esc(row.id)}" aria-label="${row.kind==='article'?'取消收藏':'取消关注'} ${esc(row.title)}">${uiIcon(row.kind==='article'?'StarFill':'mark_Fill')}</button>`:'';
+    return `<li>${row.route?`<a class="qikan-saved-link" href="${esc(row.route)}">${content}</a>`:`<div class="qikan-saved-link">${content}</div>`}${action}</li>`;
+   }).join('')}</ul>`:`<p class="qikan-account-empty">${empty}</p>`}`;
  }
  function recordReading(a){
   if(!session.profile||document.body.classList.contains('issue-preview-page')||main.querySelector('.dsu-gate'))return;
@@ -168,24 +188,30 @@
  }else window.scrollTo({top:0,behavior:'instant'})}
  document.addEventListener('click',e=>{const el=e.target.closest('button');if(!el)return;
  if(el.dataset.filter){filter=el.dataset.filter;const y=scrollY;render();window.scrollTo({top:y,behavior:'instant'})}
+ const readingRecordsSection=el.closest('.qikan-reading-records');
+ if(el.dataset.readingTab){
+  readingTab=el.dataset.readingTab;
+  readingRecordsSection.innerHTML='<h3>阅读记录</h3>'+readingRecords(session.profile);
+  readingRecordsSection.querySelector('[aria-pressed=true]').focus({preventScroll:true});
+ }
  if(el.dataset.removeSaved){
-  const key=el.dataset.removeSaved==='book'?'savedBooks':'savedArticles';
-  const index=Number(el.dataset.index);
-  session.write(key,session.read(key,[]).filter((_,position)=>position!==index));
-  const y=scrollY;
-  render();
-  window.scrollTo({top:y,behavior:'instant'});
-  const next=main.querySelector('.qikan-saved-remove')||main.querySelector('.portal-account-panel h2');
-  if(next?.matches('h2'))next.tabIndex=-1;
-  next?.focus({preventScroll:true});
-  toast('已取消收藏');
+  const kind=el.dataset.removeSaved;
+  if(kind==='magazine')session.recordContent('follow',el.dataset.contentId,null);
+  else {
+   const key=kind==='book'?'savedBooks':'savedArticles';
+   const index=Number(el.dataset.index);
+   session.write(key,session.read(key,[]).filter((_,position)=>position!==index));
+  }
+  readingRecordsSection.innerHTML='<h3>阅读记录</h3>'+readingRecords(session.profile);
+  (readingRecordsSection.querySelector('.qikan-saved-remove')||readingRecordsSection.querySelector('[aria-pressed=true]')).focus({preventScroll:true});
+  toast(kind==='article'?'已取消收藏':'已取消关注');
  }
  if(el.hasAttribute('data-logout')){session.logout();accountTab='overview';location.hash='#/me';render();toast('已退出登录')}
  if(el.hasAttribute('data-plan')){if(!session.profile){session.login();return}const p=data.membership.plans[0].prices[Number(el.dataset.plan)];modal('确认体验'+p.periodLabel+'会员',`<p>你选择了${p.periodLabel}方案 · ${p.priceFen/100} DSU / ${p.durationDays} 天。</p><p>确认后即可开启所选会员权益。</p><button class="button dark" data-confirm-plan="${el.dataset.plan}">确认体验开通</button>`)}
  if(el.hasAttribute('data-confirm-plan')){const p=data.membership.plans[0].prices[Number(el.dataset.confirmPlan)],d=new Date('2026-10-15T12:00:00');d.setDate(d.getDate()+p.durationDays);session.member({label:p.periodLabel,period:p.periodCode,price:p.priceFen/100});const m=session.membership;m.expires=d.toISOString().slice(0,10);session.write('membership',m);document.querySelector('#portal-dialog').close();toast('会员体验已开启');accountTab='membership';location.hash='#/me?tab=membership'}
  if(el.hasAttribute('data-trial')){if(!session.profile){session.login();return}if(session.membership){accountTab='membership';location.hash='#/me?tab=membership';return}const d=new Date('2026-10-15T12:00:00');d.setDate(d.getDate()+7);session.member({label:'7 天体验',price:0});const m=session.membership;m.expires=d.toISOString().slice(0,10);session.write('membership',m);accountTab='membership';location.hash='#/me?tab=membership';toast('已领取 7 天体验会员')}
  if(el.dataset.register){if(!session.profile){session.login();return}const ev=eventData.find(x=>x.id===el.dataset.register);if(ev.status==='已结束'){toast('活动回顾已收藏');session.write('event-saved-'+ev.id,true);return}if(session.read('event-'+ev.id,false)){modal('报名信息',`<p>${ev.title}</p><p>参与人：${esc(session.profile.nickname)}</p><p>${ev.date} · ${ev.location}</p><p>状态：已报名</p>`);return}session.write('event-'+ev.id,true);render();toast('报名成功，可在“我的”查看')}
- if(el.dataset.saveBook){const ids=session.read('savedBooks',[]),id=el.dataset.saveBook;if(ids.includes(id)){session.write('savedBooks',ids.filter(x=>x!==id));if(!el.classList.contains('portal-bookmark'))el.textContent='加入书架';el.setAttribute('aria-pressed','false');el.setAttribute('aria-label','加入书架');toast('已移出书架')}else{session.write('savedBooks',[...ids,id]);if(!el.classList.contains('portal-bookmark'))el.textContent='已加入书架';el.setAttribute('aria-pressed','true');el.setAttribute('aria-label','移出书架');toast('已加入书架')}}
+ if(el.dataset.saveBook){const ids=session.read('savedBooks',[]),id=el.dataset.saveBook;if(ids.includes(id)){session.write('savedBooks',ids.filter(x=>x!==id));if(!el.classList.contains('portal-bookmark'))el.textContent='关注图书';el.setAttribute('aria-pressed','false');el.setAttribute('aria-label','关注图书');toast('已取消关注')}else{session.write('savedBooks',[...ids,id]);if(!el.classList.contains('portal-bookmark'))el.textContent='已关注';el.setAttribute('aria-pressed','true');el.setAttribute('aria-label','取消关注');toast('已关注')}}
  if(el.hasAttribute('data-share-book')){const b=book(el.dataset.shareBook);modal('分享《'+esc(b.title)+'》',`<label>图书地址<input readonly value="${esc(new URL(href('book/'+b.id),location.href).href)}"></label>`)}
  if(el.hasAttribute('data-book-tool'))toolView(Number(el.dataset.bookTool),el.dataset.bookId);
  if(el.dataset.readerScroll){window.scrollBy({top:Number(el.dataset.readerScroll)*innerHeight*.7,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'})}
@@ -199,7 +225,7 @@
   const a=index===undefined?articleInfo():window.clubArticleDetail.infoAt(Number(index));
   const ids=session.read('savedArticles',[]),matches=item=>(typeof item==='string'?item:item.title)===a.title;
   const saved=!ids.some(matches),route=el.dataset.articleRoute?'#'+el.dataset.articleRoute:location.hash;
-  session.write('savedArticles',saved?[...ids,{title:a.title,route,cover:a.cover,source:a.rid||a.resource}]:ids.filter(item=>!matches(item)));
+  session.write('savedArticles',saved?[...ids,{title:a.title,route,summary:a.summary,source:a.rid||a.resource}]:ids.filter(item=>!matches(item)));
   const label=saved?'取消收藏文章':'收藏文章';
   el.setAttribute('aria-label',label);el.setAttribute('aria-pressed',String(saved));el.title=label;
   el.querySelector('i').classList.toggle('icon-StarFill',saved);el.querySelector('i').classList.toggle('icon-Star',!saved);

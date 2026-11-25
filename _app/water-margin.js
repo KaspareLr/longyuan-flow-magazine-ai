@@ -60,8 +60,8 @@ $$('[data-person]').forEach(b=>b.addEventListener('click',()=>selectPerson(Numbe
 const choiceText=['你选择守住心中的义。可以比较鲁智深与宋江：他们口中的“义”，是否指向同一件事？','你想寻找另一条路。试着为一个人物标出转折：他是否真的还有别的选择？','把判断留到读完之后，也是一种认真。重读招安前后的分歧，看看你的想法会不会改变。'];
 function choose(i){$$('[data-choice]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.choice)===i)));$('#wm-vote-result').textContent=choiceText[i];saveLocal('choice',i)}
 $$('[data-choice]').forEach(b=>b.addEventListener('click',()=>choose(Number(b.dataset.choice))));const savedChoice=readLocal('choice',null);if(Number.isInteger(savedChoice)&&savedChoice>=0&&savedChoice<3)choose(savedChoice);
-function updateShelf(){const saved=window.clubSession?.read('savedBooks',[]).includes('rb-ob-01');$('#wm-save').setAttribute('aria-pressed',String(!!saved));$('#wm-save').textContent=saved?'✓ 已加入书架':'＋ 加入书架'}
-$('#wm-save').addEventListener('click',()=>{const ids=clubSession.read('savedBooks',[]),saved=ids.includes('rb-ob-01');clubSession.write('savedBooks',saved?ids.filter(id=>id!=='rb-ob-01'):[...ids,'rb-ob-01']);updateShelf();toast(saved?'已移出书架':'已加入书架，可在“我的”查看')});updateShelf();
+function updateShelf(){const saved=window.clubSession?.read('savedBooks',[]).includes('rb-ob-01');$('#wm-save').setAttribute('aria-pressed',String(!!saved));$('#wm-save').textContent=saved?'✓ 已关注':'＋ 关注图书'}
+$('#wm-save').addEventListener('click',()=>{const ids=clubSession.read('savedBooks',[]),saved=ids.includes('rb-ob-01');clubSession.write('savedBooks',saved?ids.filter(id=>id!=='rb-ob-01'):[...ids,'rb-ob-01']);updateShelf();toast(saved?'已取消关注':'已关注，可在「我的阅读」查看')});updateShelf();
 
 // Scrolling remains native. Sticky scenes advance from the scroll position in both directions.
 const scenes=$$('.wm-chapter'),sections=['prologue','snow','tiger','liangshan','question'].map(id=>$('#'+id));
