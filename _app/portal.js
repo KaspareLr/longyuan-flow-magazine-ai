@@ -35,7 +35,7 @@
  const stats=`<div class="qikan-account-stats">${metrics.map(([label,value])=>`<div><strong>${value}</strong><span>${label}</span></div>`).join('')}</div>`;
  const avatar=`<img class="qikan-account-avatar" src="${esc(p.avatar||'assets/default-avatars/author-1.png')}" alt="">`;
  const tabLink=([key,icon,label])=>`<a href="#/me?tab=${key}" ${accountTab===key?'aria-current="page"':''}>${uiIcon(icon)}<span>${label}</span></a>`;
- const side=`<aside class="portal-account-side"><nav aria-label="个人中心">${tabs.map(tabLink).join('')}</nav><button class="qikan-account-logout" type="button" data-logout>${uiIcon('Logout')}<span>退出登录</span></button></aside>`;
+ const side=`<aside class="portal-account-side"><nav aria-label="个人中心">${tabs.map(tabLink).join('')}</nav></aside>`;
  const mobile=`<section class="qikan-account-hub" aria-label="个人中心">
   <a class="qikan-account-identity" href="#/me?tab=profile">${avatar}<span><strong>${esc(p.nickname)}</strong><small>编辑个人资料</small></span>${uiIcon('Arrow_Forward-3')}</a>
   ${stats}

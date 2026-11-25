@@ -363,6 +363,14 @@
       <footer class="dsu-pricing-foot"><p>价格与额度用于演示。</p><a href="${accountURL}">前往 DSU 账户充值</a></footer>
     </section>`;
   }
+  function quotaUsage(state){
+    const member=active(state),plan=state.subscription;
+    const quota=member?planFor(plan).quota:0;
+    const used=member?plan.used:0;
+    const cycle=member?state.records.filter(record=>record.time>=plan.start):[];
+    const category=type=>cycle.filter(record=>record.type===type).reduce((total,record)=>total+record.quota,0);
+    return {used,quota,percent:quota?used/quota*100:0,article:category('article'),ai:category('ai')};
+  }
   function panel(filter = 'all') {
     const state = load(identity(profile()));
     if (active(state) && !state.usageDemoSeeded) {
@@ -390,11 +398,7 @@
           }).join('')}</ul></section>`).join(''):'<p>暂无此类消费记录。</p>'}</section>`;
     const usage=summary();
     const member = active(state), plan = state.subscription;
-    const cycle = member ? state.records.filter(record => record.time >= plan.start) : [];
-    const used = member ? plan.used : 0;
-    const category = type => cycle.filter(record => record.type === type).reduce((total, record) => total + record.quota, 0);
-    const quota=member?planFor(plan).quota:monthlyQuota;
-    const percent = used / quota * 100;
+    const {used,quota,percent,article,ai}=quotaUsage(state);
     const walletEnabled = state.walletEnabled !== false;
     const spent = walletSpent(state), limit = state.walletLimit;
     const reset = member ? date(plan.expires) : '';
@@ -416,8 +420,8 @@
       <section class="dsu-section dsu-usage"><h3>会员额度用量</h3><p>本月 AI 已用 ${usage.ai} DSU，阅读已用 ${usage.articles} DSU。</p>
         <div class="dsu-usage-progress">
         <div class="dsu-row"><p>已用 <b>${used} / ${quota} DSU</b></p><span class="dsu-tag">${percent.toFixed(1)}%</span></div>
-        <div class="dsu-progress" aria-hidden="true"><span style="width:${category('article')/quota*100}%"></span><span style="width:${category('ai')/quota*100}%"></span></div>
-        <div class="dsu-legend"><span>文章阅读 ${category('article')} DSU</span><span>AI 问询 ${category('ai')} DSU</span></div></div>
+        <div class="dsu-progress" aria-hidden="true"><span style="width:${quota?article/quota*100:0}%"></span><span style="width:${quota?ai/quota*100:0}%"></span></div>
+        <div class="dsu-legend"><span>文章阅读 ${article} DSU</span><span>AI 问询 ${ai} DSU</span></div></div>
       </section>
       <section class="dsu-section dsu-wallet"><h3>充值余额</h3><div class="dsu-wallet-card">
         <div class="dsu-row dsu-wallet-setting"><div><p class="dsu-wallet-setting-label">使用充值余额</p><p class="dsu-wallet-hint">会员额度用完后，从充值余额扣费。</p></div>
@@ -532,25 +536,134 @@
       </div>`;
     }
   };
+  const quickMenu=document.createElement('div');
+  quickMenu.setAttribute('role','navigation');
+  quickMenu.className='dsu-avatar-menu';
+  quickMenu.id='dsu-avatar-menu';
+  quickMenu.setAttribute('popover','manual');
+  quickMenu.setAttribute('aria-label','账户快捷菜单');
+  const observedAccounts=new WeakSet();
+  let activeAccount,closeTimer,ignoreFocus=false,menuKey='';
+  function closeMenu(){
+    clearTimeout(closeTimer);
+    if(!activeAccount)return;
+    quickMenu.hidePopover();
+    activeAccount.setAttribute('aria-expanded','false');
+    activeAccount=null;
+  }
+  function placeMenu(){
+    const bounds=activeAccount.getBoundingClientRect();
+    quickMenu.style.left=Math.max(8,Math.min(bounds.right-quickMenu.offsetWidth,innerWidth-quickMenu.offsetWidth-8))+'px';
+    quickMenu.style.top=Math.min(bounds.bottom+8,Math.max(8,innerHeight-quickMenu.offsetHeight-8))+'px';
+  }
+  function openMenu(account){
+    clearTimeout(closeTimer);
+    if(account===activeAccount||!profile())return;
+    closeMenu();
+    activeAccount=account;
+    account.after(quickMenu);
+    quickMenu.showPopover();
+    placeMenu();
+    account.setAttribute('aria-expanded','true');
+  }
+  function maybeClose(){
+    clearTimeout(closeTimer);
+    closeTimer=setTimeout(()=>{
+      if(activeAccount?.matches(':hover')||quickMenu.matches(':hover')||quickMenu.contains(document.activeElement))return;
+      closeMenu();
+    },160);
+  }
+  quickMenu.addEventListener('pointerenter',()=>clearTimeout(closeTimer));
+  quickMenu.addEventListener('pointerleave',maybeClose);
+  quickMenu.addEventListener('focusout',maybeClose);
+  quickMenu.addEventListener('click',event=>{
+    if(event.target.closest('[data-avatar-signout]')){
+      closeMenu();
+      window.clubSession.logout();
+      return;
+    }
+    if(event.target.closest('a'))closeMenu();
+  });
+  document.addEventListener('pointerdown',event=>{
+    if(activeAccount&&!activeAccount.contains(event.target)&&!quickMenu.contains(event.target))closeMenu();
+  });
+  document.addEventListener('keydown',event=>{
+    if(event.key!=='Escape'||!activeAccount)return;
+    const account=activeAccount;
+    const restore=quickMenu.contains(document.activeElement);
+    closeMenu();
+    if(restore){
+      ignoreFocus=true;
+      account.focus({preventScroll:true});
+      ignoreFocus=false;
+    }
+  });
+  window.addEventListener('resize',()=>{if(activeAccount)placeMenu();});
+  window.addEventListener('scroll',()=>{if(activeAccount)placeMenu();},{passive:true});
+  window.addEventListener('hashchange',closeMenu);
   function refreshAvatarUsage(){
-    const avatars=document.querySelectorAll('header .club-account-avatar');
-    if(!avatars.length)return;
-    const usage=summary();
-    const percent=usage.quota?Math.min(100,Math.max(0,100*usage.left/usage.quota)):usage.available?100:0;
-    const stats=`可用 ${usage.available} DSU · 会员 ${usage.left} · 充值 ${usage.wallet}。本月 AI 已用 ${usage.ai}，阅读已用 ${usage.articles}。`;
-    for(const avatar of avatars){
+    const owner=profile();
+    if(!owner){
+      closeMenu();menuKey='';
+      document.querySelectorAll('header [aria-controls="dsu-avatar-menu"]').forEach(account=>{
+        account.removeAttribute('aria-description');
+        account.removeAttribute('aria-controls');
+        account.removeAttribute('aria-expanded');
+      });
+      return;
+    }
+    if(activeAccount&&!activeAccount.isConnected)closeMenu();
+    const state=load(identity(owner));
+    const {used,quota,percent,article,ai}=quotaUsage(state);
+    const quotaLeft=remaining(state),available=quotaLeft+walletAvailable(state);
+    const ring=quota?Math.min(100,Math.max(0,100*quotaLeft/quota)):available?100:0;
+    const plan=active(state)?state.subscription:null;
+    const planName=plan?planFor(plan).name:'尚未订阅';
+    const expiry=plan?new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Shanghai',dateStyle:'short'}).format(plan.expires).replaceAll('-','.'):'';
+    const nextKey=JSON.stringify([owner.avatar,owner.nickname,planName,expiry,used,quota,article,ai]);
+    if(nextKey!==menuKey){
+      menuKey=nextKey;
+      const avatarURL=new URL(owner.avatar,root);
+      const links=[['overview','我的阅读'],['profile','基本信息'],['dsu','会员与 DSU']];
+      const arrow=new URL('assets/figma-identity/account-menu-arrow.svg',root);
+      quickMenu.innerHTML=`<div class="dsu-menu-profile">
+       <img src="${esc(avatarURL)}" class="dsu-menu-avatar" width="40" height="40" alt="">
+       <div><strong>${esc(owner.nickname)}</strong><p><span>${esc(planName)}</span>${expiry?`<span>有效期至：${expiry}</span>`:''}</p></div>
+      </div>
+      <div class="dsu-menu-usage">
+       <div class="dsu-menu-usage-line"><p>已用 <b>${used} / ${quota} DSU</b></p><span>${percent.toFixed(1)}%</span></div>
+       <div class="dsu-menu-progress" aria-hidden="true"><span style="width:${quota?article/quota*100:0}%"></span><span style="width:${quota?ai/quota*100:0}%"></span></div>
+       <div class="dsu-menu-legend"><span>购买消耗</span><span>AI 对话</span></div>
+      </div>
+      <div class="dsu-menu-links">${links.map(([tab,label])=>`<a href="${esc(new URL('portal.html#/me?tab='+tab,root))}">${label}<img src="${esc(arrow)}" alt=""></a>`).join('')}</div>
+      <div class="dsu-menu-links"><button type="button" data-avatar-signout>退出登录</button></div>`;
+    }
+    for(const avatar of document.querySelectorAll('header .club-account-avatar')){
+      const account=avatar.closest('.login,.nav-login');
+      if(!account)continue;
       let meter=avatar.closest('.dsu-avatar-meter');
       if(!meter){
         meter=document.createElement('span');
         meter.className='dsu-avatar-meter';
-        meter.innerHTML='<svg viewBox="0 0 40 40" aria-hidden="true"><circle class="dsu-avatar-track" cx="20" cy="20" r="18"/><circle class="dsu-avatar-arc" cx="20" cy="20" r="18" pathLength="100"/></svg><span class="dsu-avatar-stats"></span>';
+        meter.innerHTML='<svg viewBox="0 0 40 40" aria-hidden="true"><circle class="dsu-avatar-track" cx="20" cy="20" r="18"/><circle class="dsu-avatar-arc" cx="20" cy="20" r="18" pathLength="100"/></svg>';
         avatar.before(meter);meter.prepend(avatar);
       }
-      meter.style.setProperty('--dsu-remaining',percent);
-      const tooltip=meter.querySelector('.dsu-avatar-stats');
-      if(tooltip.textContent!==stats)tooltip.textContent=stats;
-      const account=avatar.closest('.login,.nav-login');
-      if(account)account.setAttribute('aria-description',stats);
+      meter.style.setProperty('--dsu-remaining',ring);
+      account.setAttribute('aria-description',`可用 ${available} DSU。按向下键打开账户快捷菜单。`);
+      account.setAttribute('aria-controls',quickMenu.id);
+      account.setAttribute('aria-expanded',String(activeAccount===account));
+      if(observedAccounts.has(account))continue;
+      observedAccounts.add(account);
+      account.addEventListener('pointerenter',event=>{if(event.pointerType!=='touch')openMenu(account);});
+      account.addEventListener('pointerleave',maybeClose);
+      account.addEventListener('focus',()=>{if(!ignoreFocus&&account.matches(':focus-visible'))openMenu(account);});
+      account.addEventListener('blur',maybeClose);
+      account.addEventListener('keydown',event=>{
+        if(event.key!=='ArrowDown'||!profile())return;
+        event.preventDefault();
+        openMenu(account);
+        quickMenu.querySelector('a')?.focus();
+      });
     }
   }
   window.addEventListener('dsu-change',refreshAvatarUsage);
