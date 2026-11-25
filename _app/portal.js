@@ -113,11 +113,18 @@
    case 'subscription':
     rows=session.contentRows('subscription').map(record=>{
      const row=publication({...record,meta:subscriptionValidity(record.time)});
-     const archive=row.title==='南风窗'?window.nanfcIssues?.map(issue=>issue.src)
-      :row.title==='第一财经'?window.magazineArchiveData?.map(issue=>issue.cover):[];
-     const primaryFile=row.cover?.split('/').pop();
-     const alternate=archive?.find(cover=>cover&&cover.split('/').pop()!==primaryFile);
-     return {...row,alternate};
+     const archive=row.title==='南风窗'?window.nanfcIssues
+      :row.title==='第一财经'?window.magazineArchiveData:[];
+     const editions=new Map();
+     for(const entry of archive||[]){
+      const issue=Number(entry.issue??entry.label?.match(/(\d+)\s*期/)?.[1]);
+      const cover=entry.cover||entry.src;
+      if(cover&&Number.isInteger(entry.year)&&issue>0){
+       editions.set(entry.year*1000+issue,cover);
+      }
+     }
+     const [cover,alternate]=[...editions.keys()].sort((a,b)=>b-a).slice(0,2).map(key=>editions.get(key));
+     return {...row,cover:cover||row.cover,alternate};
     });
     empty='暂无全年订购的期刊。';
     break;
