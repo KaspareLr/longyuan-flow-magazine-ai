@@ -163,8 +163,14 @@
 
 .dsu-membership-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px}
 .dsu-membership-grid .dsu-section{margin:0}
-.pe-guide-heading .ai-dsu-avatar{position:relative;flex:none;display:grid;place-items:center;width:48px;height:48px;border-radius:50%;background:conic-gradient(#3154dc var(--dsu-remaining,0%),#e4e7ef 0);z-index:2}
-.ai-dsu-avatar .pe-guide-avatar{width:42px;height:42px;border-radius:50%}
-.ai-dsu-popover{display:none;position:absolute;inset:100% auto auto 0;min-width:204px;padding:12px;border:1px solid #e4e7ef;border-radius:14px;background:#fff;color:#131921;box-shadow:0 6px 18px #13192120}
-.ai-dsu-avatar:is(:hover,:focus-within) .ai-dsu-popover{display:block}.ai-dsu-popover p,.ai-dsu-receipt{margin:6px 0;font-size:12px}.ai-dsu-popover a,.ai-dsu-receipt a{text-decoration:underline}
-body.issue-full-page:has(.dsu-gate) > .demo-reading-widget,.frontpage-shared-topic,.home-discovery-topics,.oc-feature[data-topic-static],a[href="#/topics"],a[href="index.html#/topics"],a[href*="#/topic-generate"],a[href*="#/topic/"],.mh-dock-member[hidden]{display:none!important}
+.dsu-avatar-meter{position:relative;display:inline-grid;place-items:center;flex:none;isolation:isolate}
+.dsu-avatar-meter svg{position:absolute;inset:-5px;width:calc(100% + 10px);height:calc(100% + 10px);overflow:visible;pointer-events:none;transform:rotate(-90deg)}
+.dsu-avatar-meter circle{fill:none;stroke-width:2.5}
+.dsu-avatar-track{stroke:#e4e7ef}
+.dsu-avatar-arc{stroke:#131921;stroke-linecap:round;stroke-dasharray:var(--dsu-remaining) 100;opacity:clamp(0,var(--dsu-remaining),1)}
+.dsu-avatar-stats{display:none;position:absolute;top:calc(100% + 8px);right:0;width:220px;padding:10px 12px;white-space:normal;text-align:left;background:#fff;border:1px solid #e4e7ef;border-radius:12px;color:#131921;box-shadow:0 6px 18px #13192120;font-size:12px;line-height:1.6}
+.dsu-avatar-meter:hover .dsu-avatar-stats,:is(.login,.nav-login):focus-visible .dsu-avatar-stats{display:block}
+.ai-dsu-receipt{margin:6px 0;font-size:12px}.ai-dsu-receipt a{text-decoration:underline}
+body.issue-full-page:has(.dsu-gate) > .demo-reading-widget,.frontpage-shared-topic,.home-discovery-topics,.oc-feature[data-topic-static],a[href="#/topics"],a[href="index.html#/topics"],a[href*="#/topic-generate"],a[href*="#/topic/"],.home-discovery-clubs,a[href$="?claimed=1"],a[href*="?claimed=1&page="],a[href*="#/club/"]{display:none!important}
+
+.magazine-home .mh-subscription-dock:not(:has(.mh-button)){display:none}

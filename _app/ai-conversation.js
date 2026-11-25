@@ -74,13 +74,6 @@
   const prompt=event.target.closest('[data-pe-prompt]');if(prompt){event.stopImmediatePropagation();send(prompt.dataset.pePrompt,true);}
  },true);
  if(view&&matchMedia('(max-width:800px)').matches)view.querySelector('.ai-workspace').classList.add('ai-sidebar-collapsed');
- function refreshUsage(){
-  const usage=qikanDSU.summary();
-  document.querySelectorAll('.ai-dsu-avatar').forEach(el=>{
-   el.style.setProperty('--dsu-remaining',`${usage.quota?100*usage.left/usage.quota:usage.available?100:0}%`);
-   el.querySelector('[data-ai-dsu-stats]').textContent=`可用 ${usage.available} DSU · 会员 ${usage.left} · 充值 ${usage.wallet}。本月 AI 已用 ${usage.ai}，阅读已用 ${usage.articles}。`;
-  });
- }
  const mounted=new WeakSet();
  function mount(){
   document.querySelectorAll('.pe-chat').forEach(chat=>{
@@ -90,18 +83,9 @@
    chat.querySelector('.pe-chat-form')?.classList.add('guide-unified-composer');
    const heading=chat.querySelector('.pe-guide-heading'),collapse=heading.querySelector('.pe-chat-toggle');
    if(collapse?.querySelector('i'))collapse.querySelector('i').className='iconfont icon-a-4';
-   const avatar=heading.querySelector('.pe-guide-avatar');
-   if(avatar){
-    const meter=document.createElement('div');
-    meter.className='ai-dsu-avatar';meter.tabIndex=0;meter.setAttribute('aria-label','DSU 余额和用量');
-    meter.innerHTML=`<div class="ai-dsu-popover"><strong>DSU 用量</strong><p data-ai-dsu-stats></p><a href="${qikanDSU.accountURL}">查看 DSU 账户</a></div>`;
-    avatar.before(meter);meter.prepend(avatar);
-   }
-   refreshUsage();render();
+   render();
   });
  }
- window.addEventListener('dsu-change',refreshUsage);
- window.addEventListener('club-session-change',refreshUsage);
  new MutationObserver(mount).observe(document.body,{subtree:true,childList:true});mount();
  function open(q){const id=new URLSearchParams(location.hash.split('?')[1]||'').get('conversation');if(id&&state.items.some(x=>x.id===id))state.active=id;render();if(q&&current()?.messages.at(-2)?.text!==q)send(q);}
  const mobile=matchMedia('(max-width:800px)');mobile.addEventListener('change',event=>{if(event.matches)view?.querySelector('.ai-workspace').classList.add('ai-sidebar-collapsed');});

@@ -32,6 +32,10 @@
   if(m.title==='第一财经'){m={...m,issues:window.periodicalReference.archive.map(a=>({src:a.cover,label:a.issue}))};}
   const claimed=q.has('claimed')?q.get('claimed')==='1':publicationState(m).claimed;const index=Math.min(m.issues.length-1,Math.max(0,Math.floor(Number(q.get('issue'))||0)));const issue=m.issues[index];context={type:'magazine',m,issue,claimed};
   if(q.get('page')==='membership'){location.replace('portal.html#/me?tab=membership');return '';}
+  if(q.get('claimed')==='1'&&!q.has('issue')){
+   location.replace(window.magazineHomeDestination?.(m.title)||'index.html#/magazines');
+   return '';
+  }
   if(m.title==='第一财经'&&(q.has('page')||claimed)){
    context.claimed=true;
 
@@ -92,6 +96,10 @@
   return;
  }
  document.querySelector('[data-publication-membership]').replaceChildren();
+ if(type==='club'){
+  location.replace(window.magazineHomeDestination?.(id)||'index.html#/magazines');
+  return;
+ }
  if(!['magazine','book','club'].includes(type))return;context={};const q=new URLSearchParams(raw[1]);const node=document.getElementById('view-'+type);if(type==='book'){const b=editorialBooks.find(x=>String(x.id)===id);node.innerHTML=b?book(b):'<div class="rd-page"><h1>未找到这本书</h1><a href="#/books">返回图书馆</a></div>';}else{const m=magazineResource(id);node.innerHTML=m?(type==='club'?club(m):magazine(m,q)):'<div class="rd-page"><h1>未找到这本刊</h1><a href="#/magazines">返回期刊馆</a></div>';}}
  document.addEventListener('click',async e=>{
   const year=e.target.closest('[data-pe-archive-year]');if(year){const selected=year.dataset.peArchiveYear;modal.querySelectorAll('[data-pe-archive-year]').forEach(b=>b.setAttribute('aria-pressed',String(b===year)));let count=0;modal.querySelectorAll('[data-pe-archive-issue]').forEach(item=>{item.hidden=item.dataset.peArchiveIssue!==selected;if(!item.hidden)count++});modal.querySelector('.pe-archive-empty').hidden=count>0;return}

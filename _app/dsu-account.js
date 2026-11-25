@@ -482,4 +482,31 @@
       </div>`;
     }
   };
+  function refreshAvatarUsage(){
+    const avatars=document.querySelectorAll('header .club-account-avatar');
+    if(!avatars.length)return;
+    const usage=summary();
+    const percent=usage.quota?Math.min(100,Math.max(0,100*usage.left/usage.quota)):usage.available?100:0;
+    const stats=`可用 ${usage.available} DSU · 会员 ${usage.left} · 充值 ${usage.wallet}。本月 AI 已用 ${usage.ai}，阅读已用 ${usage.articles}。`;
+    for(const avatar of avatars){
+      let meter=avatar.closest('.dsu-avatar-meter');
+      if(!meter){
+        meter=document.createElement('span');
+        meter.className='dsu-avatar-meter';
+        meter.innerHTML='<svg viewBox="0 0 40 40" aria-hidden="true"><circle class="dsu-avatar-track" cx="20" cy="20" r="18"/><circle class="dsu-avatar-arc" cx="20" cy="20" r="18" pathLength="100"/></svg><span class="dsu-avatar-stats"></span>';
+        avatar.before(meter);meter.prepend(avatar);
+      }
+      meter.style.setProperty('--dsu-remaining',percent);
+      const tooltip=meter.querySelector('.dsu-avatar-stats');
+      if(tooltip.textContent!==stats)tooltip.textContent=stats;
+      const account=avatar.closest('.login,.nav-login');
+      if(account)account.setAttribute('aria-description',stats);
+    }
+  }
+  window.addEventListener('dsu-change',refreshAvatarUsage);
+  window.addEventListener('club-session-change',refreshAvatarUsage);
+  window.addEventListener('storage',event=>{if(event.key?.startsWith('qikan-dsu:'))refreshAvatarUsage();});
+  const header=document.querySelector('body > header');
+  if(header)new MutationObserver(refreshAvatarUsage).observe(header,{childList:true,subtree:true});
+  refreshAvatarUsage();
 })();
