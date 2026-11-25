@@ -97,7 +97,7 @@
     empty='暂无收藏的文章。';
     break;
    case 'subscription':
-    rows=session.contentRows('subscription').map(row=>publication({...row,meta:row.term?'订阅范围 · '+row.term:''}));
+    rows=session.contentRows('subscription').map(row=>publication({...row,meta:'一年有效期'}));
     empty='暂无全年订购的期刊。';
     break;
    case 'issue':
