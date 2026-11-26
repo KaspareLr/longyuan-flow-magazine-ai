@@ -167,7 +167,9 @@
 .dsu-avatar-meter svg{position:absolute;inset:-5px;width:calc(100% + 10px);height:calc(100% + 10px);overflow:visible;pointer-events:none;transform:rotate(-90deg)}
 .dsu-avatar-meter circle{fill:none;stroke-width:2.5}
 .dsu-avatar-track{stroke:#e4e7ef}
-.dsu-avatar-arc{stroke:#131921;stroke-linecap:round;stroke-dasharray:var(--dsu-remaining) 100;opacity:clamp(0,var(--dsu-remaining),1)}
+.dsu-avatar-total{stroke:#8c9bb0}
+.dsu-avatar-arc[data-usage=purchase]{stroke:#2f54eb}
+.dsu-avatar-arc[data-usage=ai]{stroke:#13c2c2}
 .dsu-avatar-menu {
  position:fixed;inset:auto;box-sizing:border-box;margin:0;padding:12px;
  width:min(296px,calc(100vw - 16px));max-height:calc(100dvh - 16px);overflow:auto;

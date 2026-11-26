@@ -396,10 +396,13 @@
     }
     return {used,quota,percent:quota?used/quota*100:0,...totals,missing:remaining};
   }
-  function quotaSegments(usage){
+  function quotaProgress(usage){
     const scale=Math.max(usage.used,usage.quota,1);
-    return ['purchase','ai']
-      .map(kind=>`<span data-usage="${kind}" style="width:${usage[kind]/scale*100}%"></span>`).join('');
+    return {total:usage.used/scale*100,
+      segments:[['purchase',usage.purchase/scale*100],['ai',usage.ai/scale*100]]};
+  }
+  function quotaSegments(progress){
+    return progress.segments.map(([kind,percent])=>`<span data-usage="${kind}" style="width:${percent}%"></span>`).join('');
   }
   function panel(filter = 'all', view) {
     const state = load(identity(profile()));
@@ -428,6 +431,7 @@
           }).join('')}</ul></section>`).join(''):'<p>暂无此类消费记录。</p>'}</section>`;
     const member=active(state),plan=state.subscription,totals=quotaUsage(state);
     const {used,quota,percent,missing}=totals;
+    const progress=quotaProgress(totals);
     const walletEnabled=state.walletEnabled!==false;
     const spent=walletSpent(state),limit=state.walletLimit;
     const planManagement=member&&view==='plan';
@@ -449,7 +453,7 @@
       <section class="dsu-section dsu-usage"><h3>会员额度用量</h3>
         <div class="dsu-usage-progress">
         <div class="dsu-row"><p>已用 <b>${used} / ${quota} DSU</b></p><span class="dsu-tag">${percent.toFixed(1)}%</span></div>
-        <div class="dsu-progress" style="--usage-total:${Math.min(percent,100)}%" aria-hidden="true">${quotaSegments(totals)}</div>
+        <div class="dsu-progress" style="--usage-total:${progress.total}%" aria-hidden="true">${quotaSegments(progress)}</div>
         <div class="dsu-legend"><span title="${totals.purchase} DSU">购买消耗</span><span title="${totals.ai} DSU">AI 对话</span></div>
         ${missing?'<p class="dsu-usage-history-note">部分历史流水缺失。</p>':''}</div>
       </section>
@@ -579,7 +583,6 @@
   quickMenu.setAttribute('popover','manual');
   quickMenu.setAttribute('aria-label','账户快捷菜单');
   const observedAccounts=new WeakSet();
-  let meterId=0;
   let activeAccount,closeTimer,ignoreFocus=false,menuKey='';
   function closeMenu(){
     clearTimeout(closeTimer);
@@ -653,8 +656,8 @@
     const state=load(identity(owner));
     const totals=quotaUsage(state);
     const {used,quota,percent,purchase,ai,missing}=totals;
+    const progress=quotaProgress(totals);
     const quotaLeft=remaining(state),available=quotaLeft+walletAvailable(state);
-    const ring=quota?Math.min(100,Math.max(0,100*quotaLeft/quota)):available?100:0;
     const plan=active(state)?state.subscription:null;
     const planName=plan?planFor(plan).name:'尚未订阅';
     const expiry=plan?new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Shanghai',dateStyle:'short'}).format(plan.expires).replaceAll('-','.'):'';
@@ -671,7 +674,7 @@
       </div>
       <div class="dsu-menu-usage">
        <div class="dsu-menu-usage-line"><p>已用 <b>${used} / ${quota} DSU</b></p><span>${percent.toFixed(1)}%</span></div>
-       <div class="dsu-menu-progress" style="--usage-total:${Math.min(percent,100)}%" aria-hidden="true">${quotaSegments(totals)}</div>
+       <div class="dsu-menu-progress" style="--usage-total:${progress.total}%" aria-hidden="true">${quotaSegments(progress)}</div>
        <div class="dsu-menu-legend"><span>购买消耗</span><span>AI 对话</span></div>${missing?'<p class="dsu-usage-history-note">部分历史流水缺失。</p>':''}
       </div>
       <div class="dsu-menu-links">${links.map(([tab,label])=>`<a href="${esc(new URL('portal.html#/me?tab='+tab,root))}">${label}<img src="${esc(arrow)}" alt=""></a>`).join('')}</div>
@@ -685,16 +688,22 @@
       if(!meter){
         meter=document.createElement('span');
         meter.className='dsu-avatar-meter';
-        const gradient='dsu-avatar-paint-'+(++meterId);
         meter.innerHTML=`<svg viewBox="0 0 40 40" aria-hidden="true">
-          <defs><linearGradient id="${gradient}"><stop offset="50%" stop-color="#13c2c2"/><stop offset="50%" stop-color="#2f54eb"/></linearGradient></defs>
           <circle class="dsu-avatar-track" cx="20" cy="20" r="18"/>
-          <circle class="dsu-avatar-arc" cx="20" cy="20" r="18" pathLength="100" style="stroke:url(#${gradient})"/>
+          <circle class="dsu-avatar-total" cx="20" cy="20" r="18" pathLength="100"/>
+          ${progress.segments.map(([kind])=>`<circle class="dsu-avatar-arc" data-usage="${kind}" cx="20" cy="20" r="18" pathLength="100"/>`).join('')}
         </svg>`;
         avatar.before(meter);meter.prepend(avatar);
       }
-      meter.style.setProperty('--dsu-remaining',ring);
-      account.setAttribute('aria-description',`可用 ${available} DSU。按向下键打开账户快捷菜单。`);
+      meter.querySelector('.dsu-avatar-total').setAttribute('stroke-dasharray',`${progress.total} 100`);
+      let offset=0;
+      for(const [kind,length] of progress.segments){
+        const arc=meter.querySelector(`circle[data-usage="${kind}"]`);
+        arc.setAttribute('stroke-dasharray',`${length} 100`);
+        arc.setAttribute('stroke-dashoffset',String(-offset));
+        offset+=length;
+      }
+      account.setAttribute('aria-description',`已用 ${used} / ${quota} DSU（${percent.toFixed(1)}%），可用 ${available} DSU。按向下键打开账户快捷菜单。`);
       account.setAttribute('aria-controls',quickMenu.id);
       account.setAttribute('aria-expanded',String(activeAccount===account));
       if(observedAccounts.has(account))continue;
