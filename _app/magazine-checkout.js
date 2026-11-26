@@ -16,7 +16,7 @@
   dialog.setAttribute('aria-labelledby','qikan-checkout-title');
   let amount=price??minimum;
   let paid=false, processing=false, expires=0, timer;
-  const paymentCode=method=>`<svg viewBox="0 0 37 37" role="img" aria-label="${method.label}二维码" shape-rendering="crispEdges" style="color:${method.color}"><path fill="currentColor" d="${method.path}"/></svg>`;
+  const paymentCode=method=>`<svg viewBox="2 2 33 33" role="img" aria-label="${method.label}二维码" shape-rendering="crispEdges"><path fill="#000" d="${method.path}"/></svg>`;
   dialog.innerHTML=`
    <div class="mh-dialog-head"><h2 id="qikan-checkout-title">${escape(membership?product:title)}</h2>
     <form method="dialog"><button aria-label="关闭支付"><img src="${new URL(membership?'../auth/close.svg':'checkout-close.svg',assets)}" alt=""></button></form>
@@ -39,7 +39,7 @@
         <span>${method.app}</span>
       </label>`).join('')}
     </fieldset>
-    <div class="mh-membership-code" data-membership-code></div>
+    <button type="submit" class="mh-membership-code" data-membership-code aria-label="扫码支付"></button>
     <p class="mh-qr-status"><span data-qr-status></span><button type="button" data-qr-refresh>刷新</button></p>`:
     `<fieldset class="mh-payment-methods" aria-label="选择支付方式">
      ${Object.entries(methods).map(([key,method])=>`<label>
@@ -50,7 +50,7 @@
      </label>`).join('')}
     </fieldset>`}
     <p role="alert" data-payment-error hidden></p>
-    <div class="dsu-dialog-actions mh-payment-actions"><button class="qikan-checkout-button is-primary">${membership?'确认支付':'确定'}</button></div>
+    ${membership?'':'<div class="dsu-dialog-actions mh-payment-actions"><button class="qikan-checkout-button is-primary">确定</button></div>'}
    </form>
    <section data-payment-step="success" hidden>
     <div class="mh-payment-success" aria-hidden="true">✓</div>
@@ -64,13 +64,13 @@
   function updateCountdown(){
    const seconds=Math.max(0,Math.ceil((expires-Date.now())/1000));
    dialog.querySelector('[data-qr-status]').textContent=seconds?`${seconds} 秒后二维码失效，`:'二维码已失效，';
-   dialog.querySelector('[data-membership-code]').classList.toggle('is-expired',!seconds);
+   payButton.classList.toggle('is-expired',!seconds);
    payButton.disabled=processing||!seconds;
   }
   if(membership){
    const refresh=()=>{
     expires=Date.now()+25000;
-    dialog.querySelector('[data-membership-code]').innerHTML=paymentCode(methods[form.elements.provider.value]);
+    payButton.innerHTML=paymentCode(methods[form.elements.provider.value]);
     updateCountdown();
    };
    form.elements.provider.forEach(input=>input.addEventListener('change',refresh));
