@@ -7,6 +7,7 @@
  };
  const assets=new URL('assets/figma-identity/',document.currentScript.src);
  const format=amount=>amount.toLocaleString('zh-CN',{maximumFractionDigits:2})+' DSU';
+ const yuan=new Intl.NumberFormat('zh-CN',{style:'currency',currency:'CNY'});
  let activeDialog;
  function open({title,product,price,issue,success='支付成功',minimum,membership,dsu,onPaid,onDone}){
   if(activeDialog?.open)return;
@@ -17,6 +18,7 @@
   dialog.className=compact?'qikan-checkout qikan-membership-checkout':'qikan-checkout';
   dialog.setAttribute('aria-labelledby','qikan-checkout-title');
   let amount=price??minimum;
+  const formatPayment=value=>minimum?yuan.format(value):format(value);
   let paid=false, processing=false, expires=0, timer;
   const paymentCode=method=>`<img src="${new URL('https://kasparelr.github.io/agentui-shared-images/objects/17/17e9295410354db62acca0d17bb01af04b3184d4d7c04e1167d4a3a49152df18.png',assets)}" alt="${method.label}二维码">`;
   dialog.innerHTML=`
@@ -29,17 +31,18 @@
     <div><dt>续费方式</dt><dd>${escape(membership.renewal)}</dd></div>`:
     `<div><dt>订单</dt><dd>${escape(product)}</dd></div>
     ${issue?`<div><dt>有效范围</dt><dd>${escape(issue)}</dd></div>`:''}`}
-    <div><dt>应付金额</dt><dd><strong data-order-total>${format(amount)}</strong></dd></div>
+    ${minimum?`<div><dt>到账额度</dt><dd data-recharge-credit>${format(amount)}</dd></div>`:''}
+    <div><dt>应付金额</dt><dd><strong data-order-total>${formatPayment(amount)}</strong></dd></div>
    </dl>
    <form data-payment-step="choose">
     ${minimum?`<fieldset class="mh-recharge-options">
       <legend>选择额度</legend>
       <div class="mh-recharge-presets">
-        ${[minimum,minimum*2,minimum*5].map((value,index)=>`<label><input type="radio" name="rechargeTier" value="${value}" ${index===0?'checked':''}><span>${format(value)}</span></label>`).join('')}
+        ${[minimum,minimum*2,minimum*5].map((value,index)=>`<label><input type="radio" name="rechargeTier" value="${value}" ${index===0?'checked':''}><span><strong>${format(value)}</strong><small>${formatPayment(value)}</small></span></label>`).join('')}
         <label><input type="radio" name="rechargeTier" value="custom"><span>其他</span></label>
       </div>
     </fieldset>
-    <label class="mh-payment-amount" hidden>充值金额
+    <label class="mh-payment-amount" hidden>充值额度
       <span><input type="number" name="amount" required disabled min="${minimum}" max="1000000" step="1" value="${minimum}" inputmode="numeric"> DSU</span>
     </label>`:''}
     ${dsu?`<div class="mh-dsu-payment">
@@ -99,7 +102,9 @@
    dialog.querySelector('[data-qr-refresh]').addEventListener('click',refresh);
    if(minimum){
     const updateAmount=()=>{
-     total.textContent=validAmount()?format(orderAmount()):'—';
+     const value=orderAmount();
+     total.textContent=validAmount()?formatPayment(value):'—';
+     dialog.querySelector('[data-recharge-credit]').textContent=validAmount()?format(value):'—';
      refresh();
     };
     form.elements.rechargeTier.forEach(input=>input.addEventListener('change',()=>{
@@ -154,7 +159,7 @@
      dialog.append(dialog.querySelector('.mh-order-summary'));
      dialog.classList.add('has-payment-success');
      dialog.querySelector('[data-paid-provider]').textContent=provider.label;
-     dialog.querySelector('[data-paid-amount]').textContent=format(amount);
+     dialog.querySelector('[data-paid-amount]').textContent=formatPayment(amount);
      dialog.querySelector('.mh-dialog-head button').setAttribute('aria-label','关闭支付结果');
     }else dialog.querySelector('[data-payment-receipt]').textContent=provider.label+' · '+format(amount);
    }catch(err){

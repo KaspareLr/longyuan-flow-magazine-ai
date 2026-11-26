@@ -112,7 +112,7 @@
 .mh-recharge-presets label { position:relative; }
 .mh-recharge-presets input { position:absolute;width:1px;height:1px;opacity:0; }
 .mh-recharge-presets span {
-  display:grid;place-items:center;min-height:58px;padding:6px 2px;border:1px solid transparent;
+  display:grid;place-items:center;align-content:center;gap:2px;min-height:58px;padding:6px 2px;border:1px solid transparent;
   border-radius:12px;background:#f5f7fa;text-align:center;font-size:12px;font-weight:700;cursor:pointer;
 }
 .mh-recharge-presets input:checked + span { border-color:#131921;background:#fff; }
@@ -126,3 +126,5 @@
 .mh-dsu-recovery { display:flex;flex-wrap:wrap;gap:8px; }
 .mh-dsu-recovery[hidden],.mh-payment-actions button[hidden] { display:none; }
 .qikan-membership-checkout .mh-payment-actions:has(button[hidden]) { display:none; }
+
+.mh-recharge-presets small { color:#606266;font-size:11px;font-weight:500; }
