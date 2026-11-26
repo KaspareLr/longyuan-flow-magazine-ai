@@ -92,13 +92,16 @@
 .mh-qr-status button { padding:0;border:0;background:none;color:#131921;font:inherit;cursor:pointer; }
 
 .qikan-membership-checkout .mh-success-art {
-  display:block;width:112px;height:112px;margin:0 auto 14px;border-radius:24px;
+  display:block;width:160px;height:160px;margin:0 auto 20px;border-radius:50%;
 }
 .qikan-checkout.qikan-membership-checkout [data-payment-step=success] h3 {
-  margin:0 0 8px;font-size:22px;line-height:30px;font-weight:700;
+  margin:0 0 4px;font-size:22px;line-height:30px;font-weight:700;
 }
 .qikan-membership-checkout [data-payment-receipt] {
-  display:flex;justify-content:center;align-items:baseline;gap:8px;margin:0 0 4px;
+  display:flex;justify-content:center;align-items:baseline;gap:4px;margin:0;
   color:#606266;font-size:14px;line-height:22px;
 }
 .qikan-membership-checkout [data-paid-amount] { color:#131921;font-weight:700; }
+
+.qikan-membership-checkout.has-payment-success [data-payment-step=success] { margin-top:20px; }
+.qikan-membership-checkout.has-payment-success .mh-order-summary { margin:20px 0 0; }

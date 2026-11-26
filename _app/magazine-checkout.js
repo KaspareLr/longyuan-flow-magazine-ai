@@ -53,7 +53,7 @@
     ${membership?'':'<div class="dsu-dialog-actions mh-payment-actions"><button class="qikan-checkout-button is-primary">确定</button></div>'}
    </form>
    <section data-payment-step="success" hidden>
-    ${membership?`<img class="mh-success-art" src="${new URL('https://kasparelr.github.io/agentui-shared-images/objects/27/2719458acc3afe6901c276fab1b6489143424c43bcab2d29e21c3629c128b829.jpg',assets)}" width="112" height="112" alt="">`:
+    ${membership?`<img class="mh-success-art" src="${new URL('https://kasparelr.github.io/agentui-shared-images/objects/27/2719458acc3afe6901c276fab1b6489143424c43bcab2d29e21c3629c128b829.jpg',assets)}" width="160" height="160" alt="">`:
     '<div class="mh-payment-success" aria-hidden="true">✓</div>'}
     <h3 tabindex="-1">${escape(success)}</h3>
     <p data-payment-receipt>${membership?'<span data-paid-provider></span><strong data-paid-amount></strong>':''}</p>
@@ -103,6 +103,8 @@
     await onPaid?.(amount);
     paid=true;
     if(membership){
+     dialog.append(dialog.querySelector('.mh-order-summary'));
+     dialog.classList.add('has-payment-success');
      dialog.querySelector('[data-paid-provider]').textContent=provider.label;
      dialog.querySelector('[data-paid-amount]').textContent=format(amount);
      dialog.querySelector('.mh-dialog-head button').setAttribute('aria-label','关闭支付结果');
