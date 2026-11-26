@@ -47,3 +47,30 @@ dialog.qikan-auth-dialog {
 }
 .qikan-auth-return { margin-top:8px; }
 .qikan-auth-dialog :focus-visible { outline:2px solid #435b78;outline-offset:3px; }
+
+.qikan-auth-code-row { display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:end; }
+.qikan-auth-code-row button {
+  min-height:52px;padding:0 12px;border:0;border-radius:16px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;
+}
+.qikan-auth-captcha { background:#edf0fb;color:#334080;letter-spacing:.18em;font-weight:700; }
+.qikan-auth-send { background:#edf0f4;color:#131921; }
+.qikan-auth-terms { margin:0;color:#606266;font-size:12px;line-height:1.6; }
+.qikan-auth-terms a { color:#465972;text-decoration:underline; }
+.qikan-auth-other { margin-top:22px;text-align:center; }
+.qikan-auth-other p {
+  display:flex;align-items:center;gap:12px;margin:0 0 12px;color:#606266;font-size:13px;
+}
+.qikan-auth-other p::before,.qikan-auth-other p::after { content:"";flex:1;height:1px;background:#e4e7ed; }
+.qikan-auth-providers { display:flex;justify-content:center;gap:16px; }
+.qikan-auth-providers button {
+  display:grid;place-items:center;width:44px;height:44px;padding:0;border:0;border-radius:50%;color:#fff;cursor:pointer;
+}
+.qikan-auth-providers button[data-auth-mode=wechat] { background:#07a653; }
+.qikan-auth-providers button[data-auth-provider=qq] { background:#087ec1; }
+.qikan-auth-dialog :is(.qikan-auth-providers,.qikan-auth-scan) .iconfont { font-size:22px; }
+.qikan-auth-scan { display:grid;justify-items:center;gap:12px;padding-top:12px;text-align:center; }
+.qikan-auth-scan > p { margin:0;font-size:16px; }
+.qikan-auth-scan > p .iconfont { color:#07a653;vertical-align:middle; }
+.qikan-auth-dialog .qikan-auth-scan #qikan-auth-title { margin:0;font-size:26px; }
+.qikan-auth-qr { width:min(220px,100%);aspect-ratio:1; }
+.qikan-auth-qr[hidden] { display:none; }
