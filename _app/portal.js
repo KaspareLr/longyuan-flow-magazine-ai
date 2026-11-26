@@ -264,7 +264,7 @@
   (readingRecordsSection.querySelector('.qikan-saved-remove')||readingRecordsSection.querySelector('[aria-pressed=true]')).focus({preventScroll:true});
   toast(kind==='article'?'已取消收藏':'已取消关注');
  }
- if(el.hasAttribute('data-logout')){session.logout();accountTab='overview';location.hash='#/me';render();toast('已退出登录')}
+ if(el.hasAttribute('data-logout'))session.logout();
  if(el.hasAttribute('data-plan')){if(!session.profile){session.login();return}const p=data.membership.plans[0].prices[Number(el.dataset.plan)];modal('确认体验'+p.periodLabel+'会员',`<p>你选择了${p.periodLabel}方案 · ${p.priceFen/100} DSU / ${p.durationDays} 天。</p><p>确认后即可开启所选会员权益。</p><button class="button dark" data-confirm-plan="${el.dataset.plan}">确认体验开通</button>`)}
  if(el.hasAttribute('data-confirm-plan')){const p=data.membership.plans[0].prices[Number(el.dataset.confirmPlan)],d=new Date('2026-10-15T12:00:00');d.setDate(d.getDate()+p.durationDays);session.member({label:p.periodLabel,period:p.periodCode,price:p.priceFen/100});const m=session.membership;m.expires=d.toISOString().slice(0,10);session.write('membership',m);document.querySelector('#portal-dialog').close();toast('会员体验已开启');accountTab='membership';location.hash='#/me?tab=membership'}
  if(el.hasAttribute('data-trial')){if(!session.profile){session.login();return}if(session.membership){accountTab='membership';location.hash='#/me?tab=membership';return}const d=new Date('2026-10-15T12:00:00');d.setDate(d.getDate()+7);session.member({label:'7 天体验',price:0});const m=session.membership;m.expires=d.toISOString().slice(0,10);session.write('membership',m);accountTab='membership';location.hash='#/me?tab=membership';toast('已领取 7 天体验会员')}
@@ -315,7 +315,10 @@
   window.scrollTo({top:y,behavior:'instant'});
   main.querySelector('.portal-reader-content h1')?.focus({preventScroll:true});
  });
- window.addEventListener('hashchange',()=>{filter='全部';render()});window.addEventListener('club-session-change',()=>{if(route==='me'||route==='membership')clubPageMotion.update(()=>render())});
+ window.addEventListener('hashchange',()=>{filter='全部';render()});window.addEventListener('club-session-change',()=>{
+  if(route==='me'&&!session.profile){location.replace(new URL('index.html#/frontpage',window.clubRootURL));return;}
+  if(route==='me'||route==='membership')clubPageMotion.update(()=>render());
+ });
  function updateReadingProgress(){
   if(readingProgress.hidden||document.body.classList.contains('issue-full-page'))return;
   const content=main.querySelector('.portal-reader-content');
