@@ -75,19 +75,19 @@ dialog.qikan-auth-dialog {
 .qikan-auth-qr { width:min(220px,100%);aspect-ratio:1; }
 .qikan-auth-qr[hidden] { display:none; }
 
-dialog.qikan-auth-register {
+dialog.qikan-auth-styled {
   width:min(430px,calc(100vw - 24px));padding:20px;border:0;border-radius:20px;
 }
-.qikan-auth-register .qikan-auth-close {
+.qikan-auth-styled .qikan-auth-close {
   inset:20px 20px auto auto;width:32px;height:32px;border-radius:12px;background:transparent;
 }
-.qikan-auth-register .qikan-auth-brand { margin-bottom:60px; }
-.qikan-auth-register .qikan-auth-description { margin:0 0 41px; }
-.qikan-auth-register .qikan-auth-tabs { gap:0;margin-bottom:20px;box-shadow:none; }
-.qikan-auth-register .qikan-auth-tabs button { min-height:32px;font-weight:700;color:#131921; }
-.qikan-auth-register .qikan-auth-tabs button[aria-pressed=true] { color:white; }
-.qikan-auth-register .qikan-auth-form { gap:10px; }
-.qikan-auth-register .qikan-auth-field-label {
+.qikan-auth-styled .qikan-auth-brand { margin-bottom:60px; }
+.qikan-auth-styled .qikan-auth-description { margin:0 0 41px; }
+.qikan-auth-styled .qikan-auth-tabs { gap:0;margin-bottom:20px;box-shadow:none; }
+.qikan-auth-styled .qikan-auth-tabs button { min-height:32px;font-weight:700;color:#131921; }
+.qikan-auth-styled .qikan-auth-tabs button[aria-pressed=true] { color:white; }
+.qikan-auth-styled .qikan-auth-form { gap:10px; }
+.qikan-auth-styled .qikan-auth-field-label {
   position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;
 }
 .qikan-auth-register .qikan-auth-code-row {
@@ -101,12 +101,24 @@ dialog.qikan-auth-register {
 }
 .qikan-auth-register .qikan-auth-send { background:#131921;color:white;font-weight:700; }
 .qikan-auth-register .qikan-auth-form > label:has([name=nickname]) { margin-top:10px; }
-.qikan-auth-register .qikan-auth-password input { padding-inline-end:48px !important; }
-.qikan-auth-register .qikan-auth-password button {
+.qikan-auth-styled .qikan-auth-password input { padding-inline-end:48px !important; }
+.qikan-auth-styled .qikan-auth-password button {
   inset:3px 3px auto auto;display:grid;place-items:center;min-width:44px;padding:0;
 }
-.qikan-auth-register [data-auth-password][aria-pressed=true] { background:#e4e7ed; }
+.qikan-auth-styled [data-auth-password][aria-pressed=true] { background:#e4e7ed; }
 .qikan-auth-register .qikan-auth-form p.qikan-auth-terms { margin:30px 0 0;text-align:center;color:#909399;font-size:12px;line-height:16px; }
 .qikan-auth-register .qikan-auth-terms :is(a,span) { color:#131921;font-size:inherit;text-decoration:none; }
 .qikan-auth-register .qikan-auth-submit { justify-self:center;width:auto;padding:14px 40px; }
-.qikan-auth-register #qikan-auth-title:focus { outline:none; }
+.qikan-auth-styled #qikan-auth-title:focus { outline:none; }
+
+.qikan-auth-login .qikan-auth-password-group { gap:8px; }
+.qikan-auth-login [data-auth-mode=reset] {
+  min-height:20px;color:#131921;font-size:14px;font-weight:400;text-decoration:none;
+}
+.qikan-auth-login .qikan-auth-submit { margin-top:30px;padding:14px 40px; }
+.qikan-auth-login .qikan-auth-other { margin-top:20px; }
+.qikan-auth-login .qikan-auth-other p {
+  height:50px;gap:10px;margin-bottom:10px;padding-inline:12px;color:#686d77;font-size:16px;
+}
+.qikan-auth-login .qikan-auth-providers { gap:10px; }
+.qikan-auth-login .qikan-auth-providers button:is([data-auth-mode],[data-auth-provider]) { background:#f5f7fa; }
