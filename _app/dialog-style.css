@@ -1,0 +1,95 @@
+/* Shared appearance for dialogs and reader sheets. Individual layouts set their own widths. */
+:root {
+  --qikan-dialog-radius:20px;
+  --qikan-dialog-shadow:0 20px 80px #13192120;
+  --qikan-dialog-scrim:#13192135;
+}
+dialog:is(.qikan-auth-dialog,.qikan-checkout,.dsu-dialog,.signed-member-dialog,.rd-modal,.kx-settings,
+  .book-notes-drawer,.reader-directory-dialog,.cs-filter-sheet,#portal-dialog,#mh-share-dialog,#academic-reader-dialog) {
+  box-sizing:border-box;
+  border-radius:var(--qikan-dialog-radius);
+  box-shadow:var(--qikan-dialog-shadow);
+}
+dialog:is(.qikan-auth-dialog,.qikan-checkout,.dsu-dialog,.signed-member-dialog,.kx-settings,#portal-dialog,#mh-share-dialog) {
+  border:0;
+  color:#131921;
+  background:#fff;
+  font-family:Figtree,"PingFang SC",sans-serif;
+  overscroll-behavior:contain;
+}
+dialog:is(.dsu-dialog:not(.dsu-dialog-article),.signed-member-dialog,.kx-settings,#portal-dialog,#mh-share-dialog) {
+  padding:20px;
+}
+dialog:is(.qikan-auth-dialog,.qikan-checkout,.dsu-dialog,.signed-member-dialog,.rd-modal,.kx-settings,
+  .book-notes-drawer,.reader-directory-dialog,.cs-filter-sheet,#portal-dialog,#mh-share-dialog,#academic-reader-dialog)::backdrop {
+  background:var(--qikan-dialog-scrim);
+  backdrop-filter:blur(8px);
+}
+
+/* Use the same 32px close control wherever a dialog has a close icon. */
+dialog :is(.qikan-auth-close,.mh-dialog-head button,.dsu-purchase-close,.signed-dialog-close,
+  .club-dialog-close,#mh-close-share,#academic-reader-close,[data-rd-close],
+  .book-notes-drawer > header button,.reader-directory-heading button) {
+  display:inline-grid;
+  place-items:center;
+  flex:none;
+  width:32px;
+  height:32px;
+  padding:0;
+  border:0;
+  border-radius:12px;
+  background:var(--qikan-close-fill,transparent) url("assets/auth/close.svg") center no-repeat;
+  font-size:0;
+  cursor:pointer;
+}
+dialog :is(.qikan-auth-close,.mh-dialog-head button,.dsu-purchase-close,.signed-dialog-close,
+  .club-dialog-close,#mh-close-share,#academic-reader-close,[data-rd-close],
+  .book-notes-drawer > header button,.reader-directory-heading button):hover {
+  --qikan-close-fill:#f5f7fa;
+}
+dialog :is(.qikan-auth-close,.mh-dialog-head button,.dsu-purchase-close,.signed-dialog-close,
+  .club-dialog-close,#mh-close-share,#academic-reader-close,[data-rd-close],
+  .book-notes-drawer > header button,.reader-directory-heading button) > :is(i,img,svg,span) {
+  visibility:hidden;
+}
+body:has(.portal-reader.night) .book-notes-drawer > header button {
+  background-color:#c5ccd6;
+}
+dialog:is(.dsu-dialog,.signed-member-dialog,.kx-settings,#portal-dialog,#mh-share-dialog)
+  :is(.dsu-primary,.dsu-purchase-primary,.button.dark,.btn-dark,#mh-copy) {
+  min-height:48px;
+  padding:12px 20px;
+  border:0;
+  border-radius:100px;
+  background:#131921;
+  color:white;
+  font-weight:700;
+}
+dialog:is(.dsu-dialog,.signed-member-dialog,.kx-settings,#portal-dialog,#mh-share-dialog)
+  :is(.dsu-actions .dsu-button:not(.dsu-primary),.dsu-dialog-actions .dsu-button:not(.dsu-primary),.btn-outline) {
+  min-height:48px;
+  border:1px solid #e4e7ed;
+  border-radius:100px;
+  background:white;
+  color:#131921;
+}
+dialog :is(button,a):focus-visible {
+  outline:2px solid #667b99;
+  outline-offset:3px;
+}
+
+.magazine-home #mh-share-dialog {
+  padding:20px;
+  border-radius:var(--qikan-dialog-radius);
+  box-shadow:var(--qikan-dialog-shadow);
+}
+.magazine-home #mh-share-dialog::backdrop {
+  background:var(--qikan-dialog-scrim);
+  backdrop-filter:blur(8px);
+}
+.magazine-home #mh-close-share {
+  width:32px;
+  height:32px;
+  border-radius:12px;
+  background:var(--qikan-close-fill,transparent) url("assets/auth/close.svg") center no-repeat;
+}

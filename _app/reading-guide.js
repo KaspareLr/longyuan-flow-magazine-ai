@@ -100,7 +100,7 @@ function syncGuideSurface(){
  mount.classList.toggle('catalog-reading-guide',portal&&!preview);
  mount.classList.toggle('demo-reading-widget',!portal||preview);
  document.body.classList.toggle('catalog-guide-visible',portal&&!preview);
- if((preview&&!window.clubIssuePreview?.hasGuideAccess())||document.querySelector('#portal-main .dsu-gate')){
+ if(document.querySelector('#portal-main .dsu-gate')){
   mount.hidden=true;mount.inert=true;
   document.body.classList.remove('reading-guide-open');
   return;

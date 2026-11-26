@@ -170,5 +170,5 @@ body.issue-preview-page > .club-site-footer { padding-bottom: calc(96px + env(sa
 }
 body:not(.issue-preview-page) > .issue-purchase-entry { display: none; }
 
-body.issue-preview-page.issue-guide-locked > .demo-reading-widget { display: none !important; }
+
 .issue-purchase-entry [data-issue-purchase]:disabled { cursor: default; color: #606266; }

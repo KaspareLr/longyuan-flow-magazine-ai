@@ -84,28 +84,17 @@
  }
  window.addEventListener('scroll',scheduleRails,{passive:true});
  window.addEventListener('resize',()=>{if(directoryState)directoryState.revealed=null;scheduleRails();});
- function guidePurchaseKey(){
-  const profile=window.clubSession?.profile;
-  return 'issue-purchase:dycy202609:'+(profile?.dsuId||profile?.email||profile?.nickname||'guest');
- }
- const sessionPurchases=new Set();
- function hasGuideAccess(){
-  return sessionPurchases.has(guidePurchaseKey());
- }
- function refreshGuideAccess(){
-  const preview=document.body.classList.contains('issue-preview-page');
-  document.body.classList.toggle('issue-guide-locked',preview&&!hasGuideAccess());
+ function refreshIssuePurchase(){
   const purchase=document.querySelector('body > .issue-purchase-entry [data-issue-purchase]');
   if(purchase){
-   const owned=hasGuideAccess();
-   purchase.disabled=owned;
+   const owned=window.clubSession?.contentRows('issue').some(row=>row.id==='dycy202609');
+   purchase.disabled=Boolean(owned);
    purchase.textContent=owned?'本期已购买':'购买本期：48.00 DSU';
   }
   window.syncReaderGuide?.();
  }
- window.addEventListener('club-session-change',refreshGuideAccess);
+ window.addEventListener('club-session-change',refreshIssuePurchase);
  const api={
- hasGuideAccess,
  isPreview:(a,params)=>a.context==='magazine'&&a.rid==='第一财经'&&params.get('full')!=='1',
  hasFull:a=>Boolean(fullArticle(a)),
  previewBody,
@@ -122,7 +111,7 @@
  },
  mount(a,params){
   const preview=api.isPreview(a,params);if(params.get('full')==='1'&&a.rid==='第一财经'){try{localStorage.setItem('magazine-home:last-read',JSON.stringify({index:a.index}));}catch{}}document.body.classList.toggle('issue-preview-page',preview);document.body.classList.toggle('issue-full-page',a.context==='magazine'&&params.get('full')==='1');
-  refreshGuideAccess();
+  refreshIssuePurchase();
   if(api.directoryObserver){api.directoryObserver.disconnect();api.directoryObserver=null;}
   document.querySelector('body > .issue-purchase-entry')?.remove();
   directoryState=null;
@@ -134,13 +123,12 @@
    title:'购买《第一财经》本期',product:'单期电子版',price:48,
    issue:'2026 年第 09 期',success:'购买成功',
    onPaid(){
-    sessionPurchases.add(guidePurchaseKey());
     window.clubSession?.recordContent('issue','dycy202609',{title:'第一财经',edition:'2026年09期',route:'portal.html#/article/0?context=magazine&resource='+encodeURIComponent('第一财经')});
-    refreshGuideAccess();
+    refreshIssuePurchase();
    },
    onDone(){document.querySelector('[data-issue-mode=jev]')?.focus({preventScroll:true});}
   });
-  refreshGuideAccess();
+  refreshIssuePurchase();
   document.querySelectorAll('.issue-toc-slot .reader-toc-article').forEach(link=>{link.title=link.querySelector('strong')?.textContent||'';});
   const slot=document.querySelector('.issue-toc-slot');
   const fit=()=>{scheduleRails();if(!slot||!slot.isConnected)return;const box=slot.getBoundingClientRect();slot.style.setProperty('--toc-left',box.left+'px');slot.style.setProperty('--toc-width',box.width+'px');};

@@ -21,7 +21,7 @@
  function updateCategoryFades(){const max=categoryRail.scrollWidth-categoryRail.clientWidth;categoryRail.style.setProperty('--category-fade-left',categoryRail.scrollLeft>1?'28px':'0px');categoryRail.style.setProperty('--category-fade-right',categoryRail.scrollLeft<max-1?'28px':'0px');}
  categoryRail.addEventListener('scroll',updateCategoryFades,{passive:true});
  new ResizeObserver(updateCategoryFades).observe(categoryRail);updateCategoryFades();
- let selected=0,sequence=0,progressFrame=0;const reduced=matchMedia('(prefers-reduced-motion: reduce)');
+ let selected=0,progressFrame=0;const reduced=matchMedia('(prefers-reduced-motion: reduce)');
  function animateProgress(delay=0){
   cancelAnimationFrame(progressFrame);
   const ring=page.querySelector('.magazines-home-ring');if(!ring)return;const arc=ring.querySelector('.magazines-progress-arc'),label=ring.querySelector('span');
@@ -43,7 +43,11 @@
   if(animate)animateProgress(150);
   if(animate&&!reduced.matches){cover.animate([{opacity:0,transform:'translateX(40px) rotate(2deg)'},{opacity:1,transform:'translateX(0) rotate(0)'}],{duration:650,easing:'cubic-bezier(.2,.8,.2,1)'});[...info.children].forEach((n,i)=>n.animate([{opacity:0,transform:'translateY(16px)'},{opacity:1,transform:'translateY(0)'}],{duration:500,delay:i*60,fill:'backwards',easing:'ease-out'}));}
  }
- async function select(index){if(index===selected)return;const token=++sequence;const cover=page.querySelector('.magazines-home-cover');if(!reduced.matches)await cover.animate([{opacity:1,transform:'translateX(0)'},{opacity:0,transform:'translateX(-30px)'}],{duration:200,easing:'ease-in',fill:'forwards'}).finished.catch(()=>{});if(token!==sequence)return;cover.getAnimations().forEach(a=>a.cancel());show(index,true);}
+ function select(index){
+  if(index===selected)return;
+  page.querySelector('.magazines-home-cover').getAnimations().forEach(animation=>animation.cancel());
+  show(index,true);
+ }
  function filter(category='全部'){
  page.querySelector('.magazines-all-grid').innerHTML=data.magazines.filter(m=>category==='全部'||m.category===category).map(m=>`<a class="magazines-all-card" href="${e(window.magazineHomeDestination(m.title)||m.href)}"><div class="magazines-card-cover books-library-cover-area"><span class="books-library-volume"><span class="books-library-paper" aria-hidden="true"></span><img class="books-library-cover" src="${e(m.cover)}" alt="《${e(m.title)}》封面" loading="lazy"></span></div><div class="magazines-card-info"><h3>${e(m.title)}</h3><p>${e(m.issue)}</p></div></a>`).join('');
  page.querySelectorAll('[data-magazine-category]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.magazineCategory===category)));
