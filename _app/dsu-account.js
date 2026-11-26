@@ -336,7 +336,6 @@
       <button type="button" class="dsu-button dsu-primary" data-dsu-checkout="${code}">${owner?'继续支付':'登录并继续'}</button></div></section>`;
     const annual=period==='year';
     const base=annual?'year':'month';
-    const currentCode=current?(current.code||'month-auto'):'';
     const uses=[
       ['解锁文章','按篇解锁，继续阅读全文'],
       ['购买期刊','选购单期或全年订阅'],
@@ -348,21 +347,19 @@
       const item=plans[key];
       const pro=key==='pro';
       const cycle=item.months===1?'月':'年';
-      const auto=currentCode!==key;
-      const selected=auto?key+'-auto':key;
+      const selected=key+'-auto';
       const selectedPlan=plans[selected];
-      const managing=currentCode===selected;
       return `<article class="dsu-price-card ${pro?'dsu-price-pro':''}">
         <div class="dsu-plan-head"><div><h2>${title}</h2><p class="dsu-plan-description">${description}</p></div>${pro?'':billing}</div>
         <div class="dsu-plan-purchase">
           <div class="dsu-plan-price-row">
             <div><div class="dsu-price-amount"><strong data-dsu-plan-price>${selectedPlan.price}</strong><span>DSU/${cycle}</span></div>
             <p class="dsu-price-quota">每${cycle}获得 <strong>${item.quota} DSU</strong></p></div>
-            <button type="button" class="dsu-switch dsu-plan-renewal" role="switch" aria-label="${title}连续包${cycle}" aria-checked="${auto}" data-dsu-plan-switch="${key}" data-current-plan="${currentCode}">
+            <button type="button" class="dsu-switch dsu-plan-renewal" role="switch" aria-label="${title}连续包${cycle}" aria-checked="true" data-dsu-plan-switch="${key}">
               连续包${cycle}<span class="dsu-switch-track" aria-hidden="true"></span>
             </button>
           </div>
-          <a class="dsu-button dsu-primary dsu-plan-buy" href="${managing?'#/me?tab=dsu':pricing+'?plan='+selected}">${managing?'当前套餐 · 管理':'购买'}</a>
+          <a class="dsu-button dsu-primary dsu-plan-buy" href="${pricing}?plan=${selected}">购买</a>
         </div>
         <ul class="dsu-plan-features">${uses.map(([name,detail])=>`<li><img src="${included}" alt="" width="20" height="20"><div><strong>${name}</strong><small>${detail}</small></div></li>`).join('')}</ul>
       </article>`;
@@ -371,7 +368,12 @@
       <header><h1>龙源期刊网会员</h1><p>用 DSU 阅读文章、选购期刊和使用 AI 问答。</p></header>
       ${current?`<p class="dsu-pricing-current">当前方案 · ${planFor(current).name} · 有效至 ${date(current.expires)} <a href="#/me?tab=dsu">管理额度</a></p>`:''}
       <div class="dsu-membership-grid">${card(base,'普通会员','适合日常阅读和提问')}${card('pro','Pro会员','更高的年度额度，适合频繁阅读和问答')}</div>
-      <footer class="dsu-pricing-foot"><div><strong>单独购买额度</strong><p>单笔 ${minimum} DSU 起充</p></div>${buyQuota}</footer>
+      <footer class="dsu-pricing-foot">
+        <div>${state?`<span class="dsu-pricing-balance-label">当前余额</span>
+          <strong data-dsu-pricing-balance>${(remaining(state)+walletAvailable(state)).toLocaleString('zh-CN')} DSU 可用</strong>`:'<strong>单独购买额度</strong>'}
+          <p>单笔 ${minimum} DSU 起充</p>
+        </div>${buyQuota}
+      </footer>
     </section>`;
   }
   const purchaseTypes=new Set(['article','issue','subscription','purchase']);
@@ -453,7 +455,7 @@
           <strong>${member?`<a href="#/me?tab=dsu${planManagement?'':'&amp;view=plan'}" aria-label="管理${esc(planFor(plan).name)}">${esc(planFor(plan).name)}</a>`:'尚未订阅'}</strong>
           <p class="dsu-card-detail">${expiry}</p>
         </div>
-        <a class="dsu-button" href="#/membership">查看套餐</a>
+        <a class="dsu-button" href="#/membership">购买会员</a>
         ${planManagement?`<div class="dsu-account-card-settings dsu-actions">
           ${plan.autoRenew?'<button type="button" class="dsu-button" data-dsu-cancel>取消订阅</button>':
             '<button type="button" class="dsu-button" data-dsu-renew>续费</button>'}
@@ -487,13 +489,11 @@
     if(planSwitch){
       const auto=planSwitch.getAttribute('aria-checked')!=='true';
       const selected=planSwitch.dataset.dsuPlanSwitch+(auto?'-auto':'');
-      const managing=selected===planSwitch.dataset.currentPlan;
       const card=planSwitch.closest('.dsu-price-card');
       const purchase=card.querySelector('.dsu-plan-buy');
       card.querySelector('[data-dsu-plan-price]').textContent=plans[selected].price;
       planSwitch.setAttribute('aria-checked',String(auto));
-      purchase.href=managing?'#/me?tab=dsu':'#/membership?plan='+selected;
-      purchase.textContent=managing?'当前套餐 · 管理':'购买';
+      purchase.href='#/membership?plan='+selected;
       return;
     }
     const checkout=event.target.closest('[data-dsu-checkout],[data-dsu-renew]');
@@ -615,7 +615,7 @@
   }
   function placeMenu(){
     const bounds=activeAccount.getBoundingClientRect();
-    quickMenu.style.left=Math.max(8,Math.min(bounds.right-quickMenu.offsetWidth,innerWidth-quickMenu.offsetWidth-8))+'px';
+    quickMenu.style.left=Math.max(8,Math.min(bounds.left,innerWidth-quickMenu.offsetWidth-8))+'px';
     quickMenu.style.top=Math.min(bounds.bottom+8,Math.max(8,innerHeight-quickMenu.offsetHeight-8))+'px';
   }
   function openMenu(account){
@@ -742,7 +742,11 @@
       });
     }
   }
-  window.addEventListener('dsu-change',refreshAvatarUsage);
+  window.addEventListener('dsu-change',()=>{
+    refreshAvatarUsage();
+    const balance=document.querySelector('[data-dsu-pricing-balance]');
+    if(balance)balance.textContent=summary().available.toLocaleString('zh-CN')+' DSU 可用';
+  });
   window.addEventListener('club-session-change',refreshAvatarUsage);
   window.addEventListener('storage',event=>{if(event.key?.startsWith('qikan-dsu:'))refreshAvatarUsage();});
   const header=document.querySelector('body > header');
