@@ -81,7 +81,7 @@
      ${passwordField('password',resetting?'新密码':'密码',mode==='login'?'current-password':'new-password')}
      ${mode==='login'?'<button class="qikan-auth-text-action" type="button" data-auth-mode="reset">忘记密码？</button>':''}
     </div>
-    ${mode!=='login'?passwordField('confirm',registering?'重复密码':'确认密码','new-password',registering?'密码':'确认新密码'):''}
+    ${mode!=='login'?passwordField('confirm',registering?'重复密码':'确认密码','new-password',registering?'重复密码':'确认新密码'):''}
     ${registering?`<p class="qikan-auth-terms">点击“注册”即表示您同意并愿意遵守 <a href="https://www.qikan.com.cn/userrelative/serviceterms.html" target="_blank" rel="noopener">龙源期刊网注册协议</a> 和 <span>隐私政策</span>。</p>`:''}
     <button class="qikan-auth-submit" type="submit">${text.submit}</button>
    </form>

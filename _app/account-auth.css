@@ -100,7 +100,6 @@ dialog.qikan-auth-styled {
 .qikan-auth-styled [data-auth-password][aria-pressed=true] { background:#e4e7ed; }
 .qikan-auth-register .qikan-auth-form p.qikan-auth-terms { margin:30px 0 0;text-align:center;color:#909399;font-size:12px;line-height:16px; }
 .qikan-auth-register .qikan-auth-terms :is(a,span) { color:#131921;font-size:inherit;text-decoration:none; }
-.qikan-auth-register .qikan-auth-submit { justify-self:center;width:auto;padding:14px 40px; }
 .qikan-auth-styled #qikan-auth-title:focus { outline:none; }
 
 .qikan-auth-login .qikan-auth-password-group { gap:8px; }
