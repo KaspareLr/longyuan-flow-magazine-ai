@@ -90,3 +90,15 @@
   display:flex;justify-content:center;align-items:center;margin:10px 0 0;color:#909399;font-size:12px;line-height:16px;
 }
 .mh-qr-status button { padding:0;border:0;background:none;color:#131921;font:inherit;cursor:pointer; }
+
+.qikan-membership-checkout .mh-success-art {
+  display:block;width:112px;height:112px;margin:0 auto 14px;border-radius:24px;
+}
+.qikan-checkout.qikan-membership-checkout [data-payment-step=success] h3 {
+  margin:0 0 8px;font-size:22px;line-height:30px;font-weight:700;
+}
+.qikan-membership-checkout [data-payment-receipt] {
+  display:flex;justify-content:center;align-items:baseline;gap:8px;margin:0 0 4px;
+  color:#606266;font-size:14px;line-height:22px;
+}
+.qikan-membership-checkout [data-paid-amount] { color:#131921;font-weight:700; }

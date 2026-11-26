@@ -53,9 +53,11 @@
     ${membership?'':'<div class="dsu-dialog-actions mh-payment-actions"><button class="qikan-checkout-button is-primary">确定</button></div>'}
    </form>
    <section data-payment-step="success" hidden>
-    <div class="mh-payment-success" aria-hidden="true">✓</div>
-    <h3 tabindex="-1">${escape(success)}</h3><p data-payment-receipt></p>
-    <div class="dsu-dialog-actions mh-payment-actions"><button type="button" class="qikan-checkout-button is-primary" data-payment-action="done">完成</button></div>
+    ${membership?`<img class="mh-success-art" src="${new URL('https://kasparelr.github.io/agentui-shared-images/objects/27/2719458acc3afe6901c276fab1b6489143424c43bcab2d29e21c3629c128b829.jpg',assets)}" width="112" height="112" alt="">`:
+    '<div class="mh-payment-success" aria-hidden="true">✓</div>'}
+    <h3 tabindex="-1">${escape(success)}</h3>
+    <p data-payment-receipt>${membership?'<span data-paid-provider></span><strong data-paid-amount></strong>':''}</p>
+    ${membership?'':'<div class="dsu-dialog-actions mh-payment-actions"><button type="button" class="qikan-checkout-button is-primary" data-payment-action="done">完成</button></div>'}
    </section>`;
   const form=dialog.querySelector('[data-payment-step=choose]');
   const total=dialog.querySelector('[data-order-total]');
@@ -100,7 +102,11 @@
    try{
     await onPaid?.(amount);
     paid=true;
-    dialog.querySelector('[data-payment-receipt]').textContent=provider.label+' · '+format(amount);
+    if(membership){
+     dialog.querySelector('[data-paid-provider]').textContent=provider.label;
+     dialog.querySelector('[data-paid-amount]').textContent=format(amount);
+     dialog.querySelector('.mh-dialog-head button').setAttribute('aria-label','关闭支付结果');
+    }else dialog.querySelector('[data-payment-receipt]').textContent=provider.label+' · '+format(amount);
    }catch(err){
     error.textContent=err.message||'订单提交失败，请重试。';
     error.hidden=false;
@@ -111,7 +117,7 @@
    if(paid){clearInterval(timer);show('success');}
    else if(membership)updateCountdown();
   });
-  dialog.querySelector('[data-payment-action=done]').addEventListener('click',()=>dialog.close());
+  dialog.querySelector('[data-payment-action=done]')?.addEventListener('click',()=>dialog.close());
   dialog.addEventListener('cancel',event=>{if(processing)event.preventDefault();});
   dialog.addEventListener('close',()=>{
    clearInterval(timer);
