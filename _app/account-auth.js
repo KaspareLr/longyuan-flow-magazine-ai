@@ -1,9 +1,10 @@
 (() => {
  const base = new URL('.', document.currentScript.src);
+ const brand=`<img class="qikan-auth-brand" src="${new URL('assets/longyuan-home/longyuan-logo-v2.png',base)}" alt="龙源期刊网" width="98" height="32">`;
  const storageKey = 'qikan-auth-accounts:v1';
  const copy = {
-  login: {title:'欢迎回来，继续阅读', description:'登录后，继续上次的阅读。', submit:'登录'},
-  register: {title:'你好，一起开始阅读', description:'创建账号，收藏喜欢的文章和刊物。', submit:'注册并继续'},
+  login: {title:'登录期刊网', description:'使用邮箱登录你的账号。', submit:'登录'},
+  register: {title:'注册期刊网账号', description:'填写邮箱、昵称与密码，创建账号。', submit:'注册并继续'},
   reset: {title:'重设密码', description:'输入账号邮箱和注册时保存的恢复码。', submit:'保存新密码'}
  };
  const passwordField = (name, label, autocomplete) => `<label>${label}
@@ -39,7 +40,7 @@
   return {recovery,security:{salt,passwordHash:await digest(password,salt),recoveryHash:await digest(recovery,salt)}};
  }
  function renderRecovery(code,profile){
-  content.innerHTML=`<h2 id="qikan-auth-title">保存恢复码</h2>
+  content.innerHTML=`${brand}<h2 id="qikan-auth-title">保存恢复码</h2>
    <p class="qikan-auth-description">忘记密码时可以用它重设密码。请妥善保存。</p>
    <p class="qikan-auth-recovery"><code>${code.match(/.{4}/g).join('-')}</code></p>
    <button type="button" class="qikan-auth-submit" data-auth-finish>${profile?'开始阅读':'返回登录'}</button>`;
@@ -53,7 +54,7 @@
  function render(){
   const text=copy[mode];
   const registering=mode==='register',resetting=mode==='reset';
-  content.innerHTML=`<h2 id="qikan-auth-title">${text.title}</h2><p class="qikan-auth-description">${text.description}</p>
+  content.innerHTML=`${brand}<h2 id="qikan-auth-title">${text.title}</h2><p class="qikan-auth-description">${text.description}</p>
    ${resetting?'':`<div class="qikan-auth-tabs" role="group" aria-label="账号操作">
     <button type="button" data-auth-mode="login" aria-pressed="${mode==='login'}">登录</button>
     <button type="button" data-auth-mode="register" aria-pressed="${registering}">注册</button></div>`}
@@ -61,15 +62,15 @@
     ${registering?'<label>昵称<input name="nickname" autocomplete="nickname" required maxlength="20" placeholder="请输入昵称"></label>':''}
     <label>邮箱<input name="email" type="email" autocomplete="username" required maxlength="254" placeholder="请输入邮箱"></label>
     ${resetting?'<label>恢复码<input name="recovery" required maxlength="40" autocomplete="off" spellcheck="false" placeholder="请输入恢复码"></label>':''}
-    ${passwordField('password',resetting?'新密码':'密码',mode==='login'?'current-password':'new-password')}
+    <div class="qikan-auth-password-group">
+     ${passwordField('password',resetting?'新密码':'密码',mode==='login'?'current-password':'new-password')}
+     ${mode==='login'?'<button class="qikan-auth-text-action" type="button" data-auth-mode="reset">忘记密码？</button>':''}
+    </div>
     ${mode!=='login'?passwordField('confirm','确认密码','new-password'):''}
     <p class="qikan-auth-error" role="alert"></p>
     <button class="qikan-auth-submit" type="submit">${text.submit}</button>
    </form>
-   <div class="qikan-auth-links">
-    ${registering?'':`<button type="button" data-auth-mode="${resetting?'login':'reset'}">${resetting?'返回登录':'忘记密码？'}</button>`}
-    <a href="${new URL('portal.html#/membership',base)}">查看会员套餐</a>
-   </div>`;
+   ${resetting?'<button class="qikan-auth-text-action qikan-auth-return" type="button" data-auth-mode="login">返回登录</button>':''}`;
   const form=content.querySelector('form');
   form.elements.email.value=email;
   form.addEventListener('submit',submit);
@@ -123,8 +124,6 @@
    email=content.querySelector('[name=email]')?.value||email;
    mode=button.dataset.authMode;render();
   }
-  if(event.target.closest('a')&&!pending)dialog.close();
-  else if(event.target.closest('a'))event.preventDefault();
  });
  close.addEventListener('click',()=>dialog.close());
  dialog.addEventListener('cancel',event=>{if(pending)event.preventDefault();});
