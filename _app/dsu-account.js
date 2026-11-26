@@ -322,19 +322,13 @@
       ai:used.reduce((total,row)=>total+(row.type==='ai'?row.amount:0),0),
       articles:used.reduce((total,row)=>total+(purchaseTypes.has(row.type)?row.amount:0),0)};
   }
-  function membership(code, period='month'){
+  function membership(code, period=null){
     const plan=Object.hasOwn(plans,code)?plans[code]:null;
     const owner=identity(profile());
     const state=owner?load(owner):null;
-    const current=state&&active(state)?state.subscription:null;
     const pricing='#/membership';
     const buyQuota='<button type="button" class="dsu-button" data-dsu-recharge>购买额度</button>';
-    if(plan)return `<section class="dsu-pricing dsu-pricing-checkout">
-      <div class="dsu-row"><a href="${pricing}?period=${plan.months===1?'month':'year'}">← 返回套餐比较</a>${buyQuota}</div>
-      <header><h1>开通${plan.name}</h1><p>核对套餐信息后选择支付方式。</p></header>
-      <div class="dsu-price-card"><dl><div><dt>会员额度</dt><dd>${plan.quota} DSU</dd></div><div><dt>有效期</dt><dd>${plan.months===1?'一个月':'一年'}</dd></div><div><dt>续费方式</dt><dd>${plan.auto?'到期自动续费，可在 DSU 账户取消':'到期后按需续订'}</dd></div><div><dt>应付金额</dt><dd>${plan.price} DSU</dd></div></dl>
-      <button type="button" class="dsu-button dsu-primary" data-dsu-checkout="${code}">${owner?'继续支付':'登录并继续'}</button></div></section>`;
-    const annual=period==='year';
+    const annual=period==='year'||(period!=='month'&&plan?.months===12);
     const base=annual?'year':'month';
     const uses=[
       ['解锁文章','按篇解锁，继续阅读全文'],
@@ -359,14 +353,13 @@
               连续包${cycle}<span class="dsu-switch-track" aria-hidden="true"></span>
             </button>
           </div>
-          <a class="dsu-button dsu-primary dsu-plan-buy" href="${pricing}?plan=${selected}">购买</a>
+          <button type="button" class="dsu-button dsu-primary dsu-plan-buy" data-dsu-checkout="${selected}">购买</button>
         </div>
         <ul class="dsu-plan-features">${uses.map(([name,detail])=>`<li><img src="${included}" alt="" width="20" height="20"><div><strong>${name}</strong><small>${detail}</small></div></li>`).join('')}</ul>
       </article>`;
     };
     return `<section class="dsu-pricing dsu-pricing-comparison">
       <header><h1>龙源期刊网会员</h1><p>用 DSU 阅读文章、选购期刊和使用 AI 问答。</p></header>
-      ${current?`<p class="dsu-pricing-current">当前方案 · ${planFor(current).name} · 有效至 ${date(current.expires)} <a href="#/me?tab=dsu">管理额度</a></p>`:''}
       <div class="dsu-membership-grid">${card(base,'普通会员','适合日常阅读和提问')}${card('pro','Pro会员','更高的年度额度，适合频繁阅读和问答')}</div>
       <footer class="dsu-pricing-foot">
         <div>${state?`<span class="dsu-pricing-balance-label">当前余额</span>
@@ -484,6 +477,34 @@
       ${ledger}</div>`;
   }
 
+  function openMembershipPayment(selected,renewal){
+    const owner=identity(profile());
+    const code=renewal?(load(owner).subscription?.code||'month-auto'):selected;
+    const plan=plans[code];
+    if(!plan)return;
+    window.magazineCheckout.open({
+      title:renewal?'会员续费':'支付会员订单',
+      product:plan.name,
+      issue:plan.months===1?'1个月':'1年',
+      membership:{quota:plan.quota,renewal:plan.auto?'到期自动续费，可在 DSU 账户取消':'到期后按需续订'},
+      price:plan.price,
+      success:renewal?'续费成功':'会员开通成功',
+      onPaid:()=>change(state=>{
+        if(identity(profile())!==owner)throw Error('账号已切换，请重新提交订单。');
+        const start=Date.now();
+        if(renewal){
+          if(!active(state)||planFor(state.subscription)!==plan)throw Error('会员状态已更新，请重新提交订单。');
+          state.subscription.expires=addMonths(state.subscription.expires,plan.months);
+          return;
+        }
+        const {used,purchase,ai}=quotaUsage(state);
+        state.subscription={code,start,expires:addMonths(start,plan.months),used,autoRenew:Boolean(plan.auto),
+          usageCarry:{purchase,ai}};
+      }),
+      onDone:()=>{location.hash='#/me?tab=dsu';}
+    });
+  }
+
   document.addEventListener('click', async event => {
     const planSwitch=event.target.closest('[data-dsu-plan-switch]');
     if(planSwitch){
@@ -493,38 +514,17 @@
       const purchase=card.querySelector('.dsu-plan-buy');
       card.querySelector('[data-dsu-plan-price]').textContent=plans[selected].price;
       planSwitch.setAttribute('aria-checked',String(auto));
-      purchase.href='#/membership?plan='+selected;
+      purchase.dataset.dsuCheckout=selected;
       return;
     }
     const checkout=event.target.closest('[data-dsu-checkout],[data-dsu-renew]');
     if(checkout){
-      if(!signedIn())return;
-      const owner=identity(profile());
+      const selected=checkout.dataset.dsuCheckout;
       const renewal=checkout.hasAttribute('data-dsu-renew');
-      const code=renewal?(load(owner).subscription?.code||'month-auto'):checkout.dataset.dsuCheckout;
-      const plan=plans[code];
-      if(!plan)return;
-      window.magazineCheckout.open({
-        title:renewal?'会员续费':'支付会员订单',
-        product:plan.name,
-        issue:plan.months===1?'1个月':'1年',
-        membership:{quota:plan.quota,renewal:plan.auto?'到期自动续费，可在 DSU 账户取消':'到期后按需续订'},
-        price:plan.price,
-        success:renewal?'续费成功':'会员开通成功',
-        onPaid:()=>change(state=>{
-          if(identity(profile())!==owner)throw Error('账号已切换，请重新提交订单。');
-          const start=Date.now();
-          if(renewal){
-            if(!active(state)||planFor(state.subscription)!==plan)throw Error('会员状态已更新，请重新提交订单。');
-            state.subscription.expires=addMonths(state.subscription.expires,plan.months);
-            return;
-          }
-          const {used,purchase,ai}=quotaUsage(state);
-          state.subscription={code,start,expires:addMonths(start,plan.months),used,autoRenew:Boolean(plan.auto),
-            usageCarry:{purchase,ai}};
-        }),
-        onDone:()=>{location.hash='#/me?tab=dsu';}
-      });
+      if(signedIn())openMembershipPayment(selected,renewal);
+      else document.querySelector('.qikan-auth-dialog:modal')?.addEventListener('close',()=>{
+        if(profile())openMembershipPayment(selected,renewal);
+      },{once:true});
       return;
     }
     const button = event.target.closest('[data-dsu-article],[data-dsu-recharge],[data-dsu-wallet],[data-dsu-limit],[data-dsu-cancel],[data-dsu-sample],[data-dsu-history]');
