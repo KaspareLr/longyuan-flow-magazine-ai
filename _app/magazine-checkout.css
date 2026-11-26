@@ -105,3 +105,16 @@
 
 .qikan-membership-checkout.has-payment-success [data-payment-step=success] { margin-top:20px; }
 .qikan-membership-checkout.has-payment-success .mh-order-summary { margin:20px 0 0; }
+
+.mh-recharge-options { min-width:0;margin:0 0 16px;padding:0;border:0; }
+.mh-recharge-options legend { margin-bottom:10px;padding:0;font-size:14px;font-weight:700;line-height:20px; }
+.mh-recharge-presets { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px; }
+.mh-recharge-presets label { position:relative; }
+.mh-recharge-presets input { position:absolute;width:1px;height:1px;opacity:0; }
+.mh-recharge-presets span {
+  display:grid;place-items:center;min-height:58px;padding:6px 2px;border:1px solid transparent;
+  border-radius:12px;background:#f5f7fa;text-align:center;font-size:12px;font-weight:700;cursor:pointer;
+}
+.mh-recharge-presets input:checked + span { border-color:#131921;background:#fff; }
+.mh-recharge-presets input:focus-visible + span { outline:2px solid #606266;outline-offset:2px; }
+.mh-payment-amount[hidden] { display:none; }

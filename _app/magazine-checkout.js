@@ -12,14 +12,15 @@
   if(activeDialog?.open)return;
   const dialog=document.createElement('dialog');
   activeDialog=dialog;
-  dialog.className=membership?'qikan-checkout qikan-membership-checkout':'qikan-checkout';
+  const compact=Boolean(membership||minimum);
+  dialog.className=compact?'qikan-checkout qikan-membership-checkout':'qikan-checkout';
   dialog.setAttribute('aria-labelledby','qikan-checkout-title');
   let amount=price??minimum;
   let paid=false, processing=false, expires=0, timer;
   const paymentCode=method=>`<img src="${new URL('https://kasparelr.github.io/agentui-shared-images/objects/17/17e9295410354db62acca0d17bb01af04b3184d4d7c04e1167d4a3a49152df18.png',assets)}" alt="${method.label}二维码">`;
   dialog.innerHTML=`
    <div class="mh-dialog-head"><h2 id="qikan-checkout-title">${escape(membership?product:title)}</h2>
-    <form method="dialog"><button aria-label="关闭支付"><img src="${new URL(membership?'../auth/close.svg':'checkout-close.svg',assets)}" alt=""></button></form>
+    <form method="dialog"><button aria-label="关闭支付"><img src="${new URL(compact?'../auth/close.svg':'checkout-close.svg',assets)}" alt=""></button></form>
    </div>
    <dl class="mh-order-summary">
     ${membership?`<div><dt>会员额度</dt><dd>${format(membership.quota)}</dd></div>
@@ -30,10 +31,17 @@
     <div><dt>应付金额</dt><dd><strong data-order-total>${format(amount)}</strong></dd></div>
    </dl>
    <form data-payment-step="choose">
-    ${minimum?`<label class="mh-payment-amount">充值金额
-      <span><input type="number" name="amount" required min="${minimum}" max="1000000" step="1" value="${minimum}" inputmode="numeric"> DSU</span>
-     </label>`:''}
-    ${membership?`<fieldset class="mh-payment-tabs" aria-label="选择支付方式">
+    ${minimum?`<fieldset class="mh-recharge-options">
+      <legend>选择额度</legend>
+      <div class="mh-recharge-presets">
+        ${[minimum,minimum*2,minimum*5].map((value,index)=>`<label><input type="radio" name="rechargeTier" value="${value}" ${index===0?'checked':''}><span>${format(value)}</span></label>`).join('')}
+        <label><input type="radio" name="rechargeTier" value="custom"><span>其他</span></label>
+      </div>
+    </fieldset>
+    <label class="mh-payment-amount" hidden>充值金额
+      <span><input type="number" name="amount" required disabled min="${minimum}" max="1000000" step="1" value="${minimum}" inputmode="numeric"> DSU</span>
+    </label>`:''}
+    ${compact?`<fieldset class="mh-payment-tabs" aria-label="选择支付方式">
       ${Object.entries(methods).map(([key,method])=>`<label>
         <input type="radio" name="provider" value="${key}" aria-label="${method.label}" ${key==='alipay'?'checked':''}>
         <span>${method.app}</span>
@@ -50,26 +58,30 @@
      </label>`).join('')}
     </fieldset>`}
     <p role="alert" data-payment-error hidden></p>
-    ${membership?'':'<div class="dsu-dialog-actions mh-payment-actions"><button class="qikan-checkout-button is-primary">确定</button></div>'}
+    ${compact?'':'<div class="dsu-dialog-actions mh-payment-actions"><button class="qikan-checkout-button is-primary">确定</button></div>'}
    </form>
    <section data-payment-step="success" hidden>
-    ${membership?`<img class="mh-success-art" src="${new URL('https://kasparelr.github.io/agentui-shared-images/objects/27/2719458acc3afe6901c276fab1b6489143424c43bcab2d29e21c3629c128b829.jpg',assets)}" width="160" height="160" alt="">`:
+    ${compact?`<img class="mh-success-art" src="${new URL('https://kasparelr.github.io/agentui-shared-images/objects/27/2719458acc3afe6901c276fab1b6489143424c43bcab2d29e21c3629c128b829.jpg',assets)}" width="160" height="160" alt="">`:
     '<div class="mh-payment-success" aria-hidden="true">✓</div>'}
     <h3 tabindex="-1">${escape(success)}</h3>
-    <p data-payment-receipt>${membership?'<span data-paid-provider></span><strong data-paid-amount></strong>':''}</p>
-    ${membership?'':'<div class="dsu-dialog-actions mh-payment-actions"><button type="button" class="qikan-checkout-button is-primary" data-payment-action="done">完成</button></div>'}
+    <p data-payment-receipt>${compact?'<span data-paid-provider></span><strong data-paid-amount></strong>':''}</p>
+    ${compact?'':'<div class="dsu-dialog-actions mh-payment-actions"><button type="button" class="qikan-checkout-button is-primary" data-payment-action="done">完成</button></div>'}
    </section>`;
   const form=dialog.querySelector('[data-payment-step=choose]');
   const total=dialog.querySelector('[data-order-total]');
   const error=dialog.querySelector('[data-payment-error]');
   const payButton=form.querySelector('[type=submit],.mh-payment-actions button');
+  const amountField=form.elements.amount;
+  const orderAmount=()=>minimum?(amountField.disabled?Number(form.elements.rechargeTier.value):amountField.valueAsNumber):price;
+  const validAmount=()=>!amountField||amountField.disabled||amountField.validity.valid;
   function updateCountdown(){
    const seconds=Math.max(0,Math.ceil((expires-Date.now())/1000));
-   dialog.querySelector('[data-qr-status]').textContent=seconds?`${seconds} 秒后二维码失效，`:'二维码已失效，';
-   payButton.classList.toggle('is-expired',!seconds);
-   payButton.disabled=processing||!seconds;
+   const valid=validAmount();
+   dialog.querySelector('[data-qr-status]').textContent=!valid?`请输入至少 ${minimum} DSU 的整数金额，`:seconds?`${seconds} 秒后二维码失效，`:'二维码已失效，';
+   payButton.classList.toggle('is-expired',!seconds||!valid);
+   payButton.disabled=processing||!seconds||!valid;
   }
-  if(membership){
+  if(compact){
    const refresh=()=>{
     expires=Date.now()+25000;
     payButton.innerHTML=paymentCode(methods[form.elements.provider.value]);
@@ -77,6 +89,20 @@
    };
    form.elements.provider.forEach(input=>input.addEventListener('change',refresh));
    dialog.querySelector('[data-qr-refresh]').addEventListener('click',refresh);
+   if(minimum){
+    const updateAmount=()=>{
+     total.textContent=validAmount()?format(orderAmount()):'—';
+     refresh();
+    };
+    form.elements.rechargeTier.forEach(input=>input.addEventListener('change',()=>{
+     const custom=form.elements.rechargeTier.value==='custom';
+     amountField.disabled=!custom;
+     amountField.closest('label').hidden=!custom;
+     updateAmount();
+     if(custom)amountField.focus();
+    }));
+    amountField.addEventListener('input',updateAmount);
+   }
    refresh();
    timer=setInterval(updateCountdown,250);
   }
@@ -86,14 +112,10 @@
     if(!section.hidden)(section.querySelector('h3')||section.querySelector(':checked'))?.focus();
    }
   }
-  form.elements.amount?.addEventListener('input',event=>{
-   const field=event.currentTarget;
-   total.textContent=field.validity.valid?format(field.valueAsNumber):'—';
-  });
   form.addEventListener('submit',async event=>{
    event.preventDefault();
-   if(paid||processing||(membership&&Date.now()>=expires))return;
-   amount=form.elements.amount?.valueAsNumber??price;
+   if(paid||processing||(compact&&(Date.now()>=expires||!validAmount())))return;
+   amount=orderAmount();
    const provider=methods[form.elements.provider.value];
    error.hidden=true;
    const controls=[...dialog.querySelectorAll('button')];
@@ -102,7 +124,7 @@
    try{
     await onPaid?.(amount);
     paid=true;
-    if(membership){
+    if(compact){
      dialog.append(dialog.querySelector('.mh-order-summary'));
      dialog.classList.add('has-payment-success');
      dialog.querySelector('[data-paid-provider]').textContent=provider.label;
@@ -117,7 +139,7 @@
     controls.forEach(control=>{control.disabled=false;});
    }
    if(paid){clearInterval(timer);show('success');}
-   else if(membership)updateCountdown();
+   else if(compact)updateCountdown();
   });
   dialog.querySelector('[data-payment-action=done]')?.addEventListener('click',()=>dialog.close());
   dialog.addEventListener('cancel',event=>{if(processing)event.preventDefault();});
