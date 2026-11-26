@@ -303,12 +303,10 @@
   }
 
   function showInsufficient(){
-    if(dialog.open)return;
-    dialog.classList.remove('dsu-dialog-article');
-    dialog.innerHTML=`<div class="dsu-settings-form"><header><h2 id="dsu-dialog-title">可用 DSU 不足</h2></header><div class="dsu-actions"><button type="button" class="dsu-button" data-cancel>关闭</button><a class="dsu-button" href="${accountURL}">充值 DSU</a><a class="dsu-button dsu-primary" href="${membershipURL}">查看会员套餐</a></div></div>`;
-    dialog.querySelector('[data-cancel]').onclick=()=>dialog.close();
-    dialog.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>dialog.close()));
-    dialog.showModal();
+    window.magazineCheckout.open({
+      title:'文章购买',price:articlePrice,
+      dsu:{available:()=>summary().available,membershipURL,balanceOnly:true}
+    });
   }
   async function purchaseArticle(button){
     if(!signedIn()||button.disabled)return false;
@@ -621,9 +619,15 @@
       const publication=kind+':'+id;
       const hasPurchase=state=>state.records.some(record=>record.publication===publication);
       if(owned()){reflectOwnership();return;}
+      const annual=kind==='subscription';
+      const now=Date.now();
+      const validity=time=>new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Shanghai'}).format(time).replaceAll('-','.');
       window.magazineCheckout.open({
         ...options,
-        dsu:{available:()=>summary().available,membershipURL,recharge:()=>openRecharge(open)},
+        title:annual?'期刊订购':'单期购买',
+        product:annual?id:id==='dycy202609'?'第一财经 2026年09期':options.product,
+        issue:annual?validity(now)+'–'+validity(addMonths(now,12)):'永久有效',
+        dsu:{available:()=>summary().available,membershipURL},
         onPaid:async amount=>{
           await change(state=>{
             if(identity(profile())!==owner)throw Error('账号已切换，请重新提交订单。');

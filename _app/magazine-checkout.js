@@ -16,6 +16,7 @@
   const qr=Boolean(membership||minimum);
   const compact=qr||Boolean(dsu);
   dialog.className=compact?'qikan-checkout qikan-membership-checkout':'qikan-checkout';
+  if(dsu)dialog.classList.add('qikan-dsu-checkout');
   dialog.setAttribute('aria-labelledby','qikan-checkout-title');
   let amount=price??minimum;
   const formatPayment=value=>minimum?yuan.format(value):format(value);
@@ -25,15 +26,15 @@
    <div class="mh-dialog-head"><h2 id="qikan-checkout-title">${escape(membership?product:title)}</h2>
     <form method="dialog"><button aria-label="关闭支付"><img src="${new URL(compact?'../auth/close.svg':'checkout-close.svg',assets)}" alt=""></button></form>
    </div>
-   <dl class="mh-order-summary">
-    ${membership?`<div><dt>会员额度</dt><dd>${format(membership.quota)}</dd></div>
+   ${dsu?.balanceOnly?'':`<dl class="mh-order-summary">
+    ${dsu?`<div><dt>购买内容</dt><dd>${escape(product)}</dd></div><div><dt>有效期</dt><dd>${escape(issue)}</dd></div>`:membership?`<div><dt>会员额度</dt><dd>${format(membership.quota)}</dd></div>
     <div><dt>有效期</dt><dd>${escape(issue)}</dd></div>
     <div><dt>续费方式</dt><dd>${escape(membership.renewal)}</dd></div>`:
     `<div><dt>订单</dt><dd>${escape(product)}</dd></div>
     ${issue?`<div><dt>有效范围</dt><dd>${escape(issue)}</dd></div>`:''}`}
     ${minimum?`<div><dt>到账额度</dt><dd data-recharge-credit>${format(amount)}</dd></div>`:''}
     <div><dt>应付金额</dt><dd><strong data-order-total>${formatPayment(amount)}</strong></dd></div>
-   </dl>
+   </dl>`}
    <form data-payment-step="choose">
     ${minimum?`<fieldset class="mh-recharge-options">
       <legend>选择额度</legend>
@@ -46,12 +47,9 @@
       <span><input type="number" name="amount" required disabled min="${minimum}" max="1000000" step="1" value="${minimum}" inputmode="numeric"> DSU</span>
     </label>`:''}
     ${dsu?`<div class="mh-dsu-payment">
-      <div><strong>DSU 支付</strong><span>可用 <b data-publication-balance></b></span></div>
-      <p class="mh-dsu-shortfall" data-publication-shortfall hidden></p>
-      <div class="mh-dsu-recovery" data-publication-recovery hidden>
-       <button type="button" class="dsu-button dsu-primary" data-publication-recharge>充值 DSU</button>
-       <a class="dsu-button" href="${escape(dsu.membershipURL)}">开通会员</a>
-      </div>
+      <div><span>账户余额</span><strong data-publication-balance></strong></div>
+      <button class="dsu-button dsu-primary" type="submit">确认支付</button>
+      <a class="dsu-button dsu-primary" data-publication-recovery href="${escape(dsu.membershipURL)}" hidden>购买额度或会员</a>
     </div>`:qr?`<fieldset class="mh-payment-tabs" aria-label="选择支付方式">
       ${Object.entries(methods).map(([key,method])=>`<label>
         <input type="radio" name="provider" value="${key}" aria-label="${method.label}" ${key==='alipay'?'checked':''}>
@@ -69,7 +67,7 @@
      </label>`).join('')}
     </fieldset>`}
     <p role="alert" data-payment-error hidden></p>
-    ${qr?'':`<div class="dsu-dialog-actions mh-payment-actions"><button class="qikan-checkout-button is-primary" type="submit">${dsu?'确认购买':'确定'}</button></div>`}
+    ${qr||dsu?'':`<div class="dsu-dialog-actions mh-payment-actions"><button class="qikan-checkout-button is-primary" type="submit">${dsu?'确认购买':'确定'}</button></div>`}
    </form>
    <section data-payment-step="success" hidden>
     ${compact?`<img class="mh-success-art" src="${new URL('https://kasparelr.github.io/agentui-shared-images/objects/27/2719458acc3afe6901c276fab1b6489143424c43bcab2d29e21c3629c128b829.jpg',assets)}" width="160" height="160" alt="">`:
@@ -120,22 +118,15 @@
    timer=setInterval(updateCountdown,250);
   }
   function updateBalance(){
-   const available=dsu.available(),shortfall=Math.max(0,price-available);
-   dialog.querySelector('[data-publication-balance]').textContent=format(available);
-   const note=dialog.querySelector('[data-publication-shortfall]');
-   note.hidden=shortfall===0;
-   note.textContent=shortfall?`可用 DSU 不足，还差 ${format(shortfall)}。`:'';
-   dialog.querySelector('[data-publication-recovery]').hidden=shortfall===0;
-   payButton.hidden=shortfall>0;
+   const available=dsu.available();
+   const needsFunds=dsu.balanceOnly||available<price;
+   dialog.querySelector('[data-publication-balance]').textContent=format(available)+' 可用';
+   dialog.querySelector('[data-publication-recovery]').hidden=!needsFunds;
+   payButton.hidden=needsFunds;
   }
-  let rechargeRequested=false;
   if(dsu){
    updateBalance();
-   dialog.querySelector('[data-publication-recharge]').addEventListener('click',()=>{
-    rechargeRequested=true;
-    dialog.close();
-   });
-   dialog.querySelector('[data-publication-recovery] a').addEventListener('click',()=>dialog.close());
+   dialog.querySelector('[data-publication-recovery]').addEventListener('click',()=>dialog.close());
   }
   function show(step){
    for(const section of dialog.querySelectorAll('[data-payment-step]')){
@@ -145,7 +136,7 @@
   }
   form.addEventListener('submit',async event=>{
    event.preventDefault();
-   if(paid||processing||(qr&&(Date.now()>=expires||!validAmount())))return;
+   if(paid||processing||(dsu&&(dsu.balanceOnly||dsu.available()<price))||(qr&&(Date.now()>=expires||!validAmount())))return;
    amount=orderAmount();
    const provider=dsu?{label:'DSU 支付'}:methods[form.elements.provider.value];
    error.hidden=true;
@@ -180,7 +171,7 @@
    dialog.remove();
    activeDialog=null;
    if(paid)onDone?.();
-   if(rechargeRequested)dsu.recharge();
+
   },{once:true});
   document.body.append(dialog);
   dialog.showModal();
