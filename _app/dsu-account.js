@@ -9,7 +9,8 @@
     'month-auto':{name:'连续包月',price:99,quota:300,months:1,auto:true},
     year:{name:'年度会员',price:999,quota:3600,months:12},
     'year-auto':{name:'连续包年',price:999,quota:3600,months:12,auto:true},
-    pro:{name:'年度 Pro',price:3599,quota:5000,months:12}
+    pro:{name:'年度 Pro',price:3599,quota:5000,months:12},
+    'pro-auto':{name:'年度 Pro · 连续包年',price:3599,quota:5000,months:12,auto:true}
   };
   const planFor = subscription => plans[subscription?.code] || plans['month-auto'];
   const membershipURL=new URL('portal.html#/membership',root).href;
@@ -341,28 +342,35 @@
       ['购买期刊','选购单期或全年订阅'],
       ['阅读向导与可信问答','按实际使用量消耗 DSU']
     ];
-    const billing=`<nav class="dsu-billing-switch" aria-label="普通会员计费周期"><a href="${pricing}?period=month" ${annual?'':'aria-current="true"'}>月付</a><a href="${pricing}?period=year" ${annual?'aria-current="true"':''}>年付</a></nav>`;
+    const billing=`<nav class="dsu-billing-switch" aria-label="普通会员计费周期"><a href="${pricing}?period=month" ${annual?'':'aria-current="true"'}>月</a><a href="${pricing}?period=year" ${annual?'aria-current="true"':''}>年</a></nav>`;
+    const included=new URL('assets/membership/included.svg',root).href;
     const card=(key,title,description)=>{
       const item=plans[key];
       const pro=key==='pro';
       const cycle=item.months===1?'月':'年';
-      const action=(code,label)=>currentCode===code
-        ? '<a class="dsu-button dsu-current-plan" href="#/me?tab=dsu">当前套餐 · 管理</a>'
-        : `<a class="dsu-button ${code===key?'dsu-primary':''}" href="${pricing}?plan=${code}">${label}</a>`;
+      const auto=currentCode!==key;
+      const selected=auto?key+'-auto':key;
+      const managing=currentCode===selected;
       return `<article class="dsu-price-card ${pro?'dsu-price-pro':''}">
-        <div class="dsu-plan-head"><h2>${title}</h2>${pro?'<span class="dsu-plan-cycle">仅年付</span>':billing}</div>
-        <p class="dsu-plan-description">${description}</p>
-        <div class="dsu-plan-actions">${action(key,pro?'选择年度 Pro':'开通'+item.name)}${pro?'':action(key+'-auto','选择连续包'+cycle)}</div>
-        <div class="dsu-price-amount"><strong>${item.price.toLocaleString('zh-CN')}</strong><span> DSU / ${cycle}</span></div>
-        <p class="dsu-price-quota">每${cycle}获得 <strong>${item.quota.toLocaleString('zh-CN')} DSU</strong></p>
-        <ul class="dsu-plan-features">${uses.map(([name,detail])=>`<li><span aria-hidden="true">✓</span><div><strong>${name}</strong><small>${detail}</small></div></li>`).join('')}</ul>
+        <div class="dsu-plan-head"><div><h2>${title}</h2><p class="dsu-plan-description">${description}</p></div>${pro?'':billing}</div>
+        <div class="dsu-plan-purchase">
+          <div class="dsu-plan-price-row">
+            <div><div class="dsu-price-amount"><strong>${item.price}</strong><span>DSU/${cycle}</span></div>
+            <p class="dsu-price-quota">每${cycle}获得 <strong>${item.quota} DSU</strong></p></div>
+            <button type="button" class="dsu-switch dsu-plan-renewal" role="switch" aria-label="${title}连续包${cycle}" aria-checked="${auto}" data-dsu-plan-switch="${key}" data-current-plan="${currentCode}">
+              连续包${cycle}<span class="dsu-switch-track" aria-hidden="true"></span>
+            </button>
+          </div>
+          <a class="dsu-button dsu-primary dsu-plan-buy" href="${managing?'#/me?tab=dsu':pricing+'?plan='+selected}">${managing?'当前套餐 · 管理':'购买'}</a>
+        </div>
+        <ul class="dsu-plan-features">${uses.map(([name,detail])=>`<li><img src="${included}" alt="" width="20" height="20"><div><strong>${name}</strong><small>${detail}</small></div></li>`).join('')}</ul>
       </article>`;
     };
     return `<section class="dsu-pricing dsu-pricing-comparison">
       <header><h1>龙源期刊网会员</h1><p>用 DSU 阅读文章、选购期刊和使用 AI 问答。</p></header>
       ${current?`<p class="dsu-pricing-current">当前方案 · ${planFor(current).name} · 有效至 ${date(current.expires)} <a href="#/me?tab=dsu">管理额度</a></p>`:''}
-      <div class="dsu-membership-grid">${card(base,'普通会员','适合日常阅读和提问。')}${card('pro','年度 Pro','更高的年度额度，适合频繁阅读和问答。')}</div>
-      <footer class="dsu-pricing-foot">${buyQuota}</footer>
+      <div class="dsu-membership-grid">${card(base,'普通会员','适合日常阅读和提问')}${card('pro','Pro会员','更高的年度额度，适合频繁阅读和问答')}</div>
+      <footer class="dsu-pricing-foot"><div><strong>单独购买额度</strong><p>单笔 ${minimum} DSU 起充</p></div>${buyQuota}</footer>
     </section>`;
   }
   const purchaseTypes=new Set(['article','issue','subscription','purchase']);
@@ -474,6 +482,17 @@
   }
 
   document.addEventListener('click', async event => {
+    const planSwitch=event.target.closest('[data-dsu-plan-switch]');
+    if(planSwitch){
+      const auto=planSwitch.getAttribute('aria-checked')!=='true';
+      const selected=planSwitch.dataset.dsuPlanSwitch+(auto?'-auto':'');
+      const managing=selected===planSwitch.dataset.currentPlan;
+      const purchase=planSwitch.closest('.dsu-price-card').querySelector('.dsu-plan-buy');
+      planSwitch.setAttribute('aria-checked',String(auto));
+      purchase.href=managing?'#/me?tab=dsu':'#/membership?plan='+selected;
+      purchase.textContent=managing?'当前套餐 · 管理':'购买';
+      return;
+    }
     const checkout=event.target.closest('[data-dsu-checkout],[data-dsu-renew]');
     if(checkout){
       if(!signedIn())return;
