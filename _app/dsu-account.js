@@ -26,6 +26,31 @@
   const profile = () => window.clubSession?.profile;
   const identity = p => p?.dsuId || (p && (p.email?.trim().toLowerCase() || p.nickname.trim().toLowerCase()));
   const key = id => 'qikan-dsu:' + id;
+  function resetPurchasesOnReload(){
+    if(window.clubSession?.personalPreview)return;
+    let navigation=performance;
+    try{navigation=window.top.performance;}catch{}
+    if(navigation.getEntriesByType('navigation')[0]?.type!=='reload')return;
+    const resetKey='qikan-purchase-reset';
+    const stamp=String(navigation.timeOrigin);
+    const owner=identity(profile());
+    if(!owner)return;
+    try{
+      if(sessionStorage.getItem(resetKey)===stamp)return;
+      const ledger=JSON.parse(localStorage.getItem(key(owner))||'null');
+      if(ledger){
+        const {walletEnabled,walletLimit}=ledger;
+        localStorage.setItem(key(owner),JSON.stringify({balance:0,subscription:null,records:[],walletEnabled,walletLimit}));
+      }
+      const contentKey='club-demo:reading-content:'+owner;
+      const content=JSON.parse(localStorage.getItem(contentKey)||'null');
+      if(Array.isArray(content)){
+        localStorage.setItem(contentKey,JSON.stringify(content.filter(row=>row.kind!=='issue'&&row.kind!=='subscription')));
+      }
+      sessionStorage.setItem(resetKey,stamp);
+    }catch{}
+  }
+  resetPurchasesOnReload();
   const month = time => new Intl.DateTimeFormat('sv-SE', {year:'numeric', month:'2-digit', timeZone:'Asia/Shanghai'}).format(time);
   function nextMonth(time, day) {
     const end = new Date(time);
