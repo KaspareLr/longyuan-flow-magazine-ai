@@ -140,35 +140,36 @@ body.issue-preview-page .portal-toc .reader-toc-article[aria-current]::before{co
 
 
 .issue-purchase-entry {
-  position: fixed; left: 50%; bottom: max(20px, env(safe-area-inset-bottom));
-  transform: translateX(-50%); z-index: 1100;
-  display: flex; align-items: center; gap: 40px;
-  max-width: calc(100% - 24px); padding: 10px;
-  border: 1px solid #ffffffc9; border-radius: 100px; background: #ffffff6e;
-  backdrop-filter: blur(100px);
-  box-shadow: 0 7px 30px #252a3508, inset 0 1px #fff9;
+  position:fixed;left:50%;bottom:max(20px,env(safe-area-inset-bottom));
+  transform:translateX(-50%);z-index:1100;
+  box-sizing:border-box;display:flex;align-items:center;gap:20px;
+  max-width:calc(100% - 24px);padding:10px;
+  border:1px solid #ffffffc9;border-radius:20px;background:#ffffff6e;
+  backdrop-filter:blur(100px);
+  box-shadow:0 7px 30px #252a3508,inset 0 1px #fff9;
+  font-family:Figtree,"PingFang SC",sans-serif;
 }
+.issue-purchase-summary {
+  display:flex;align-items:center;gap:20px;min-width:0;border-inline-end:.5px solid #c0c4cc;
+}
+.issue-purchase-identity { display:grid;width:180px;min-width:0; }
+.issue-purchase-identity strong,.issue-purchase-price { color:#131921;font-size:16px;line-height:28px;font-weight:700; }
+.issue-purchase-identity strong { white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.issue-purchase-identity span { color:#909399;font-size:12px;line-height:16px;white-space:nowrap; }
+.issue-purchase-price { box-sizing:content-box;width:120px;padding-inline:20px;text-align:end;white-space:nowrap; }
 .issue-purchase-entry .button {
-  display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;
-  padding: 14px 32px; border: 1px solid #e4e7ed; border-radius: 100px;
-  background: white; color: #131921;
-  font: 700 14px/20px Figtree,"PingFang SC",sans-serif; cursor: pointer;
+  display:inline-flex;align-items:center;justify-content:center;flex:none;min-height:48px;white-space:nowrap;
+  padding:14px 32px;border:0;border-radius:100px;background:#131921;color:white;
+  box-shadow:0 2px 3px #0000001a;
+  font:500 14px/20px Figtree,"PingFang SC",sans-serif;cursor:pointer;
 }
-.issue-purchase-entry .dark {
-  padding: 12px 24px 12px 18px; border: 0; background: #131921; color: white;
+.issue-purchase-entry [data-issue-purchase]:disabled { cursor:default;background:#eef0f4;color:#606266;box-shadow:none; }
+body.issue-preview-page > .club-site-footer { padding-bottom:calc(96px + env(safe-area-inset-bottom)); }
+@media(max-width:580px){
+  .issue-purchase-entry { gap:10px;bottom:max(12px,env(safe-area-inset-bottom)); }
+  .issue-purchase-summary { gap:8px; }
+  .issue-purchase-identity { width:auto; }
+  .issue-purchase-price { width:auto;padding-inline:4px 10px;font-size:14px; }
+  .issue-purchase-entry .button { padding-inline:16px; }
 }
-.issue-purchase-entry .dark img { flex: none; }
-body.issue-preview-page > .club-site-footer { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
-@media(max-width:760px) {
-  .issue-purchase-entry { gap: 8px; bottom: max(12px, env(safe-area-inset-bottom)); }
-  .issue-purchase-entry .button { padding-inline: 12px; }
-  .issue-purchase-entry .dark { padding-inline: 10px 14px; }
-}
-@media(min-width:761px) {
-  .issue-purchase-entry [data-issue-purchase] { width: 190px; justify-content: center; }
-  .issue-purchase-entry .dark { width: 126px; justify-content: center; }
-}
-body:not(.issue-preview-page) > .issue-purchase-entry { display: none; }
-
-
-.issue-purchase-entry [data-issue-purchase]:disabled { cursor: default; color: #606266; }
+body:not(.issue-preview-page) > .issue-purchase-entry { display:none; }

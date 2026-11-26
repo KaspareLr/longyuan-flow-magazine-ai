@@ -1,6 +1,7 @@
 /* Existing historical directory/details become an issue preview stream. */
 (()=>{
  const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const issueEdition='2026年09期',issuePrice=48;
  function fullArticle(a){const id=a.url?.match(/dycy\d+/)?.[0];return (window.clubEditorialArticleData||[]).find(x=>x.id===id||x.title===a.title);}
  function issueExcerpt(content){
   const total=content.reduce((length,block)=>length+(block.type==='paragraph'?block.text.length:0),0);
@@ -89,7 +90,7 @@
   if(purchase){
    const owned=window.clubSession?.contentRows('issue').some(row=>row.id==='dycy202609');
    purchase.disabled=Boolean(owned);
-   purchase.textContent=owned?'本期已购买':'购买本期：48.00 DSU';
+   purchase.textContent=owned?'已购买':'购买';
   }
   window.syncReaderGuide?.();
  }
@@ -103,9 +104,12 @@
   const list=a.list;const mk=i=>'#issue-preview-'+i;
   const rows=list.map((item,index)=>({...item,index,summary:item.excerpt||item.summary,resource:a.resource,group:item.group||'本期文章'}));
   const tocData={...a,list:list.map(item=>({...item,excerpt:'',summary:''}))};
-  return `<div class="portal-reader issue-preview-reader"><button type="button" class="issue-directory-toggle" aria-expanded="false" aria-controls="issue-preview-directory">本期目录 <span aria-hidden="true">☰</span></button><div class="issue-toc-slot" id="issue-preview-directory">${toc(tocData,mk).replace(/<img[^>]*>/g,'').replace(/aria-label="返回期刊详情"/,'aria-label="返回刊物首页"')}</div><section class="portal-reader-content issue-preview-stream" aria-label="本期文章预览"><nav class="issue-purchase-entry" aria-label="本期购买和会员">
-   <button type="button" class="button" data-issue-purchase aria-haspopup="dialog">购买本期：48.00 DSU</button>
-   <a class="button dark" href="portal.html#/membership"><img src="assets/magazine-home/member-dock.svg" alt="" width="24" height="24">成为会员</a>
+  return `<div class="portal-reader issue-preview-reader"><button type="button" class="issue-directory-toggle" aria-expanded="false" aria-controls="issue-preview-directory">本期目录 <span aria-hidden="true">☰</span></button><div class="issue-toc-slot" id="issue-preview-directory">${toc(tocData,mk).replace(/<img[^>]*>/g,'').replace(/aria-label="返回期刊详情"/,'aria-label="返回刊物首页"')}</div><section class="portal-reader-content issue-preview-stream" aria-label="本期文章预览"><nav class="issue-purchase-entry" aria-label="购买本期">
+   <div class="issue-purchase-summary">
+    <div class="issue-purchase-identity"><strong>${esc(a.resource)}</strong><span>${issueEdition}</span></div>
+    <strong class="issue-purchase-price">${issuePrice.toFixed(2)} DSU</strong>
+   </div>
+   <button type="button" class="button" data-issue-purchase aria-haspopup="dialog">购买</button>
   </nav>
   ${rows.map(item=>{const full=fullArticle(item);return `<article class="issue-preview-article" id="issue-preview-${item.index}" data-preview-index="${item.index}"><header class="portal-article-head"><span class="club-overline">${String(item.index+1).padStart(2,'0')} · ${esc(item.group)}</span><h1>${esc(item.title)}</h1><div class="portal-article-meta">${full?.authors?.length?`<span>${esc(full.authors.join(' / '))}</span>`:''}<span>${esc(a.resource)} · 2026年09期</span></div></header><div class="issue-preview-excerpt portal-prose">${previewBody(item)}</div><footer class="issue-preview-bottom"><a class="button" href="portal.html#/article/${item.index}?context=magazine&resource=${encodeURIComponent(a.rid)}&full=1">继续阅读全文</a></footer></article>`;}).join('')}</section></div>`;
  },
@@ -120,7 +124,7 @@
   const purchase=document.querySelector('[data-issue-purchase]');
   window.qikanDSU.mountPublicationPurchase(purchase,{
    kind:'issue',id:'dycy202609',
-   title:'购买《第一财经》本期',product:'单期电子版',price:48,
+   title:'购买《第一财经》本期',product:'单期电子版',price:issuePrice,
    issue:'2026 年第 09 期',success:'购买成功',
    onPaid(){
     window.clubSession?.recordContent('issue','dycy202609',{title:'第一财经',edition:'2026年09期',route:'portal.html#/article/0?context=magazine&resource='+encodeURIComponent('第一财经')});
