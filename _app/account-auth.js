@@ -6,12 +6,13 @@
  const storageKey = 'qikan-auth-accounts:v1';
  const copy = {
   login: {title:'登录期刊网', description:'继续你的阅读。', submit:'登录'},
-  register: {title:'注册期刊网账号', description:'开始使用你的阅读空间。', submit:'立即注册'},
+  register: {title:'注册', description:'开始使用你的阅读空间', submit:'立即注册'},
   reset: {title:'重设密码', description:'设置新的登录密码。', submit:'保存新密码'}
  };
- const passwordField = (name, label, autocomplete) => `<label>${label}
-   <span class="qikan-auth-password"><input name="${name}" type="password" autocomplete="${autocomplete}" maxlength="128">
-   <button type="button" data-auth-password aria-label="显示${label}" aria-pressed="false">显示</button></span></label>`;
+ const authAsset = name => new URL('assets/auth/'+name,base);
+ const passwordField = (name, label, autocomplete, registering) => `<label><span class="qikan-auth-field-label">${label}</span>
+   <span class="qikan-auth-password"><input name="${name}" type="password" autocomplete="${autocomplete}" maxlength="128" placeholder="${registering?'密码':''}">
+   <button type="button" data-auth-password aria-label="显示${label}" aria-pressed="false">${registering?`<img src="${authAsset('password-visibility.svg')}" alt="">`:'显示'}</button></span></label>`;
  const dialog = document.createElement('dialog');
  dialog.className = 'club-account-dialog qikan-auth-dialog';
  dialog.setAttribute('aria-labelledby','qikan-auth-title');
@@ -35,6 +36,9 @@
   }catch{}
  }
  function render(){
+  const registering=mode==='register';
+  dialog.classList.toggle('qikan-auth-register',registering);
+  close.innerHTML=registering?`<img src="${authAsset('close.svg')}" alt="">`:'×';
   if(mode==='wechat'){
    content.innerHTML=`<div class="qikan-auth-scan">
     <p><i class="iconfont icon-Wechat" aria-hidden="true"></i> 使用微信扫一扫登录</p>
@@ -47,29 +51,29 @@
    return;
   }
   const text=copy[mode];
-  const registering=mode==='register',resetting=mode==='reset';
+  const resetting=mode==='reset';
   content.innerHTML=`${brand}<h2 id="qikan-auth-title">${text.title}</h2><p class="qikan-auth-description">${text.description}</p>
    ${resetting?'':`<div class="qikan-auth-tabs" role="group" aria-label="账号操作">
     <button type="button" data-auth-mode="login" aria-pressed="${mode==='login'}">登录</button>
     <button type="button" data-auth-mode="register" aria-pressed="${registering}">注册</button></div>`}
    <form class="qikan-auth-form" novalidate>
-    ${registering?`<label>手机号<input name="phone" type="tel" autocomplete="tel" placeholder="请输入手机号"></label>
+    ${registering?`<label><span class="qikan-auth-field-label">手机号</span><input name="phone" type="tel" autocomplete="tel" placeholder="请输入手机号"></label>
      <div class="qikan-auth-code-row">
-      <label>图形验证码<input name="captcha" autocomplete="off" placeholder="请输入图形验证码"></label>
-      <button type="button" class="qikan-auth-captcha" data-auth-captcha aria-label="刷新图形验证码，当前为 7103">7103</button>
+      <label><span class="qikan-auth-field-label">图形验证码</span><input name="captcha" autocomplete="off" placeholder="图形验证码"></label>
+      <button type="button" class="qikan-auth-captcha" data-auth-captcha aria-label="刷新图形验证码，当前为 0323">0323</button>
      </div>
      <div class="qikan-auth-code-row">
-      <label>验证码<input name="sms" inputmode="numeric" autocomplete="one-time-code" placeholder="请输入验证码"></label>
+      <label><span class="qikan-auth-field-label">验证码</span><input name="sms" inputmode="numeric" autocomplete="one-time-code" placeholder="请输入验证码"></label>
       <button type="button" class="qikan-auth-send" data-auth-sms>发送验证码</button>
      </div>
-     <label>用户名<input name="nickname" autocomplete="nickname" maxlength="20" placeholder="请输入用户名"></label>`:
+     <label><span class="qikan-auth-field-label">用户名</span><input name="nickname" autocomplete="nickname" maxlength="20" placeholder="请输入用户名"></label>`:
      `<label>${resetting?'邮箱':'手机号或邮箱'}<input name="email" type="${resetting?'email':'text'}" autocomplete="username" maxlength="254" placeholder="${resetting?'请输入邮箱':'请输入手机号或邮箱'}"></label>`}
     <div class="qikan-auth-password-group">
-     ${passwordField('password',resetting?'新密码':'密码',mode==='login'?'current-password':'new-password')}
+     ${passwordField('password',resetting?'新密码':'密码',mode==='login'?'current-password':'new-password',registering)}
      ${mode==='login'?'<button class="qikan-auth-text-action" type="button" data-auth-mode="reset">忘记密码？</button>':''}
     </div>
-    ${mode!=='login'?passwordField('confirm',registering?'重复密码':'确认密码','new-password'):''}
-    ${registering?`<p class="qikan-auth-terms">点击“注册”即表示您同意并愿意遵守 <a href="https://www.qikan.com.cn/userrelative/serviceterms.html" target="_blank" rel="noopener">龙源期刊网注册协议</a> 和 隐私政策。</p>`:''}
+    ${mode!=='login'?passwordField('confirm',registering?'重复密码':'确认密码','new-password',registering):''}
+    ${registering?`<p class="qikan-auth-terms">点击“注册”即表示您同意并愿意遵守 <a href="https://www.qikan.com.cn/userrelative/serviceterms.html" target="_blank" rel="noopener">龙源期刊网注册协议</a> 和 <span>隐私政策</span>。</p>`:''}
     <button class="qikan-auth-submit" type="submit">${text.submit}</button>
    </form>
    ${mode==='login'?`<div class="qikan-auth-other"><p>其他方式登录</p><div class="qikan-auth-providers">
@@ -81,7 +85,11 @@
   const accountInput=form.elements.phone||form.elements.email;
   accountInput.value=registering?phone:email;
   form.addEventListener('submit',submit);
-  accountInput.focus();
+  if(registering){
+   const title=content.querySelector('#qikan-auth-title');
+   title.tabIndex=-1;
+   title.focus({preventScroll:true});
+  }else accountInput.focus();
  }
  function submit(event){
   event.preventDefault();
@@ -105,9 +113,10 @@
   const button=event.target.closest('button');
   if(button?.hasAttribute('data-auth-password')){
    const input=button.previousElementSibling,show=input.type==='password';
-   input.type=show?'text':'password';button.textContent=show?'隐藏':'显示';
+   input.type=show?'text':'password';
+   if(mode!=='register')button.textContent=show?'隐藏':'显示';
    button.setAttribute('aria-pressed',String(show));
-   button.setAttribute('aria-label',(show?'隐藏':'显示')+input.closest('label').firstChild.textContent.trim());
+   button.setAttribute('aria-label',(show?'隐藏':'显示')+input.closest('label').querySelector('.qikan-auth-field-label').textContent);
   }
   if(button?.hasAttribute('data-auth-captcha')){
    const code=1000+(Number(button.textContent)-1000+1+Math.floor(Math.random()*8999))%9000;
