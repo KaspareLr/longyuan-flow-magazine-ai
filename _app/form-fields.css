@@ -12,44 +12,44 @@ body:has(.portal-reader.night) {
   --qikan-field-focus:#abc0df;
   --qikan-field-ink:#f7f9fc;
 }
-:where(input:is(:not([type]),[type=text],[type=email],[type=password],[type=search],[type=url],[type=tel],[type=number]),textarea):not([hidden]) {
+/* Search and conversation components keep their own surface and input styles. */
+:where(input:is(:not([type]),[type=text],[type=email],[type=password],[type=search],[type=url],[type=tel],[type=number]),textarea):not([hidden]):not(:where(
+  :is(#search-page-form,.cs-search-surface,.kx-composer,.pe-chat-form,.guide-unified-composer) *
+)) {
   box-sizing:border-box;
   color:var(--qikan-field-ink) !important;
   font:400 16px/28px Figtree,"PingFang SC",sans-serif !important;
+
+  &:not(:where(:is(.composer,.mp-search,.catalog-search,.academic-search-box) *)) {
+    border:1px solid var(--qikan-field-border) !important;
+    border-radius:var(--qikan-field-radius) !important;
+    background:var(--qikan-field-background) !important;
+    box-shadow:none !important;
+    padding:10px 12px !important;
+
+    &:is(input) { height:50px !important; }
+  }
+
+  &:where(:is(.composer,.mp-search,.catalog-search,.academic-search-box) *) {
+    border:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+  }
+
+  &::placeholder { color:#686d77 !important;opacity:1; }
+  body:has(.portal-reader.night) &::placeholder { color:#bac4cf !important; }
+  &:focus { outline:none !important;border-color:var(--qikan-field-focus) !important; }
+  &[aria-invalid=true] { border-color:#a02626 !important; }
 }
-:where(input:is(:not([type]),[type=text],[type=email],[type=password],[type=search],[type=url],[type=tel],[type=number]),textarea):not([hidden]):not(:where(
-  .composer textarea,.pe-chat-form textarea,.guide-unified-composer textarea,.kx-composer textarea,
-  .cs-search-surface input,.mp-search input,.catalog-search input,.academic-search-box input
-)),
-:where(.composer,.pe-chat-form,.guide-unified-composer,.kx-composer,.cs-search-surface,.mp-search,.catalog-search,.academic-search-box) {
+
+:where(.composer:not(#search-page-form),.mp-search,.catalog-search,.academic-search-box) {
   border:1px solid var(--qikan-field-border) !important;
   border-radius:var(--qikan-field-radius) !important;
   background:var(--qikan-field-background) !important;
   box-shadow:none !important;
-}
-:where(input:is(:not([type]),[type=text],[type=email],[type=password],[type=search],[type=url],[type=tel],[type=number]),textarea):not([hidden]):not(:where(
-  .composer textarea,.pe-chat-form textarea,.guide-unified-composer textarea,.kx-composer textarea,
-  .cs-search-surface input,.mp-search input,.catalog-search input,.academic-search-box input
-)) {
-  padding:10px 12px !important;
-}
-:where(input:is(:not([type]),[type=text],[type=email],[type=password],[type=search],[type=url],[type=tel],[type=number])):not([hidden]):not(:where(
-  .cs-search-surface input,.mp-search input,.catalog-search input,.academic-search-box input
-)) { height:50px !important; }
-:where(input,textarea)::placeholder { color:#686d77 !important;opacity:1; }
-body:has(.portal-reader.night) :where(input,textarea)::placeholder { color:#bac4cf !important; }
 
-/* Composite fields use a single border around the input and its tools. */
-:where(.composer textarea,.pe-chat-form textarea,.guide-unified-composer textarea,.kx-composer textarea,
-  .cs-search-surface input,.mp-search input,.catalog-search input,.academic-search-box input) {
-  border:0 !important;background:transparent !important;box-shadow:none !important;
+  &:has(:is(input,textarea):focus) { border-color:var(--qikan-field-focus) !important; }
 }
-:where(input:is(:not([type]),[type=text],[type=email],[type=password],[type=search],[type=url],[type=tel],[type=number]),textarea):not([hidden]):focus {
-  outline:none !important;border-color:var(--qikan-field-focus) !important;
-}
-:where(.composer,.pe-chat-form,.guide-unified-composer,.kx-composer,.cs-search-surface,.mp-search,.catalog-search,.academic-search-box):has(:is(input,textarea):focus) {
-  border-color:var(--qikan-field-focus) !important;
-}
-:where(input,textarea)[aria-invalid=true]:not([hidden]) { border-color:#a02626 !important; }
+
 .qikan-auth-password input,.dsu-number-field input { padding-inline-end:68px !important; }
 .qikan-auth-password button { inset-block-start:3px; }
