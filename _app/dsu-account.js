@@ -6,11 +6,11 @@
   // Demo prices and quotas can be changed together without changing payment flows.
   const plans = {
     month:{name:'月度会员',price:99,quota:300,months:1},
-    'month-auto':{name:'连续包月',price:99,quota:300,months:1,auto:true},
+    'month-auto':{name:'连续包月',price:89,quota:300,months:1,auto:true},
     year:{name:'年度会员',price:999,quota:3600,months:12},
-    'year-auto':{name:'连续包年',price:999,quota:3600,months:12,auto:true},
+    'year-auto':{name:'连续包年',price:899,quota:3600,months:12,auto:true},
     pro:{name:'年度 Pro',price:3599,quota:5000,months:12},
-    'pro-auto':{name:'年度 Pro · 连续包年',price:3599,quota:5000,months:12,auto:true}
+    'pro-auto':{name:'年度 Pro · 连续包年',price:3299,quota:5000,months:12,auto:true}
   };
   const planFor = subscription => plans[subscription?.code] || plans['month-auto'];
   const membershipURL=new URL('portal.html#/membership',root).href;
@@ -350,12 +350,13 @@
       const cycle=item.months===1?'月':'年';
       const auto=currentCode!==key;
       const selected=auto?key+'-auto':key;
+      const selectedPlan=plans[selected];
       const managing=currentCode===selected;
       return `<article class="dsu-price-card ${pro?'dsu-price-pro':''}">
         <div class="dsu-plan-head"><div><h2>${title}</h2><p class="dsu-plan-description">${description}</p></div>${pro?'':billing}</div>
         <div class="dsu-plan-purchase">
           <div class="dsu-plan-price-row">
-            <div><div class="dsu-price-amount"><strong>${item.price}</strong><span>DSU/${cycle}</span></div>
+            <div><div class="dsu-price-amount"><strong data-dsu-plan-price>${selectedPlan.price}</strong><span>DSU/${cycle}</span></div>
             <p class="dsu-price-quota">每${cycle}获得 <strong>${item.quota} DSU</strong></p></div>
             <button type="button" class="dsu-switch dsu-plan-renewal" role="switch" aria-label="${title}连续包${cycle}" aria-checked="${auto}" data-dsu-plan-switch="${key}" data-current-plan="${currentCode}">
               连续包${cycle}<span class="dsu-switch-track" aria-hidden="true"></span>
@@ -487,7 +488,9 @@
       const auto=planSwitch.getAttribute('aria-checked')!=='true';
       const selected=planSwitch.dataset.dsuPlanSwitch+(auto?'-auto':'');
       const managing=selected===planSwitch.dataset.currentPlan;
-      const purchase=planSwitch.closest('.dsu-price-card').querySelector('.dsu-plan-buy');
+      const card=planSwitch.closest('.dsu-price-card');
+      const purchase=card.querySelector('.dsu-plan-buy');
+      card.querySelector('[data-dsu-plan-price]').textContent=plans[selected].price;
       planSwitch.setAttribute('aria-checked',String(auto));
       purchase.href=managing?'#/me?tab=dsu':'#/membership?plan='+selected;
       purchase.textContent=managing?'当前套餐 · 管理':'购买';
