@@ -74,7 +74,7 @@
     '<div class="mh-payment-success" aria-hidden="true">✓</div>'}
     <h3 tabindex="-1">${escape(success)}</h3>
     <p data-payment-receipt>${compact?'<span data-paid-provider></span><strong data-paid-amount></strong>':''}</p>
-    ${compact?'':'<div class="dsu-dialog-actions mh-payment-actions"><button type="button" class="qikan-checkout-button is-primary" data-payment-action="done">完成</button></div>'}
+    ${membership?'<button type="button" class="qikan-checkout-button is-primary mh-membership-return" data-payment-action="done">返回</button>':compact?'':'<div class="dsu-dialog-actions mh-payment-actions"><button type="button" class="qikan-checkout-button is-primary" data-payment-action="done">完成</button></div>'}
    </section>`;
   const form=dialog.querySelector('[data-payment-step=choose]');
   const total=dialog.querySelector('[data-order-total]');
@@ -147,7 +147,10 @@
     await onPaid?.(amount);
     paid=true;
     if(compact){
-     dialog.append(dialog.querySelector('.mh-order-summary'));
+     const summary=dialog.querySelector('.mh-order-summary');
+     const returnButton=dialog.querySelector('.mh-membership-return');
+     if(returnButton)returnButton.before(summary);
+     else dialog.append(summary);
      dialog.classList.add('has-payment-success');
      dialog.querySelector('[data-paid-provider]').textContent=provider.label;
      dialog.querySelector('[data-paid-amount]').textContent=formatPayment(amount);
