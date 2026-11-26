@@ -93,3 +93,6 @@ dialog :is(button,a):focus-visible {
   border-radius:12px;
   background:var(--qikan-close-fill,transparent) url("assets/auth/close.svg") center no-repeat;
 }
+
+/* Keep action links legible when a page supplies its own link color. */
+dialog .dsu-button.dsu-primary { color:#fff; }
