@@ -43,9 +43,7 @@
         <label><input type="radio" name="rechargeTier" value="custom"><span>其他</span></label>
       </div>
     </fieldset>
-    <label class="mh-payment-amount" hidden>充值额度
-      <span><input type="number" name="amount" required disabled min="${minimum}" max="1000000" step="1" value="${minimum}" inputmode="numeric"> DSU</span>
-    </label>`:''}
+    <label class="mh-payment-amount" hidden><span><input type="text" name="amount" aria-label="充值额度" disabled value="${minimum}" inputmode="numeric" autocomplete="off"> DSU</span></label>`:''}
     ${dsu?`<div class="mh-dsu-payment">
       <div><span>账户余额</span><strong data-publication-balance></strong></div>
       <button class="dsu-button dsu-primary" type="submit">确认支付</button>
@@ -81,12 +79,16 @@
   const error=dialog.querySelector('[data-payment-error]');
   const payButton=form.querySelector('[type=submit],.mh-payment-actions button');
   const amountField=form.elements.amount;
-  const orderAmount=()=>minimum?(amountField.disabled?Number(form.elements.rechargeTier.value):amountField.valueAsNumber):price;
-  const validAmount=()=>!amountField||amountField.disabled||amountField.validity.valid;
+  const orderAmount=()=>minimum?Number(amountField.disabled?form.elements.rechargeTier.value:amountField.value.trim()):price;
+  const validAmount=()=>{
+   if(!amountField||amountField.disabled)return true;
+   const amount=orderAmount();
+   return /^\d+$/.test(amountField.value.trim())&&amount>=minimum&&amount<=1000000;
+  };
   function updateCountdown(){
    const seconds=Math.max(0,Math.ceil((expires-Date.now())/1000));
    const valid=validAmount();
-   dialog.querySelector('[data-qr-status]').textContent=!valid?`请输入至少 ${minimum} DSU 的整数金额，`:seconds?`${seconds} 秒后二维码失效，`:'二维码已失效，';
+   dialog.querySelector('[data-qr-status]').textContent=!valid?`请输入 ${minimum} 至 1,000,000 DSU 的整数额度，`:seconds?`${seconds} 秒后二维码失效，`:'二维码已失效，';
    payButton.classList.toggle('is-expired',!seconds||!valid);
    payButton.disabled=processing||!seconds||!valid;
   }
