@@ -39,9 +39,6 @@ dialog.qikan-auth-dialog {
   min-height:48px;width:100%;padding:12px 16px;border:0;border-radius:100px;
   background:#131921;color:#fff;font:700 14px/20px Figtree,sans-serif;cursor:pointer;
 }
-.qikan-auth-dialog .qikan-auth-submit:disabled { opacity:.65;cursor:wait; }
-.qikan-auth-dialog .qikan-auth-error { margin:0;color:#a02626;font-size:13px;line-height:20px; }
-.qikan-auth-error:empty { display:none; }
 .qikan-auth-brand { display:block;width:98px;height:32px;object-fit:contain;margin:0 0 20px; }
 .qikan-auth-password-group { display:grid;gap:4px; }
 .qikan-auth-text-action {
@@ -50,4 +47,3 @@ dialog.qikan-auth-dialog {
 }
 .qikan-auth-return { margin-top:8px; }
 .qikan-auth-dialog :focus-visible { outline:2px solid #435b78;outline-offset:3px; }
-.qikan-auth-dialog .qikan-auth-recovery { padding:14px;border-radius:12px;background:#f5f7fa;color:#131921;overflow-wrap:anywhere; }
