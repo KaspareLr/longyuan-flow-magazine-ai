@@ -8,11 +8,12 @@
  const assets=new URL('assets/figma-identity/',document.currentScript.src);
  const format=amount=>amount.toLocaleString('zh-CN',{maximumFractionDigits:2})+' DSU';
  let activeDialog;
- function open({title,product,price,issue,success='支付成功',minimum,membership,onPaid,onDone}){
+ function open({title,product,price,issue,success='支付成功',minimum,membership,dsu,onPaid,onDone}){
   if(activeDialog?.open)return;
   const dialog=document.createElement('dialog');
   activeDialog=dialog;
-  const compact=Boolean(membership||minimum);
+  const qr=Boolean(membership||minimum);
+  const compact=qr||Boolean(dsu);
   dialog.className=compact?'qikan-checkout qikan-membership-checkout':'qikan-checkout';
   dialog.setAttribute('aria-labelledby','qikan-checkout-title');
   let amount=price??minimum;
@@ -41,7 +42,14 @@
     <label class="mh-payment-amount" hidden>充值金额
       <span><input type="number" name="amount" required disabled min="${minimum}" max="1000000" step="1" value="${minimum}" inputmode="numeric"> DSU</span>
     </label>`:''}
-    ${compact?`<fieldset class="mh-payment-tabs" aria-label="选择支付方式">
+    ${dsu?`<div class="mh-dsu-payment">
+      <div><strong>DSU 支付</strong><span>可用 <b data-publication-balance></b></span></div>
+      <p class="mh-dsu-shortfall" data-publication-shortfall hidden></p>
+      <div class="mh-dsu-recovery" data-publication-recovery hidden>
+       <button type="button" class="dsu-button dsu-primary" data-publication-recharge>充值 DSU</button>
+       <a class="dsu-button" href="${escape(dsu.membershipURL)}">开通会员</a>
+      </div>
+    </div>`:qr?`<fieldset class="mh-payment-tabs" aria-label="选择支付方式">
       ${Object.entries(methods).map(([key,method])=>`<label>
         <input type="radio" name="provider" value="${key}" aria-label="${method.label}" ${key==='alipay'?'checked':''}>
         <span>${method.app}</span>
@@ -58,7 +66,7 @@
      </label>`).join('')}
     </fieldset>`}
     <p role="alert" data-payment-error hidden></p>
-    ${compact?'':'<div class="dsu-dialog-actions mh-payment-actions"><button class="qikan-checkout-button is-primary">确定</button></div>'}
+    ${qr?'':`<div class="dsu-dialog-actions mh-payment-actions"><button class="qikan-checkout-button is-primary" type="submit">${dsu?'确认购买':'确定'}</button></div>`}
    </form>
    <section data-payment-step="success" hidden>
     ${compact?`<img class="mh-success-art" src="${new URL('https://kasparelr.github.io/agentui-shared-images/objects/27/2719458acc3afe6901c276fab1b6489143424c43bcab2d29e21c3629c128b829.jpg',assets)}" width="160" height="160" alt="">`:
@@ -81,7 +89,7 @@
    payButton.classList.toggle('is-expired',!seconds||!valid);
    payButton.disabled=processing||!seconds||!valid;
   }
-  if(compact){
+  if(qr){
    const refresh=()=>{
     expires=Date.now()+25000;
     payButton.innerHTML=paymentCode(methods[form.elements.provider.value]);
@@ -106,6 +114,24 @@
    refresh();
    timer=setInterval(updateCountdown,250);
   }
+  function updateBalance(){
+   const available=dsu.available(),shortfall=Math.max(0,price-available);
+   dialog.querySelector('[data-publication-balance]').textContent=format(available);
+   const note=dialog.querySelector('[data-publication-shortfall]');
+   note.hidden=shortfall===0;
+   note.textContent=shortfall?`可用 DSU 不足，还差 ${format(shortfall)}。`:'';
+   dialog.querySelector('[data-publication-recovery]').hidden=shortfall===0;
+   payButton.hidden=shortfall>0;
+  }
+  let rechargeRequested=false;
+  if(dsu){
+   updateBalance();
+   dialog.querySelector('[data-publication-recharge]').addEventListener('click',()=>{
+    rechargeRequested=true;
+    dialog.close();
+   });
+   dialog.querySelector('[data-publication-recovery] a').addEventListener('click',()=>dialog.close());
+  }
   function show(step){
    for(const section of dialog.querySelectorAll('[data-payment-step]')){
     section.hidden=section.dataset.paymentStep!==step;
@@ -114,9 +140,9 @@
   }
   form.addEventListener('submit',async event=>{
    event.preventDefault();
-   if(paid||processing||(compact&&(Date.now()>=expires||!validAmount())))return;
+   if(paid||processing||(qr&&(Date.now()>=expires||!validAmount())))return;
    amount=orderAmount();
-   const provider=methods[form.elements.provider.value];
+   const provider=dsu?{label:'DSU 支付'}:methods[form.elements.provider.value];
    error.hidden=true;
    const controls=[...dialog.querySelectorAll('button')];
    processing=true;
@@ -139,7 +165,8 @@
     controls.forEach(control=>{control.disabled=false;});
    }
    if(paid){clearInterval(timer);show('success');}
-   else if(compact)updateCountdown();
+   else if(qr)updateCountdown();
+   else if(dsu)updateBalance();
   });
   dialog.querySelector('[data-payment-action=done]')?.addEventListener('click',()=>dialog.close());
   dialog.addEventListener('cancel',event=>{if(processing)event.preventDefault();});
@@ -148,6 +175,7 @@
    dialog.remove();
    activeDialog=null;
    if(paid)onDone?.();
+   if(rechargeRequested)dsu.recharge();
   },{once:true});
   document.body.append(dialog);
   dialog.showModal();

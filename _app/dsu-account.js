@@ -90,7 +90,7 @@
     window.dispatchEvent(new Event('dsu-change'));
   }
 
-  function applyCharge(state, type, description, amount, article) {
+  function applyCharge(state, type, description, amount, article, publication) {
     if (article && unlocked(state, article)) return;
     const quota = Math.min(remaining(state), amount);
     const wallet = amount - quota;
@@ -99,7 +99,7 @@
     if (wallet > walletAvailable(state)) throw Error('已达到充值余额的每月消费上限，可在 DSU 账户调整。');
     if (quota) state.subscription.used += quota;
     state.balance -= wallet;
-    state.records.unshift({type, description, amount, quota, wallet, article, time:Date.now()});
+    state.records.unshift({type, description, amount, quota, wallet, article, publication, time:Date.now()});
   }
 
   function charge(type, description, amount, article) {
@@ -568,19 +568,56 @@
         })});
       return;
     }
+    openRecharge();
+  });
+
+  function openRecharge(onDone){
     const owner=identity(profile());
     window.magazineCheckout.open({
-      title:'充值 DSU',product:'DSU 余额',minimum,success:'充值成功',
+      title:'充值 DSU',product:'DSU 余额',minimum,success:'充值成功',onDone,
       onPaid:amount=>change(state=>{
         if(identity(profile())!==owner)throw Error('账号已切换，请重新提交订单。');
         state.balance+=amount;
       })
     });
-  });
+  }
+
+  function mountPublicationPurchase(trigger,{kind,id,...options}){
+    const owned=()=>profile()&&window.clubSession.contentRows(kind).some(row=>row.id===id);
+    const originalLabel=trigger.textContent;
+    function reflectOwnership(){
+      trigger.disabled=Boolean(owned());
+      trigger.textContent=trigger.disabled?(kind==='subscription'?'已订购':'已购买'):originalLabel;
+    }
+    reflectOwnership();
+    function open(){
+      const owner=identity(profile());
+      if(!owner||!trigger.isConnected)return;
+      const publication=kind+':'+id;
+      const hasPurchase=state=>state.records.some(record=>record.publication===publication);
+      if(owned()){reflectOwnership();return;}
+      window.magazineCheckout.open({
+        ...options,
+        dsu:{available:()=>summary().available,membershipURL,recharge:()=>openRecharge(open)},
+        onPaid:async amount=>{
+          await change(state=>{
+            if(identity(profile())!==owner)throw Error('账号已切换，请重新提交订单。');
+            if(!hasPurchase(state))applyCharge(state,kind,options.title,amount,undefined,publication);
+          });
+          options.onPaid?.();
+          reflectOwnership();
+        }
+      });
+    }
+    trigger.addEventListener('click',()=>{
+      if(signedIn())open();
+      else document.querySelector('.qikan-auth-dialog:modal')?.addEventListener('close',open,{once:true});
+    });
+  }
 
   window.qikanDSU = {
     page(a) { return window.qikanArticleRoutes?.[articleId(a)]; },
-    panel, membership, summary,
+    panel, membership, summary, mountPublicationPurchase,
     readingUnlocks(){const owner=identity(profile());return owner?load(owner).records.filter(row=>row.type==='article'&&row.article):[];}, spendAI, signedIn, accountURL, membershipURL, articleId, articlePrice, aiPrice,
     canRead(a) {
       const owner=identity(profile()),article=articleId(a);

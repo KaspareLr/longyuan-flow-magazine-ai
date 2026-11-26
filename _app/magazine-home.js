@@ -92,7 +92,8 @@
   clubSession.recordContent('follow',name,next?{title:name,route:homeRoute,edition,cover:reference.cover}:null);
   syncFollow();toast(next?'已关注《'+name+'》':'已取消关注');
  });
- if(!listing)window.magazineCheckout.mount(document.querySelector('#mh-subscribe'),{
+ if(!listing)window.qikanDSU.mountPublicationPurchase(document.querySelector('#mh-subscribe'),{
+   kind:'subscription',id:name,
   title:'订阅《'+name+'》全年', product:'全年电子版', price,
   issue:south?'订阅后一年内更新的电子版':'2026 年第 11 期至 2027 年第 10 期',success:'订阅成功',
   onPaid(){clubSession.recordContent('subscription',name,{title:name,route:homeRoute,cover:reference.cover,term:south?'一年内更新的电子版':'2026 年第 11 期至 2027 年第 10 期'});}

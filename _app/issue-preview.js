@@ -129,7 +129,8 @@
   if(!preview)return;
   document.body.append(document.querySelector('.issue-purchase-entry'));
   const purchase=document.querySelector('[data-issue-purchase]');
-  window.magazineCheckout.mount(purchase,{
+  window.qikanDSU.mountPublicationPurchase(purchase,{
+   kind:'issue',id:'dycy202609',
    title:'购买《第一财经》本期',product:'单期电子版',price:48,
    issue:'2026 年第 09 期',success:'购买成功',
    onPaid(){

@@ -118,3 +118,11 @@
 .mh-recharge-presets input:checked + span { border-color:#131921;background:#fff; }
 .mh-recharge-presets input:focus-visible + span { outline:2px solid #606266;outline-offset:2px; }
 .mh-payment-amount[hidden] { display:none; }
+
+.mh-dsu-payment { padding:12px;border-radius:12px;background:#f5f7fa;font-size:14px;line-height:20px; }
+.mh-dsu-payment > div:first-child { display:flex;justify-content:space-between;gap:8px; }
+.mh-dsu-payment span { color:#606266; }
+.mh-dsu-shortfall { margin:10px 0;color:#606266; }
+.mh-dsu-recovery { display:flex;flex-wrap:wrap;gap:8px; }
+.mh-dsu-recovery[hidden],.mh-payment-actions button[hidden] { display:none; }
+.qikan-membership-checkout .mh-payment-actions:has(button[hidden]) { display:none; }
