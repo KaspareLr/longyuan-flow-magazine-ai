@@ -59,3 +59,37 @@
 @media(max-width:760px) {
   .qikan-checkout { margin:auto auto 12px;padding-bottom:max(20px,env(safe-area-inset-bottom)); }
 }
+
+.qikan-checkout.qikan-membership-checkout { width:min(390px,calc(100% - 32px));margin:auto; }
+.qikan-membership-checkout .mh-order-summary > div { padding-block:6px;border-top:0; }
+.qikan-membership-checkout .mh-order-summary :is(dt,dd) {
+  color:#909399;font-size:12px;line-height:16px;font-weight:400;
+}
+.qikan-membership-checkout .mh-order-summary > div:last-child :is(dt,dd) {
+  color:#131921;font-size:16px;line-height:28px;font-weight:700;
+}
+.mh-payment-tabs {
+  display:flex;min-width:0;margin:0;padding:4px;border:0;border-radius:100px;background:#f5f7fa;
+}
+.mh-payment-tabs label { position:relative;flex:1;min-width:0; }
+.mh-payment-tabs input { position:absolute;inline-size:1px;block-size:1px;opacity:0; }
+.mh-payment-tabs span {
+  display:block;padding:6px 16px;border-radius:100px;text-align:center;
+  color:#131921;font-size:14px;line-height:20px;font-weight:700;cursor:pointer;
+}
+.mh-payment-tabs input:checked + span { background:#131921;color:white; }
+.mh-payment-tabs input:focus-visible + span { outline:2px solid #606266;outline-offset:2px; }
+.mh-membership-code {
+  box-sizing:content-box;width:144px;height:144px;margin:10px auto 0;padding:8px;border-radius:12px;
+  background:white;box-shadow:0 2px 3px #0000001a;
+}
+.mh-membership-code svg { display:block;width:144px;height:144px; }
+.mh-membership-code.is-expired svg { opacity:.2; }
+.qikan-checkout .mh-qr-status {
+  display:flex;justify-content:center;align-items:center;margin:10px 0 0;color:#909399;font-size:12px;line-height:16px;
+}
+.mh-qr-status button { padding:0;border:0;background:none;color:#131921;font:inherit;cursor:pointer; }
+.qikan-membership-checkout [data-payment-step=choose] .mh-payment-actions { margin-top:10px; }
+.qikan-membership-checkout [data-payment-step=choose] .qikan-checkout-button {
+  min-height:28px;padding:4px 14px;background:#f5f7fa;color:#131921;font-size:12px;
+}

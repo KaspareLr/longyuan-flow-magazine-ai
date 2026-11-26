@@ -8,37 +8,49 @@
  const assets=new URL('assets/figma-identity/',document.currentScript.src);
  const format=amount=>amount.toLocaleString('zh-CN',{maximumFractionDigits:2})+' DSU';
  let activeDialog;
- function open({title,product,price,issue,success='支付成功',minimum,onPaid,onDone}){
+ function open({title,product,price,issue,success='支付成功',minimum,membership,onPaid,onDone}){
   if(activeDialog?.open)return;
   const dialog=document.createElement('dialog');
   activeDialog=dialog;
-  dialog.className='qikan-checkout';
+  dialog.className=membership?'qikan-checkout qikan-membership-checkout':'qikan-checkout';
   dialog.setAttribute('aria-labelledby','qikan-checkout-title');
   let amount=price??minimum;
-  let paid=false, processing=false;
+  let paid=false, processing=false, expires=0, timer;
+  const paymentCode=method=>`<svg viewBox="0 0 37 37" role="img" aria-label="${method.label}二维码" shape-rendering="crispEdges" style="color:${method.color}"><path fill="currentColor" d="${method.path}"/></svg>`;
   dialog.innerHTML=`
-   <div class="mh-dialog-head"><h2 id="qikan-checkout-title">${escape(title)}</h2>
-    <form method="dialog"><button aria-label="关闭支付"><img src="${new URL('checkout-close.svg',assets)}" alt=""></button></form>
+   <div class="mh-dialog-head"><h2 id="qikan-checkout-title">${escape(membership?product:title)}</h2>
+    <form method="dialog"><button aria-label="关闭支付"><img src="${new URL(membership?'../auth/close.svg':'checkout-close.svg',assets)}" alt=""></button></form>
    </div>
    <dl class="mh-order-summary">
-    <div><dt>订单</dt><dd>${escape(product)}</dd></div>
-    ${issue?`<div><dt>有效范围</dt><dd>${escape(issue)}</dd></div>`:''}
+    ${membership?`<div><dt>会员额度</dt><dd>${format(membership.quota)}</dd></div>
+    <div><dt>有效期</dt><dd>${escape(issue)}</dd></div>
+    <div><dt>续费方式</dt><dd>${escape(membership.renewal)}</dd></div>`:
+    `<div><dt>订单</dt><dd>${escape(product)}</dd></div>
+    ${issue?`<div><dt>有效范围</dt><dd>${escape(issue)}</dd></div>`:''}`}
     <div><dt>应付金额</dt><dd><strong data-order-total>${format(amount)}</strong></dd></div>
    </dl>
    <form data-payment-step="choose">
     ${minimum?`<label class="mh-payment-amount">充值金额
       <span><input type="number" name="amount" required min="${minimum}" max="1000000" step="1" value="${minimum}" inputmode="numeric"> DSU</span>
      </label>`:''}
-    <fieldset class="mh-payment-methods" aria-label="选择支付方式">
+    ${membership?`<fieldset class="mh-payment-tabs" aria-label="选择支付方式">
+      ${Object.entries(methods).map(([key,method])=>`<label>
+        <input type="radio" name="provider" value="${key}" aria-label="${method.label}" ${key==='alipay'?'checked':''}>
+        <span>${method.app}</span>
+      </label>`).join('')}
+    </fieldset>
+    <div class="mh-membership-code" data-membership-code></div>
+    <p class="mh-qr-status"><span data-qr-status></span><button type="button" data-qr-refresh>刷新</button></p>`:
+    `<fieldset class="mh-payment-methods" aria-label="选择支付方式">
      ${Object.entries(methods).map(([key,method])=>`<label>
       <span class="mh-payment-radio"><input type="radio" name="provider" value="${key}" aria-label="${method.label}" ${key==='wechat'?'checked':''}>
        <img src="${new URL('checkout-selected.svg',assets)}" alt=""></span>
       <span class="mh-payment-provider"><strong>${method.label}</strong><small>请使用${method.app}扫一扫</small></span>
       <span class="mh-payment-code"><svg viewBox="0 0 37 37" role="img" aria-label="${method.label}二维码" shape-rendering="crispEdges" style="color:${method.color}"><path fill="currentColor" d="${method.path}"/></svg></span>
      </label>`).join('')}
-    </fieldset>
+    </fieldset>`}
     <p role="alert" data-payment-error hidden></p>
-    <div class="dsu-dialog-actions mh-payment-actions"><button class="qikan-checkout-button is-primary">确定</button></div>
+    <div class="dsu-dialog-actions mh-payment-actions"><button class="qikan-checkout-button is-primary">${membership?'确认支付':'确定'}</button></div>
    </form>
    <section data-payment-step="success" hidden>
     <div class="mh-payment-success" aria-hidden="true">✓</div>
@@ -48,6 +60,24 @@
   const form=dialog.querySelector('[data-payment-step=choose]');
   const total=dialog.querySelector('[data-order-total]');
   const error=dialog.querySelector('[data-payment-error]');
+  const payButton=form.querySelector('[type=submit],.mh-payment-actions button');
+  function updateCountdown(){
+   const seconds=Math.max(0,Math.ceil((expires-Date.now())/1000));
+   dialog.querySelector('[data-qr-status]').textContent=seconds?`${seconds} 秒后二维码失效，`:'二维码已失效，';
+   dialog.querySelector('[data-membership-code]').classList.toggle('is-expired',!seconds);
+   payButton.disabled=processing||!seconds;
+  }
+  if(membership){
+   const refresh=()=>{
+    expires=Date.now()+25000;
+    dialog.querySelector('[data-membership-code]').innerHTML=paymentCode(methods[form.elements.provider.value]);
+    updateCountdown();
+   };
+   form.elements.provider.forEach(input=>input.addEventListener('change',refresh));
+   dialog.querySelector('[data-qr-refresh]').addEventListener('click',refresh);
+   refresh();
+   timer=setInterval(updateCountdown,250);
+  }
   function show(step){
    for(const section of dialog.querySelectorAll('[data-payment-step]')){
     section.hidden=section.dataset.paymentStep!==step;
@@ -60,7 +90,7 @@
   });
   form.addEventListener('submit',async event=>{
    event.preventDefault();
-   if(paid||processing)return;
+   if(paid||processing||(membership&&Date.now()>=expires))return;
    amount=form.elements.amount?.valueAsNumber??price;
    const provider=methods[form.elements.provider.value];
    error.hidden=true;
@@ -78,11 +108,13 @@
     processing=false;
     controls.forEach(control=>{control.disabled=false;});
    }
-   if(paid)show('success');
+   if(paid){clearInterval(timer);show('success');}
+   else if(membership)updateCountdown();
   });
   dialog.querySelector('[data-payment-action=done]').addEventListener('click',()=>dialog.close());
   dialog.addEventListener('cancel',event=>{if(processing)event.preventDefault();});
   dialog.addEventListener('close',()=>{
+   clearInterval(timer);
    dialog.remove();
    activeDialog=null;
    if(paid)onDone?.();

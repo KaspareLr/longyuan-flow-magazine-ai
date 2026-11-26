@@ -507,7 +507,8 @@
       window.magazineCheckout.open({
         title:renewal?'会员续费':'支付会员订单',
         product:plan.name,
-        issue:plan.months===1?'一个月':'一年',
+        issue:plan.months===1?'1个月':'1年',
+        membership:{quota:plan.quota,renewal:plan.auto?'到期自动续费，可在 DSU 账户取消':'到期后按需续订'},
         price:plan.price,
         success:renewal?'续费成功':'会员开通成功',
         onPaid:()=>change(state=>{
