@@ -40,20 +40,10 @@
   const c=current();if(view){const list=view.querySelector('.ai-history-list');list.innerHTML=state.items.filter(x=>x.messages.length).map(x=>`<div class="ai-history-item ${x.id===state.active?'selected':''}"><button data-ai-select="${x.id}" title="${esc(x.title)}">${esc(x.title)}</button><button data-ai-delete="${x.id}" title="删除对话" aria-label="删除对话">${icon('Delete2')}</button></div>`).join('')||'<p class="ai-history-empty">暂无对话记录</p>';
    const thread=view.querySelector('.ai-thread');thread.innerHTML=c&&(c.messages.length||quote?.conversation===c.id)?messageHTML(c):welcomeHTML(true);
    const input=view.querySelector('textarea');if(document.activeElement!==input)input.value=c?.draft||'';
-   view.querySelector('.ai-composer').classList.toggle('is-kexin-composer',researchRoute()||Boolean(c?.researchURL));
+   view.querySelector('.ai-composer').classList.toggle('is-kexin-composer',researchRoute()||Boolean(c?.research||c?.researchURL));
    const ctx=view.querySelector('.ai-context');
-   ctx.hidden=!c?.context&&!c?.researchURL;
-   if(c?.researchURL){
-    ctx.textContent='在可信官网研究此问题';
-    ctx.href=c.researchURL;
-    ctx.target='_blank';
-    ctx.rel='noopener';
-   }else if(c?.context){
-    ctx.textContent='正在讨论 · '+c.context.title;
-    ctx.href=c.context.url;
-    ctx.removeAttribute('target');
-    ctx.removeAttribute('rel');
-   }
+   ctx.hidden=!c?.context;
+   if(c?.context){ctx.textContent='正在讨论 · '+c.context.title;ctx.href=c.context.url;}
    view.querySelector('[data-ai-restore]').hidden=!guideReturn();
    view.querySelectorAll('.ai-send').forEach(send=>{send.innerHTML=icon(busy?'Stop':'Arrow_Forward-2');send.setAttribute('aria-label',busy?'停止生成':'发送消息');});
   }
@@ -156,25 +146,18 @@
  new MutationObserver(mount).observe(document.body,{subtree:true,childList:true});mount();
  function open(q){const id=new URLSearchParams(location.hash.split('?')[1]||'').get('conversation');if(id&&state.items.some(x=>x.id===id))state.active=id;render();if(q&&current()?.messages.at(-2)?.text!==q)showQuote(q);}
  const mobile=matchMedia('(max-width:800px)');mobile.addEventListener('change',event=>{if(event.matches)view?.querySelector('.ai-workspace').classList.add('ai-sidebar-collapsed');});
- function startResearch(question,researchURL){
+ function startResearch(question){
   if(!view||quote?.charging)return;
   quote=null;
   editing=null;
   const c=fresh();
   c.draft=question;
-  c.researchURL=researchURL;
+  c.research=true;
   save();
   location.hash='#/search?from=kexin&conversation='+encodeURIComponent(c.id);
   render();
   if(question&&window.clubSession?.profile)showQuote(question);
  }
- view?.querySelector('.ai-context').addEventListener('click',event=>{
-  const c=current();
-  if(!c?.researchURL || !window.kexinComposer)return;
-  const composer=view.querySelector('.ai-composer');
-  const question=composer.querySelector('textarea').value.trim()||new URL(c.researchURL).searchParams.get('q')||'';
-  event.currentTarget.href=window.kexinComposer.researchURL(question,composer);
- });
  window.longyuanConversation={open,startResearch,refresh:render};window.addEventListener('hashchange',()=>{if(location.hash.startsWith('#/search'))open(new URLSearchParams(location.hash.split('?')[1]||'').get('q'));});
  window.addEventListener('storage',event=>{if(event.key===key){try{state=JSON.parse(event.newValue);render();}catch{}}});open(new URLSearchParams(location.hash.split('?')[1]||'').get('q'));const pending=current();if(pending?.pending&&pending.messages.at(-1)?.role==='assistant')pump(pending,pending.messages.at(-1),pending.pending);
 })();

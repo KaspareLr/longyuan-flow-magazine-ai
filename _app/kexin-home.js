@@ -33,12 +33,11 @@
     ]]
   ];
 
-  const service = 'https://kexin.wenkoo.com.cn/chat/new';
   const form = view.querySelector('form');
   const input = form.elements.q;
   const status = view.querySelector('[data-kexin-status]');
   const panel = view.querySelector('[data-kexin-panel]');
-  const arrow = '<span class="kx-arrow" aria-hidden="true">→</span>';
+  const arrow = '<i class="iconfont icon-Arrow_Forward-2 kx-arrow" aria-hidden="true"></i>';
   const chips = (values) => values.map(value => `<span>${value}</span>`).join('');
   const sceneButtons = [...view.querySelectorAll('[data-kexin-scene]')];
 
@@ -52,7 +51,7 @@
     const sources = [...new Set(questions.flatMap(question => question[2].split('、')))];
     panel.innerHTML = `
       <div class="kx-scene-intro">
-        <div><h3>${title}</h3><span class="kx-scene-rule" aria-hidden="true"></span><p>${subtitle}</p></div>
+        <div><h3>${title}</h3><p>${subtitle}</p></div>
         <div class="kx-scene-sources">
           <p class="kx-source-label">这个场景会核对的来源（${sources.length} 类）</p>
           <div class="kx-chips">${chips(sources)}</div>
@@ -62,7 +61,7 @@
         <article class="kx-question">
           <h4>${question}</h4><p>${desc}</p>
           <div class="kx-question-foot"><div class="kx-chips">${chips(sources.split('、'))}</div>
-            <button class="btn btn-outline" type="button" data-kexin-question="${i}" aria-label="用可信分析：${question}">用可信分析 ${arrow}</button>
+            <button class="kx-question-action" type="button" data-kexin-question="${i}" aria-label="用可信分析：${question}">${arrow}</button>
           </div>
         </article>`).join('')}</div>`;
     view.querySelectorAll('[data-kexin-question]').forEach((button, i) => {
@@ -78,7 +77,7 @@
     button.id = `kexin-scene-${index}`;
     button.setAttribute('role', 'tab');
     button.setAttribute('aria-controls', panel.id);
-    button.innerHTML = `<strong>${scenes[index][0]}</strong><span>查看问题 ${arrow}</span>`;
+    button.innerHTML = `<span class="kx-scene-card-copy"><strong>${scenes[index][0]}</strong><small>${scenes[index][2]}</small></span>`;
     button.addEventListener('click', () => renderScene(index));
     button.addEventListener('keydown', event => {
       const last = sceneButtons.length - 1;
@@ -136,23 +135,12 @@
     });
   }
 
-  function researchURL(question, composer) {
-    const query = new URLSearchParams({
-      q: question,
-      mode: composer.elements.mode.value,
-      view: 'dialogue',
-      knowledgeMode: composer.elements.knowledge.checked ? 'ALL' : 'NONE',
-      kb: '',
-      webSearch: composer.elements.webSearch.checked ? '1' : '0'
-    });
-    return `${service}?${query}`;
-  }
   function canSend(composer, question) {
     const allowed = !question || composer.elements.webSearch.checked || composer.elements.knowledge.checked;
     (composer === form ? status : chatStatus).textContent = allowed ? '' : '请开启联网搜索或参考知识库，也可以前往可信官网上传附件。';
     return allowed;
   }
-  window.kexinComposer = {canSend, researchURL};
+  window.kexinComposer = {canSend};
   function syncInput() { status.textContent = ''; }
   input.addEventListener('input', syncInput);
   input.addEventListener('keydown', event => {
@@ -163,7 +151,7 @@
   form.addEventListener('submit', event => {
     event.preventDefault();
     const question = input.value.trim();
-    if (canSend(form, question)) window.longyuanConversation.startResearch(question, researchURL(question,form));
+    if (canSend(form, question)) window.longyuanConversation.startResearch(question);
   });
   renderScene(0);
   syncInput();
