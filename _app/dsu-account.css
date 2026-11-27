@@ -271,7 +271,7 @@ body.issue-full-page:has(.dsu-gate) > .demo-reading-widget,.frontpage-shared-top
   cursor:pointer;
 }
 .dsu-faq-list summary::-webkit-details-marker { display:none; }
-.dsu-faq-list .dsu-faq-arrow { flex:none; color:#606266; font-size:16px; line-height:1; transform:rotate(90deg); }
+.dsu-faq-list .dsu-faq-arrow { display:grid; place-items:center; flex:0 0 24px; height:24px; color:#606266; font-size:32px; line-height:24px; transform:rotate(90deg); }
 .dsu-faq-list details[open] .dsu-faq-arrow { transform:rotate(-90deg); }
 .dsu-faq-list summary:focus-visible { outline:2px solid #2766bd; outline-offset:-4px; }
 .dsu-faq-list p { margin:0; padding:0 20px 16px; color:#606266; font-size:14px; line-height:24px; }
