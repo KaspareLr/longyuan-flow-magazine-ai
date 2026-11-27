@@ -12,12 +12,16 @@
  function fresh(context=null){stop();const c={id:(crypto.randomUUID?.() ?? Array.from(crypto.getRandomValues(new Uint32Array(4)), value=>value.toString(16).padStart(8,'0')).join('')),title:'新对话',messages:[],draft:'',context,updated:Date.now()};state.items.unshift(c);state.active=c.id;save();return c;}
  function context(){return {title:document.querySelector('#portal-main h1,.pe-identity h1,.oc-header h1,.books-home-copy h1')?.textContent.trim()||document.querySelector('.view.active h1')?.textContent.trim()||'当前阅读',url:location.href};}
  const tools=(m,i)=>m.role==='user'?`<button data-ai-edit="${i}" title="编辑提问" aria-label="编辑提问">${icon('EditPen')}</button>`:`<button data-ai-copy="${i}" title="复制回答" aria-label="复制回答">${icon('Copy')}</button><button data-ai-retry="${i}" title="重新生成" aria-label="重新生成">${icon('Refresh2')}</button>`;
- function messageHTML(c){
+ function messageHTML(c,inlineQuote=true){
   const history=c.messages.map((m,i)=>`<article class="ai-message ai-${m.role}"><div class="ai-message-body">${esc(m.text).replace(/\n/g,'<br>')}${busy&&i===c.messages.length-1?'<span class="ai-cursor"></span>':''}</div><div class="ai-message-actions">${tools(m,i)}</div></article>`).join('');
   if(quote?.conversation!==c.id)return history;
+  const question=quote.retry===null?`<article class="ai-message ai-user"><div class="ai-message-body">${esc(quote.question)}</div></article>`:'';
+  return history+question+(inlineQuote?quoteHTML():'');
+ }
+ function quoteHTML(){
   const {available}=qikanDSU.summary();
   const sufficient=available>=qikanDSU.aiPrice;
-  return history+`${quote.retry===null?`<article class="ai-message ai-user"><div class="ai-message-body">${esc(quote.question)}</div></article>`:''}
+  return `
    <div class="ai-cost-prompt">
     <div class="ai-cost-copy">
      <span class="ai-cost-title">本次问答将消耗 ${qikanDSU.aiPrice} DSU</span>
@@ -35,10 +39,11 @@
  const view=document.querySelector('#view-search');
  if(view&&!state.historyPreviewInitialized){const examples=[['如何保持深度阅读？','可以先从十分钟不被打断的阅读开始。选择一篇感兴趣的文章，带着一个问题读完，再用自己的话概括主要观点。'],['城市更新如何影响日常生活？','不妨从熟悉的街道观察：步行是否更方便，是否有可以停留的空间，原有的小店与邻里关系是否被保留下来。这些细节让城市更新与日常生活联系起来。']];for(const [q,a] of examples){if(state.items.filter(x=>x.messages.length).length>=2)break;if(state.items.some(x=>x.title===q))continue;state.items.push({id:(crypto.randomUUID?.() ?? Array.from(crypto.getRandomValues(new Uint32Array(4)), value=>value.toString(16).padStart(8,'0')).join('')),title:q,messages:[{role:'user',text:q},{role:'assistant',text:a}],draft:'',context:null,updated:Date.now()});}state.historyPreviewInitialized=true;state.active=null;save();}
 
- if(view)view.innerHTML=`<div class="ai-workspace"><aside class="ai-history"><header><strong>龙源 AI</strong><button data-ai-sidebar aria-label="收起历史记录" title="收起历史记录">${icon('Slider')}</button></header><button class="ai-new" data-ai-new>新对话</button><span class="ai-history-label">对话记录</span><div class="ai-history-list"></div><footer>让每个问题，通向更深的阅读。</footer></aside><main class="ai-main"><header class="ai-main-header"><button data-ai-sidebar aria-label="展开历史记录" title="展开历史记录">${icon('Slider')}</button><button data-ai-restore hidden title="恢复阅读向导" aria-label="恢复阅读向导">${icon('ZoomIN-2')}</button></header><div class="ai-scroll"><div class="ai-thread" role="log" aria-label="对话记录"></div></div><div class="ai-composer-area"><a class="ai-context" hidden></a><form class="ai-composer guide-unified-composer"><textarea rows="1" aria-label="发送消息" placeholder="说说你想读什么，或问一个问题…" maxlength="4000"></textarea><div class="ai-composer-tools"><label class="guide-unified-attach" tabindex="0" role="button" title="添加内容" aria-label="添加内容">${icon('Link')}<input type="file" hidden></label><button type="submit" class="ai-send" aria-label="发送消息">${icon('Arrow_Top')}</button></div></form><p class="ai-composer-hint">结合原文阅读，让理解更进一步。</p></div></main></div>`;
+ if(view)view.innerHTML=`<div class="ai-workspace"><aside class="ai-history"><header><strong>龙源 AI</strong><button data-ai-sidebar aria-label="收起历史记录" title="收起历史记录">${icon('Slider')}</button></header><button class="ai-new" data-ai-new>新对话</button><span class="ai-history-label">对话记录</span><div class="ai-history-list"></div><footer>让每个问题，通向更深的阅读。</footer></aside><main class="ai-main"><header class="ai-main-header"><button data-ai-sidebar aria-label="展开历史记录" title="展开历史记录">${icon('Slider')}</button><button data-ai-restore hidden title="恢复阅读向导" aria-label="恢复阅读向导">${icon('ZoomIN-2')}</button></header><div class="ai-scroll"><div class="ai-thread" role="log" aria-label="对话记录"></div></div><div class="ai-composer-area"><a class="ai-context" hidden></a><div class="ai-composer-quote" aria-live="polite"></div><form class="ai-composer guide-unified-composer"><textarea rows="1" aria-label="发送消息" placeholder="说说你想读什么，或问一个问题…" maxlength="4000"></textarea><div class="ai-composer-tools"><label class="guide-unified-attach" tabindex="0" role="button" title="添加内容" aria-label="添加内容">${icon('Link')}<input type="file" hidden></label><button type="submit" class="ai-send" aria-label="发送消息">${icon('Arrow_Top')}</button></div></form><p class="ai-composer-hint">结合原文阅读，让理解更进一步。</p></div></main></div>`;
  function render(){
   const c=current();if(view){const list=view.querySelector('.ai-history-list');list.innerHTML=state.items.filter(x=>x.messages.length).map(x=>`<div class="ai-history-item ${x.id===state.active?'selected':''}"><button data-ai-select="${x.id}" title="${esc(x.title)}">${esc(x.title)}</button><button data-ai-delete="${x.id}" title="删除对话" aria-label="删除对话">${icon('Delete2')}</button></div>`).join('')||'<p class="ai-history-empty">暂无对话记录</p>';
-   const thread=view.querySelector('.ai-thread');thread.innerHTML=c&&(c.messages.length||quote?.conversation===c.id)?messageHTML(c):welcomeHTML(true);
+   const thread=view.querySelector('.ai-thread');thread.innerHTML=c&&(c.messages.length||quote?.conversation===c.id)?messageHTML(c,false):welcomeHTML(true);
+   view.querySelector('.ai-composer-quote').innerHTML=c&&quote?.conversation===c.id?quoteHTML():'';
    const input=view.querySelector('textarea');if(document.activeElement!==input)input.value=c?.draft||'';
    view.querySelector('.ai-composer').classList.toggle('is-kexin-composer',researchRoute()||Boolean(c?.research||c?.researchURL));
    const ctx=view.querySelector('.ai-context');
@@ -77,7 +82,7 @@
   render();
   requestAnimationFrame(()=>document.querySelectorAll('.ai-cost-prompt').forEach(node=>{
    if(!node.getClientRects().length)return;
-   const scroller=node.closest('.pe-chat-messages,.ai-scroll');
+   const scroller=node.closest('.pe-chat-messages')||node.closest('.ai-workspace')?.querySelector('.ai-scroll');
    if(scroller)scroller.scrollTop=scroller.scrollHeight;
   }));
  }

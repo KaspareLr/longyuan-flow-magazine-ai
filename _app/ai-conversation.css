@@ -101,3 +101,6 @@ body:has(#view-search.active){overflow:hidden;background:#fff}body:has(#view-sea
     inset-inline-start:260px;
   }
 }
+
+.ai-composer-quote { width:min(100%,360px); margin-inline:auto; }
+.ai-composer-quote > .ai-cost-prompt { margin:0 0 10px; }
