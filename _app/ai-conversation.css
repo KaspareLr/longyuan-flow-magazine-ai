@@ -87,3 +87,11 @@ body:has(#view-search.active){overflow:hidden;background:#fff}body:has(#view-sea
   background:#fff;
   color:#909399;
 }
+.ai-cost-prompt .ai-cost-actions > :is(a,[data-ai-cost-confirm]):is(:hover,:focus-visible,:active) {
+  background:#131921;
+  color:#fff;
+}
+.ai-cost-prompt .ai-cost-actions > [data-ai-cost-cancel]:is(:hover,:focus-visible,:active) {
+  background:#fff;
+  color:#606266;
+}
