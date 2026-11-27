@@ -94,6 +94,34 @@
     send.disabled = !input.value.trim();
     status.textContent = '';
   }
+  const modeTrigger = form.querySelector('[data-kexin-mode-trigger]');
+  const modeOptions = form.querySelector('#kexin-mode-options');
+  function setModeMenu(open) {
+    modeOptions.hidden = !open;
+    modeTrigger.setAttribute('aria-expanded', String(open));
+    if (open) modeOptions.querySelector(':checked').focus();
+  }
+  modeTrigger.addEventListener('click', () => setModeMenu(modeOptions.hidden));
+  modeOptions.addEventListener('change', event => {
+    modeTrigger.textContent = event.target.labels[0].querySelector('strong').textContent;
+    setModeMenu(false);
+    modeTrigger.focus();
+  });
+  modeOptions.addEventListener('click', event => {
+    if (event.target.matches('input:checked')) {
+      setModeMenu(false);
+      modeTrigger.focus();
+    }
+  });
+  document.addEventListener('click', event => {
+    if (!modeOptions.hidden && !modeTrigger.parentElement.contains(event.target)) setModeMenu(false);
+  });
+  form.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && !modeOptions.hidden) {
+      setModeMenu(false);
+      modeTrigger.focus();
+    }
+  });
   input.addEventListener('input', syncInput);
   input.addEventListener('keydown', event => {
     if (event.key !== 'Enter' || event.shiftKey || event.isComposing) return;
@@ -104,17 +132,17 @@
     event.preventDefault();
     const question = input.value.trim();
     if (!question) return;
-    if (!form.elements.webSearch.checked) {
-      status.textContent = '请开启联网搜索，或前往可信官网选择知识库、上传附件。';
+    if (!form.elements.webSearch.checked && !form.elements.knowledge.checked) {
+      status.textContent = '请开启联网搜索或参考知识库，也可以前往可信官网上传附件。';
       return;
     }
     const query = new URLSearchParams({
       q: question,
       mode: form.elements.mode.value,
       view: form.elements.view.value,
-      knowledgeMode: 'NONE',
+      knowledgeMode: form.elements.knowledge.checked ? 'ALL' : 'NONE',
       kb: '',
-      webSearch: '1'
+      webSearch: form.elements.webSearch.checked ? '1' : '0'
     });
     location.href = `${service}?${query}`;
   });

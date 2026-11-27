@@ -5,22 +5,27 @@
   padding: clamp(48px, 7vw, 104px) 0 64px;
   color: #131921;
 }
-.kx-intro { text-align: center; }
-.kx-intro h1 { margin: 0; font: 700 clamp(42px, 6vw, 80px)/1.12 var(--serif); }
-.kx-intro p { margin: 18px 0 24px; color: #606266; font-size: 17px; }
-
+.kx-intro { display:grid; justify-items:center; gap:20px; text-align:center; }
+.kx-intro h1 { margin:0; font:700 clamp(32px, 10vw, 80px)/1.1 var(--serif); }
+.kx-intro p { margin:0; color:#131921; font:700 clamp(22px, 5vw, 32px)/1.25 var(--serif); }
+.kx-hero-art { position:relative; display:grid; place-items:center; width:120px; height:120px; }
+.kx-hero-art img { display:block; width:80px; height:80px; border-radius:50%; object-fit:cover; }
+.kx-hero-art .kx-hero-glow { position:absolute; z-index:-1; width:120px; height:120px; filter:blur(20px); }
+.kx-hero-art { isolation:isolate; }
 .kx-home .kx-composer {
-  width: 100%;
-  max-width: 720px;
-  height: auto;
-  margin-inline: auto;
+  position:relative;
+  z-index:2;
+  width:100%;
+  max-width:720px;
+  height:auto;
+  margin:40px auto 0;
 }
-.kx-home .kx-composer textarea { display: block; width: 100%; border: 0; }
-.kx-home .kx-composer textarea::placeholder { color: #606266; opacity: 1; }
+.kx-home .kx-composer textarea { display:block; width:100%; border:0; }
+.kx-home .kx-composer textarea::placeholder { color:#606266; opacity:1; }
 .kx-view-choice {
   display: flex;
   width: fit-content;
-  margin: 0 0 10px;
+  margin: 12px auto 0;
   padding: 4px;
   border: 0;
   border-radius: 999px;
@@ -39,21 +44,61 @@
 }
 .kx-composer-actions { justify-content: space-between; }
 .kx-composer-buttons { margin-inline-start: auto; }
-.kx-composer-tools :is(select, a, label) {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  min-height: 30px;
-  padding: 4px 9px;
-  border: 1px solid #e4e7ed;
-  border-radius: 10px;
-  background: #f3f5f8;
-  color: #131921;
-  font: inherit;
-  font-size: 12px;
-  text-decoration: none;
+.kx-composer-tools, .kx-composer-buttons { gap:10px; }
+.kx-composer-tools .kx-pill {
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  min-height:32px;
+  padding:6px 14px;
+  border:0;
+  border-radius:100px;
+  background:#0000000d;
+  color:#606266;
+  font:400 12px/16px Figtree,"PingFang SC",sans-serif;
+  white-space:nowrap;
+  cursor:pointer;
 }
-.kx-web-search input { accent-color: #131921; }
+.kx-composer-tools .kx-toggle { position:relative; padding-inline-start:6px; }
+.kx-toggle input,.kx-mode-options input { position:absolute; opacity:0; }
+.kx-toggle-track {
+  display:flex;
+  align-items:center;
+  width:34px;
+  height:20px;
+  padding:0 3px;
+  border-radius:999px;
+  background:#909399;
+}
+.kx-toggle-track::after { content:""; width:14px; height:14px; border-radius:50%; background:#fff; box-shadow:0 1px 3px #0f172a29; }
+.kx-toggle input:checked + .kx-toggle-track { justify-content:flex-end; background:#17191d; }
+.kx-toggle input:focus-visible + .kx-toggle-track { outline:2px solid #2766bd; outline-offset:2px; }
+.kx-mode-picker { position:relative; }
+.kx-mode-options {
+  position:absolute;
+  z-index:3;
+  top:calc(100% + 8px);
+  inset-inline-start:0;
+  display:grid;
+  gap:10px;
+  width:min(296px,calc(100vw - 56px));
+  min-width:0;
+  margin:0;
+  padding:12px;
+  border:1px solid #e4e7ed;
+  border-radius:20px;
+  background:#fff;
+  box-shadow:0 12px 44px #13192117;
+  font:400 12px/16px Figtree,"PingFang SC",sans-serif;
+}
+.kx-mode-options[hidden] { display:none; }
+.kx-mode-options label { position:relative; display:flex; align-items:center; gap:8px; cursor:pointer; }
+.kx-mode-options label::before { content:""; flex:0 0 16px; height:16px; border:1px solid #d9d9d9; border-radius:50%; box-sizing:border-box; }
+.kx-mode-options label:has(:checked)::before { border:0; background:url(assets/figma-identity/checkout-selected.svg) center no-repeat; }
+.kx-mode-options label:has(:focus-visible)::before { outline:2px solid #2766bd; outline-offset:2px; }
+.kx-mode-options label span { display:grid; gap:2px; }
+.kx-mode-options strong { color:#131921; }
+.kx-mode-options small { color:#909399; font:inherit; }
 .kx-home .kx-composer-buttons :is(button, a) {
   display: grid;
   place-items: center;
@@ -62,9 +107,9 @@
   margin: 0;
   border-radius: 12px;
 }
-.kx-attachment { background: #f3f5f8; }
+.kx-attachment { background:#ffffff1a; }
 .kx-home .kx-send { background: #020617; }
-.kx-send:disabled { opacity: .4; cursor: default; }
+.kx-send:disabled { cursor: default; }
 .kx-status { margin: 8px 0 0; text-align: center; color: #9b322b; }
 .kx-status:empty { display: none; }
 
