@@ -7,10 +7,9 @@
     const id = profile.dsuId || profile.email?.trim().toLowerCase() || profile.nickname.trim().toLowerCase();
     const key = 'qikan-avatar:' + id;
     const saved = read(key, null);
-    const avatar = [profile.avatar, saved].map(path => avatarPaths[path] || path).find(path => pool.includes(path)) ||
+    const avatar = [profile.avatar, saved].map(path => avatarPaths[path] || path).find(path => pool.includes(path) || /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(path)) ||
       pool[Math.floor(Math.random() * pool.length)];
     if (saved !== avatar) write(key, avatar);
     return profile.avatar === avatar ? profile : {...profile, avatar};
   };
-  window.qikanAccountAvatar.options = Object.freeze(pool);
 })();

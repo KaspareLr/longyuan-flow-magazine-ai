@@ -53,7 +53,7 @@
  let panel='';
  if(accountTab==='dsu')panel=qikanDSU.panel(['article','ai'].includes(params.get('filter'))?params.get('filter'):'all',params.get('view'));
  else if(accountTab==='payments')panel=qikanDSU.paymentHistory();
- else if(accountTab==='profile')panel=`<h2>基本信息</h2><form class="portal-profile-form" id="profile-form"><div class="qikan-profile-avatar"><span>头像</span>${avatar}<details><summary>更换头像</summary><div class="qikan-avatar-options" role="group" aria-label="选择头像">${qikanAccountAvatar.options.map((path,index)=>`<label><input type="radio" name="avatar" value="${path}" aria-label="头像 ${index+1}" ${path===p.avatar?'checked':''}><img src="${path}" alt=""></label>`).join('')}</div></details></div><label><span class="qikan-field-label">昵称 <small data-profile-count="nickname">${p.nickname.length} / 20</small></span><input name="nickname" value="${esc(p.nickname)}" maxlength="20" required></label><label class="full">邮箱<input type="email" name="email" autocomplete="email" value="${esc(p.email||'')}" placeholder="reader@example.com"></label><label class="full"><span class="qikan-field-label">个人简介 <small data-profile-count="bio">${(p.bio||'').length} / 160</small></span><textarea name="bio" maxlength="160">${esc(p.bio||'')}</textarea><small>一句话，介绍你的阅读世界。</small></label><label class="full">阅读兴趣<input name="interests" value="${esc((p.interests||[]).join('、'))}" placeholder="文学、生活、历史"></label><button class="button dark full">保存修改</button><p class="portal-form-status full" role="status"></p></form>`;
+ else if(accountTab==='profile')panel=`<h2>基本信息</h2><form class="portal-profile-form" id="profile-form"><div class="qikan-profile-avatar"><span>头像</span>${avatar}<label class="qikan-avatar-upload"><span>点击上传</span><input type="file" name="avatar" accept="image/*" aria-label="上传头像"></label></div><label><span class="qikan-field-label">昵称 <small data-profile-count="nickname">${p.nickname.length} / 20</small></span><input name="nickname" value="${esc(p.nickname)}" maxlength="20" required></label><label class="full">邮箱<input type="email" name="email" autocomplete="email" value="${esc(p.email||'')}" placeholder="reader@example.com"></label><label class="full"><span class="qikan-field-label">个人简介 <small data-profile-count="bio">${(p.bio||'').length} / 160</small></span><textarea name="bio" maxlength="160">${esc(p.bio||'')}</textarea><small>一句话，介绍你的阅读世界。</small></label><label class="full">阅读兴趣<input name="interests" value="${esc((p.interests||[]).join('、'))}" placeholder="文学、生活、历史"></label><button class="button dark full">保存修改</button><p class="portal-form-status full" role="status"></p></form>`;
  else if(accountTab==='password')panel=`<h2>修改密码</h2>
  <form class="portal-profile-form" id="change-password-form">
   <label class="full">原密码<input type="password" name="currentPassword" autocomplete="current-password" required></label>
@@ -311,13 +311,44 @@
  document.addEventListener('input',e=>{
   const field=e.target;
   if(field.form?.id!=='profile-form')return;
-  if(field.name==='avatar'){
-   field.form.querySelector('.qikan-profile-avatar > img').src=field.value;
-   return;
-  }
   if(field.maxLength<0)return;
   const counter=field.form.querySelector('[data-profile-count="'+field.name+'"]');
   if(counter)counter.textContent=field.value.length+' / '+field.maxLength;
+ });
+ document.addEventListener('change',async e=>{
+  const input=e.target;
+  if(!input.matches('#profile-form input[name=avatar]'))return;
+  const file=input.files[0];
+  if(!file)return;
+  const form=input.form;
+  const status=form.querySelector('[role=status]');
+  const save=form.querySelector('button[type=submit],button:not([type])');
+  const url=URL.createObjectURL(file);
+  input.disabled=true;
+  save.disabled=true;
+  try{
+   const image=new Image();
+   image.src=url;
+   await image.decode();
+   const canvas=document.createElement('canvas');
+   canvas.width=canvas.height=256;
+   const side=Math.min(image.naturalWidth,image.naturalHeight);
+   const ctx=canvas.getContext('2d');
+   ctx.fillStyle='#fff';
+   ctx.fillRect(0,0,256,256);
+   ctx.drawImage(image,(image.naturalWidth-side)/2,(image.naturalHeight-side)/2,side,side,0,0,256,256);
+   const preview=canvas.toDataURL('image/jpeg',0.9);
+   form.dataset.avatar=preview;
+   form.querySelector('.qikan-profile-avatar > img').src=preview;
+   status.textContent='头像已预览，保存修改后生效。';
+  }catch{
+   status.textContent='无法读取这张图片，请选择其他图片。';
+  }finally{
+   URL.revokeObjectURL(url);
+   input.value='';
+   input.disabled=false;
+   save.disabled=false;
+  }
  });
  document.addEventListener('submit',e=>{
  if(e.target.id==='change-password-form'){
@@ -328,7 +359,7 @@
   form.reset();
   status.textContent='密码修改已保存。';
  }
- if(e.target.id==='profile-form'){e.preventDefault();const f=e.target;session.update({...session.profile,dsuId:session.profile.dsuId||session.profile.email?.trim().toLowerCase()||session.profile.nickname.trim().toLowerCase(),nickname:f.nickname.value.trim(),avatar:f.elements.avatar.value||session.profile.avatar,email:f.email.value,bio:f.bio.value.trim(),interests:f.interests.value.split(/[、,，]/).map(x=>x.trim()).filter(Boolean)});document.querySelector('.portal-form-status').textContent='已保存，你的资料已更新。'}
+ if(e.target.id==='profile-form'){e.preventDefault();const f=e.target;session.update({...session.profile,dsuId:session.profile.dsuId||session.profile.email?.trim().toLowerCase()||session.profile.nickname.trim().toLowerCase(),nickname:f.nickname.value.trim(),avatar:f.dataset.avatar||session.profile.avatar,email:f.email.value,bio:f.bio.value.trim(),interests:f.interests.value.split(/[、,，]/).map(x=>x.trim()).filter(Boolean)});document.querySelector('.portal-form-status').textContent='已保存，你的资料已更新。'}
  if(e.target.id==='redeem-form'){e.preventDefault();if(!session.profile){session.login();return}if(e.target.code.value.trim().toUpperCase()!=='READ2026'){toast('兑换码不正确，请检查后重试');return}session.member({label:'年度兑换',price:0});accountTab='membership';location.hash='#/me?tab=membership';toast('年度会员体验已兑换')}
  });
  window.addEventListener('dsu-change',()=>{if(route==='me')render()});
