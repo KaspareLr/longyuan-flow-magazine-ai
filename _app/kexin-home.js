@@ -144,7 +144,7 @@
       kb: '',
       webSearch: form.elements.webSearch.checked ? '1' : '0'
     });
-    location.href = `${service}?${query}`;
+    window.longyuanConversation.startResearch(question, `${service}?${query}`);
   });
   renderScene(0);
   syncInput();
