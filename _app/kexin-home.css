@@ -10,10 +10,6 @@ body:has(#view-kexin.active) { background: #fff; }
 .kx-intro { display:grid; justify-items:center; gap:20px; text-align:center; }
 .kx-intro h1 { margin:0; font:700 clamp(32px, 10vw, 80px)/1.1 var(--serif); }
 .kx-intro p { margin:0; color:#131921; font:700 clamp(22px, 5vw, 32px)/1.25 var(--serif); }
-.kx-hero-art { position:relative; display:grid; place-items:center; width:120px; height:120px; }
-.kx-hero-art img { display:block; width:80px; height:80px; border-radius:50%; object-fit:cover; }
-.kx-hero-art .kx-hero-glow { position:absolute; z-index:-1; width:120px; height:120px; filter:blur(20px); }
-.kx-hero-art { isolation:isolate; }
 .kx-home .kx-composer {
   position:relative;
   z-index:2;
@@ -102,7 +98,10 @@ body:has(#view-kexin.active) { background: #fff; }
 .kx-status:empty { display: none; }
 
 .kx-research { display:grid; gap:40px; margin-top:clamp(56px,7vw,100px); }
-.kx-research h2 { margin:0; text-align:center; font:700 32px/40px var(--serif); }
+.kx-research h2 { display:flex; align-items:center; justify-content:center; gap:8px; margin:0; text-align:center; font:700 32px/40px var(--serif); }
+.kx-laurel { display:block; flex:none; mask:url(https://kasparelr.github.io/agentui-shared-images/objects/1a/1a22569264c804430176ff4e4a76180d0993e553c09694c6dd129a60bac1e73c.svg) center no-repeat; }
+.kx-laurel-right { transform:scaleX(-1); }
+
 .kx-scenes { display:flex; gap:20px; overflow-x:auto; padding-bottom:6px; align-items:stretch; }
 .kx-scenes button {
   display:flex;
@@ -133,14 +132,17 @@ body:has(#view-kexin.active) { background: #fff; }
   display:flex;
   flex-direction:column;
   gap:10px;
-  padding:19px;
+  padding:30px 20px;
   border:1px solid #e4e7ed;
   border-radius:12px;
   background:#fff;
 }
+.kx-question-copy { display:grid; gap:10px; }
+.kx-question-copy::before { content:""; width:32px; height:2px; background:#131921; }
+.kx-question-copy .kx-chips { padding-block:20px; }
 .kx-question h4 { margin:0; font:700 20px/32px var(--serif); }
 .kx-question p { margin:0; color:#606266; font-size:14px; line-height:20px; }
-.kx-question-foot { justify-content:flex-start; margin-top:auto; }
+.kx-question-foot { justify-content:flex-end; margin-top:auto; }
 .kx-question-foot .kx-question-action {
   display:grid;
   place-items:center;
@@ -153,7 +155,7 @@ body:has(#view-kexin.active) { background: #fff; }
   background:#fff;
   color:#131921;
 }
-.kx-question:is(:hover,:focus-within) { box-shadow:0 2px 6px #0000001a; }
+.kx-question:is(:hover,:focus-within) { box-shadow:0 2px 3px #0000001a; }
 .kx-question-action .kx-arrow { font-size:24px; line-height:1; }
 @media (min-width:768px) {
   .kx-questions { grid-template-columns:repeat(2,minmax(0,1fr)); }
@@ -169,6 +171,7 @@ body:has(#view-kexin.active) { background: #fff; }
 @media (max-width:767px) {
   #view-kexin.kx-home { width:calc(100% - 32px); padding-top:68px; }
   .kx-research, .kx-panel { gap:24px; }
+  .kx-research h2 { font-size:clamp(22px,8vw,32px); }
   .kx-scene-intro { padding-top:24px; }
   .kx-scene-intro h3 { font-size:32px; line-height:40px; }
   .kx-question-foot { margin-top:12px; }

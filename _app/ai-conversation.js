@@ -12,8 +12,19 @@
  function fresh(context=null){stop();const c={id:(crypto.randomUUID?.() ?? Array.from(crypto.getRandomValues(new Uint32Array(4)), value=>value.toString(16).padStart(8,'0')).join('')),title:'新对话',messages:[],draft:'',context,updated:Date.now()};state.items.unshift(c);state.active=c.id;save();return c;}
  function context(){return {title:document.querySelector('#portal-main h1,.pe-identity h1,.oc-header h1,.books-home-copy h1')?.textContent.trim()||document.querySelector('.view.active h1')?.textContent.trim()||'当前阅读',url:location.href};}
  const tools=(m,i)=>m.role==='user'?`<button data-ai-edit="${i}" title="编辑提问" aria-label="编辑提问">${icon('EditPen')}</button>`:`<button data-ai-copy="${i}" title="复制回答" aria-label="复制回答">${icon('Copy')}</button><button data-ai-retry="${i}" title="重新生成" aria-label="重新生成">${icon('Refresh2')}</button>`;
+ function researchSources(){
+  const articles=window.nanfcIssueReference?.groups.flatMap(group=>group.articles).slice(0,2)||[];
+  if(!articles.length)return '';
+  return `<section class="ai-research-sources" aria-label="来源示例">
+   <h2>来源示例</h2>
+   <ol>${articles.map((article,index)=>{
+    const href='portal.html#/article/'+index+'?'+new URLSearchParams({context:'magazine',resource:'南风窗'});
+    return `<li><a href="${esc(href)}"><span class="ai-source-index">${index+1}</span><span><strong>${esc(article.title)}</strong><small>南风窗 · 2026年09期</small></span>${icon('Arrow_Forward-3')}</a></li>`;
+   }).join('')}</ol>
+  </section>`;
+ }
  function messageHTML(c,inlineQuote=true){
-  const history=c.messages.map((m,i)=>`<article class="ai-message ai-${m.role}"><div class="ai-message-body">${esc(m.text).replace(/\n/g,'<br>')}${busy&&i===c.messages.length-1?'<span class="ai-cursor"></span>':''}</div><div class="ai-message-actions">${tools(m,i)}</div></article>`).join('');
+  const history=c.messages.map((m,i)=>`<article class="ai-message ai-${m.role}"><div class="ai-message-body">${esc(m.text).replace(/\n/g,'<br>')}${busy&&i===c.messages.length-1?'<span class="ai-cursor"></span>':''}</div>${!inlineQuote&&(c.research||c.researchURL||researchRoute())&&m.role==='assistant'&&m.status==='complete'?researchSources():''}<div class="ai-message-actions">${tools(m,i)}</div></article>`).join('');
   if(quote?.conversation!==c.id)return history;
   const question=quote.retry===null?`<article class="ai-message ai-user"><div class="ai-message-body">${esc(quote.question)}</div></article>`:'';
   return history+question+(inlineQuote?quoteHTML():'');

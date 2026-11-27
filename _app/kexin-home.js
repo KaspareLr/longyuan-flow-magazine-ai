@@ -59,8 +59,10 @@
       </div>
       <div class="kx-questions">${questions.map(([question, desc, sources], i) => `
         <article class="kx-question">
-          <h4>${question}</h4><p>${desc}</p>
-          <div class="kx-chips">${chips(sources.split('、'))}</div>
+          <div class="kx-question-copy">
+            <h4>${question}</h4><p>${desc}</p>
+            <div class="kx-chips">${chips(sources.split('、'))}</div>
+          </div>
           <div class="kx-question-foot">
             <button class="kx-question-action" type="button" data-kexin-question="${i}" aria-label="用可信分析：${question}">${arrow}</button>
           </div>
