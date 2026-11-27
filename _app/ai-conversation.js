@@ -6,6 +6,7 @@
  let timer=null,busy=false,editing=null, quote=null;
  const current=()=>state.items.find(x=>x.id===state.active);
  const guideReturnKey='longyuan-ai-guide-return';
+ const researchRoute=()=>location.hash.startsWith('#/search')&&new URLSearchParams(location.hash.split('?')[1]||'').get('from')==='kexin';
  function guideReturn(){return location.hash.startsWith('#/search')&&new URLSearchParams(location.hash.split('?')[1]||'').get('from')==='guide'?sessionStorage.getItem(guideReturnKey):null;}
  function save(){localStorage.setItem(key,JSON.stringify(state));}
  function fresh(context=null){stop();const c={id:(crypto.randomUUID?.() ?? Array.from(crypto.getRandomValues(new Uint32Array(4)), value=>value.toString(16).padStart(8,'0')).join('')),title:'新对话',messages:[],draft:'',context,updated:Date.now()};state.items.unshift(c);state.active=c.id;save();return c;}
@@ -39,6 +40,7 @@
   const c=current();if(view){const list=view.querySelector('.ai-history-list');list.innerHTML=state.items.filter(x=>x.messages.length).map(x=>`<div class="ai-history-item ${x.id===state.active?'selected':''}"><button data-ai-select="${x.id}" title="${esc(x.title)}">${esc(x.title)}</button><button data-ai-delete="${x.id}" title="删除对话" aria-label="删除对话">${icon('Delete2')}</button></div>`).join('')||'<p class="ai-history-empty">暂无对话记录</p>';
    const thread=view.querySelector('.ai-thread');thread.innerHTML=c&&(c.messages.length||quote?.conversation===c.id)?messageHTML(c):welcomeHTML(true);
    const input=view.querySelector('textarea');if(document.activeElement!==input)input.value=c?.draft||'';
+   view.querySelector('.ai-composer').classList.toggle('is-kexin-composer',researchRoute()||Boolean(c?.researchURL));
    const ctx=view.querySelector('.ai-context');
    ctx.hidden=!c?.context&&!c?.researchURL;
    if(c?.researchURL){
@@ -53,7 +55,7 @@
     ctx.removeAttribute('rel');
    }
    view.querySelector('[data-ai-restore]').hidden=!guideReturn();
-   const send=view.querySelector('.ai-send');send.innerHTML=icon(busy?'Stop':'Arrow_Forward-2');send.setAttribute('aria-label',busy?'停止生成':'发送消息');
+   view.querySelectorAll('.ai-send').forEach(send=>{send.innerHTML=icon(busy?'Stop':'Arrow_Forward-2');send.setAttribute('aria-label',busy?'停止生成':'发送消息');});
   }
   document.querySelectorAll('.pe-chat:not([data-issue-guide])').forEach(chat=>{const box=chat.querySelector('.pe-chat-messages');if(c&&(c.messages.length||quote?.conversation===c.id)){box.innerHTML=messageHTML(c);box.dataset.aiSynced='true';}else if(box.dataset.aiSynced){box.innerHTML=welcomeHTML();delete box.dataset.aiSynced;}const submit=chat.querySelector('[type=submit]');if(submit){submit.innerHTML=icon(busy?'Stop':'Arrow_Forward-2');submit.setAttribute('aria-label',busy?'停止生成':'发送提问');}const input=chat.querySelector('textarea');if(input&&document.activeElement!==input)input.value=c?.draft||'';});
  }
@@ -116,9 +118,11 @@
   document.querySelectorAll('.ai-composer textarea,.pe-chat:not([data-issue-guide]) textarea').forEach(input=>{input.value=c.draft;});
   generate(c,request.question);
  }
- document.addEventListener('submit',event=>{const form=event.target.closest('.ai-composer,.pe-chat-form');if(!form||form.closest('[data-issue-guide]'))return;event.preventDefault();event.stopImmediatePropagation();if(busy){stop();render();return;}const input=form.querySelector('textarea');showQuote(input.value,form.matches('.pe-chat-form'));},true);
+ document.addEventListener('submit',event=>{const form=event.target.closest('.ai-composer,.pe-chat-form');if(!form||form.closest('[data-issue-guide]'))return;event.preventDefault();event.stopImmediatePropagation();if(busy){stop();render();return;}const input=form.querySelector('textarea');
+  if(form.classList.contains('is-kexin-composer')&&!window.kexinComposer?.canSend(form,input.value.trim()))return;
+  showQuote(input.value,form.matches('.pe-chat-form'));},true);
  document.addEventListener('input',event=>{if(!event.target.closest('[data-issue-guide]')&&event.target.matches('.ai-composer textarea,.pe-chat-form textarea')){const c=current()||fresh(event.target.closest('.pe-chat-form')?context():null);c.draft=event.target.value;save();event.target.style.height='auto';event.target.style.height=Math.min(event.target.scrollHeight,200)+'px';}});
- document.addEventListener('keydown',event=>{if(!event.target.closest('[data-issue-guide]')&&event.target.matches('.ai-composer textarea,.pe-chat-form textarea')&&event.key==='Enter'&&!event.shiftKey&&!event.isComposing){event.preventDefault();if(!busy){showQuote(event.target.value,!!event.target.closest('.pe-chat-form'));}}});
+ document.addEventListener('keydown',event=>{if(!event.target.closest('[data-issue-guide]')&&event.target.matches('.ai-composer textarea,.pe-chat-form textarea')&&event.key==='Enter'&&!event.shiftKey&&!event.isComposing){event.preventDefault();if(!busy)event.target.form.requestSubmit();}});
  document.addEventListener('click',async event=>{
   const b=event.target.closest('button');if(!b)return;
   if(b.hasAttribute('data-ai-cost-cancel')){quote=null;render();return;}
@@ -162,8 +166,15 @@
   save();
   location.hash='#/search?from=kexin&conversation='+encodeURIComponent(c.id);
   render();
-  if(window.clubSession?.profile)showQuote(question);
+  if(question&&window.clubSession?.profile)showQuote(question);
  }
+ view?.querySelector('.ai-context').addEventListener('click',event=>{
+  const c=current();
+  if(!c?.researchURL || !window.kexinComposer)return;
+  const composer=view.querySelector('.ai-composer');
+  const question=composer.querySelector('textarea').value.trim()||new URL(c.researchURL).searchParams.get('q')||'';
+  event.currentTarget.href=window.kexinComposer.researchURL(question,composer);
+ });
  window.longyuanConversation={open,startResearch,refresh:render};window.addEventListener('hashchange',()=>{if(location.hash.startsWith('#/search'))open(new URLSearchParams(location.hash.split('?')[1]||'').get('q'));});
  window.addEventListener('storage',event=>{if(event.key===key){try{state=JSON.parse(event.newValue);render();}catch{}}});open(new URLSearchParams(location.hash.split('?')[1]||'').get('q'));const pending=current();if(pending?.pending&&pending.messages.at(-1)?.role==='assistant')pump(pending,pending.messages.at(-1),pending.pending);
 })();

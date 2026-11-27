@@ -22,20 +22,6 @@
 }
 .kx-home .kx-composer textarea { display:block; width:100%; border:0; }
 .kx-home .kx-composer textarea::placeholder { color:#606266; opacity:1; }
-.kx-view-choice {
-  display: flex;
-  width: fit-content;
-  margin: 12px auto 0;
-  padding: 4px;
-  border: 0;
-  border-radius: 999px;
-  background: #f3f5f8;
-}
-.kx-view-choice label { position: relative; cursor: pointer; }
-.kx-view-choice input { position: absolute; opacity: 0; }
-.kx-view-choice span { display: block; padding: 6px 16px; border-radius: 999px; color: #606266; }
-.kx-view-choice input:checked + span { background: white; color: #131921; box-shadow: 0 2px 4px #13192115; }
-.kx-view-choice input:focus-visible + span { outline: 2px solid #2766bd; }
 .kx-composer-actions, .kx-composer-tools, .kx-composer-buttons {
   display: flex;
   align-items: center;
@@ -175,3 +161,19 @@
   .kx-research { gap: 24px; }
   .kx-research h2 { text-align: left; }
 }
+
+.kx-composer-buttons .iconfont { font-size:24px; line-height:1; }
+.kx-composer-buttons .kx-send { color:#fff; }
+.ai-composer:not(.is-kexin-composer) > :is(.kx-composer-actions,.kx-status),
+.ai-composer.is-kexin-composer > .ai-composer-tools { display:none; }
+.ai-workspace .ai-composer.is-kexin-composer { height:auto; }
+.ai-composer.is-kexin-composer .kx-mode-options { top:auto; bottom:calc(100% + 8px); }
+.ai-composer.is-kexin-composer .kx-composer-actions { height:auto; }
+.ai-composer.is-kexin-composer .kx-composer-buttons > :is(button,a) {
+  display:grid;
+  place-items:center;
+  width:32px;
+  height:32px;
+  border-radius:12px;
+}
+.ai-composer.is-kexin-composer .kx-composer-buttons .kx-send { background:#020617; color:#fff; }

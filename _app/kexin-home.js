@@ -37,7 +37,6 @@
   const form = view.querySelector('form');
   const input = form.elements.q;
   const status = view.querySelector('[data-kexin-status]');
-  const send = form.querySelector('[type=submit]');
   const panel = view.querySelector('[data-kexin-panel]');
   const arrow = '<span class="kx-arrow" aria-hidden="true">→</span>';
   const chips = (values) => values.map(value => `<span>${value}</span>`).join('');
@@ -90,61 +89,81 @@
       sceneButtons[next].focus();
     });
   });
-  function syncInput() {
-    send.disabled = !input.value.trim();
-    status.textContent = '';
-  }
-  const modeTrigger = form.querySelector('[data-kexin-mode-trigger]');
-  const modeOptions = form.querySelector('#kexin-mode-options');
-  function setModeMenu(open) {
-    modeOptions.hidden = !open;
-    modeTrigger.setAttribute('aria-expanded', String(open));
-    if (open) modeOptions.querySelector(':checked').focus();
-  }
-  modeTrigger.addEventListener('click', () => setModeMenu(modeOptions.hidden));
-  modeOptions.addEventListener('change', event => {
-    modeTrigger.textContent = event.target.labels[0].querySelector('strong').textContent;
-    setModeMenu(false);
-    modeTrigger.focus();
-  });
-  modeOptions.addEventListener('click', event => {
-    if (event.target.matches('input:checked')) {
-      setModeMenu(false);
-      modeTrigger.focus();
+  const chatForm = document.querySelector('#view-search .ai-composer');
+  const chatActions = form.querySelector('.kx-composer-actions').cloneNode(true);
+  chatActions.querySelector('.kx-mode-options').id = 'kexin-chat-mode-options';
+  chatActions.querySelector('[data-kexin-mode-trigger]').setAttribute('aria-controls','kexin-chat-mode-options');
+  chatActions.querySelector('.kx-send').classList.add('ai-send');
+  chatForm.append(chatActions);
+  const chatStatus = document.createElement('p');
+  chatStatus.className = 'kx-status';
+  chatStatus.setAttribute('role','status');
+  chatForm.append(chatStatus);
+
+  const composers = [form,chatForm];
+  for (const composer of composers) {
+    const trigger = composer.querySelector('[data-kexin-mode-trigger]');
+    const options = composer.querySelector('.kx-mode-options');
+    function setModeMenu(open) {
+      options.hidden = !open;
+      trigger.setAttribute('aria-expanded', String(open));
+      if (open) options.querySelector(':checked').focus();
     }
-  });
-  document.addEventListener('click', event => {
-    if (!modeOptions.hidden && !modeTrigger.parentElement.contains(event.target)) setModeMenu(false);
-  });
-  form.addEventListener('keydown', event => {
-    if (event.key === 'Escape' && !modeOptions.hidden) {
+    trigger.addEventListener('click', () => setModeMenu(options.hidden));
+    options.addEventListener('change', () => {
       setModeMenu(false);
-      modeTrigger.focus();
-    }
-  });
+      trigger.focus();
+    });
+    document.addEventListener('click', event => {
+      if (!options.hidden && !trigger.parentElement.contains(event.target)) setModeMenu(false);
+    });
+    composer.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && !options.hidden) {
+        setModeMenu(false);
+        trigger.focus();
+      }
+    });
+    composer.addEventListener('change', event => {
+      if (!['mode','knowledge','webSearch'].includes(event.target.name)) return;
+      for (const other of composers) {
+        other.elements.mode.value = composer.elements.mode.value;
+        other.elements.knowledge.checked = composer.elements.knowledge.checked;
+        other.elements.webSearch.checked = composer.elements.webSearch.checked;
+        other.querySelector('[data-kexin-mode-trigger]').textContent =
+          other.querySelector('.kx-mode-options :checked').labels[0].querySelector('strong').textContent;
+      }
+      status.textContent = chatStatus.textContent = '';
+    });
+  }
+
+  function researchURL(question, composer) {
+    const query = new URLSearchParams({
+      q: question,
+      mode: composer.elements.mode.value,
+      view: 'dialogue',
+      knowledgeMode: composer.elements.knowledge.checked ? 'ALL' : 'NONE',
+      kb: '',
+      webSearch: composer.elements.webSearch.checked ? '1' : '0'
+    });
+    return `${service}?${query}`;
+  }
+  function canSend(composer, question) {
+    const allowed = !question || composer.elements.webSearch.checked || composer.elements.knowledge.checked;
+    (composer === form ? status : chatStatus).textContent = allowed ? '' : '请开启联网搜索或参考知识库，也可以前往可信官网上传附件。';
+    return allowed;
+  }
+  window.kexinComposer = {canSend, researchURL};
+  function syncInput() { status.textContent = ''; }
   input.addEventListener('input', syncInput);
   input.addEventListener('keydown', event => {
     if (event.key !== 'Enter' || event.shiftKey || event.isComposing) return;
     event.preventDefault();
-    if (!send.disabled) form.requestSubmit();
+    form.requestSubmit();
   });
   form.addEventListener('submit', event => {
     event.preventDefault();
     const question = input.value.trim();
-    if (!question) return;
-    if (!form.elements.webSearch.checked && !form.elements.knowledge.checked) {
-      status.textContent = '请开启联网搜索或参考知识库，也可以前往可信官网上传附件。';
-      return;
-    }
-    const query = new URLSearchParams({
-      q: question,
-      mode: form.elements.mode.value,
-      view: form.elements.view.value,
-      knowledgeMode: form.elements.knowledge.checked ? 'ALL' : 'NONE',
-      kb: '',
-      webSearch: form.elements.webSearch.checked ? '1' : '0'
-    });
-    window.longyuanConversation.startResearch(question, `${service}?${query}`);
+    if (canSend(form, question)) window.longyuanConversation.startResearch(question, researchURL(question,form));
   });
   renderScene(0);
   syncInput();

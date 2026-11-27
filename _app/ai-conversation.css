@@ -95,3 +95,9 @@ body:has(#view-search.active){overflow:hidden;background:#fff}body:has(#view-sea
   background:#fff;
   color:#606266;
 }
+
+@media (min-width:801px) {
+  body:has(#view-search.active .ai-workspace:not(.ai-sidebar-collapsed)) .navigation-progressive-blur {
+    inset-inline-start:260px;
+  }
+}
