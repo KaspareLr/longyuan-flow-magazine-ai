@@ -11,7 +11,7 @@
  function fresh(context=null){stop();const c={id:(crypto.randomUUID?.() ?? Array.from(crypto.getRandomValues(new Uint32Array(4)), value=>value.toString(16).padStart(8,'0')).join('')),title:'新对话',messages:[],draft:'',context,updated:Date.now()};state.items.unshift(c);state.active=c.id;save();return c;}
  function context(){return {title:document.querySelector('#portal-main h1,.pe-identity h1,.oc-header h1,.books-home-copy h1')?.textContent.trim()||document.querySelector('.view.active h1')?.textContent.trim()||'当前阅读',url:location.href};}
  const tools=(m,i)=>m.role==='user'?`<button data-ai-edit="${i}" title="编辑提问" aria-label="编辑提问">${icon('EditPen')}</button>`:`<button data-ai-copy="${i}" title="复制回答" aria-label="复制回答">${icon('Copy')}</button><button data-ai-retry="${i}" title="重新生成" aria-label="重新生成">${icon('Refresh2')}</button>`;
- function messageHTML(c){return c.messages.map((m,i)=>`<article class="ai-message ai-${m.role}"><div class="ai-message-body">${esc(m.text).replace(/\n/g,'<br>')}${busy&&i===c.messages.length-1?'<span class="ai-cursor"></span>':''}</div>${m.role==='assistant'&&m.status?`<p class="ai-dsu-receipt">${m.cost?'本次消耗 '+m.cost+' DSU。':''}${m.status==='insufficient'?`DSU 已用完。 <a href="${qikanDSU.accountURL}">充值 DSU</a> · <a href="${qikanDSU.membershipURL}">查看或升级套餐</a>`:''}</p>`:''}<div class="ai-message-actions">${tools(m,i)}</div></article>`).join('');}
+ function messageHTML(c){return c.messages.map((m,i)=>`<article class="ai-message ai-${m.role}"><div class="ai-message-body">${esc(m.text).replace(/\n/g,'<br>')}${busy&&i===c.messages.length-1?'<span class="ai-cursor"></span>':''}</div>${m.role==='assistant'&&m.status?`<p class="ai-dsu-receipt">${m.status==='insufficient'?`DSU 已用完。 <a href="${qikanDSU.accountURL}">充值 DSU</a> · <a href="${qikanDSU.membershipURL}">查看或升级套餐</a>`:''}</p>`:''}<div class="ai-message-actions">${tools(m,i)}</div></article>`).join('');}
  const welcomeChoices=[['帮我挑一篇','说说此刻的心情或兴趣，我按你的状态选'],['给自己十分钟','选一篇轻松、可读全文的短文'],['问一个主题','先告诉我想聊什么，答案带原文出处']];
  const welcomeHTML=(full=false)=>`<div class="pe-guide-welcome guide-unified-welcome ${full?'ai-welcome':''}"><${full?'h1':'h3'}>此刻，想读点什么？</${full?'h1':'h3'}><p>说说你的想法，或从这里开始。</p><div class="ai-guide-choices">${welcomeChoices.map(([title,desc])=>`<button type="button" class="pe-guide-prompt" ${full?'data-ai-prompt':'data-pe-prompt'}="${title}"><span><strong>${title}</strong><small>${desc}</small></span>${icon('Arrow_Forward-2')}</button>`).join('')}</div></div>`;
  const view=document.querySelector('#view-search');
@@ -33,19 +33,11 @@
  function stop(){generation++;clearTimeout(timer);timer=null;busy=false;const c=current();if(c?.pending){const response=c.messages.at(-1);if(response?.role==='assistant'&&response.cost&&!response.status)response.status='stopped';delete c.pending;}save();}
  function pump(c,m,full){
   busy=true;c.pending=full;let pos=m.text.length;
-  m.operation ||= crypto.randomUUID?.()||Math.random().toString(36).slice(2);
-  m.cost ||= 0;
+  
   const token=++generation;
-  const question=c.messages.at(-2)?.text||'AI 问答';
-  const segmentSize=Math.ceil(full.length/qikanDSU.aiPrice);
-  async function tick(){
+  function tick(){
    if(token!==generation)return;
-   if(Math.floor(pos/segmentSize)>=m.cost){
-    try{await qikanDSU.spendAI(question,m.operation);m.cost++;}
-    catch{if(token===generation){m.status='insufficient';stop();render();}return;}
-   }
-   if(token!==generation){m.status='stopped';save();return;}
-   pos=Math.min(full.length,(m.cost)*segmentSize,pos+5);m.text=full.slice(0,pos);
+   pos=Math.min(full.length,pos+5);m.text=full.slice(0,pos);
    if(pos===full.length){m.status='complete';stop();}
    else timer=setTimeout(tick,25);
    save();render();
@@ -55,8 +47,8 @@
   }
   render();timer=setTimeout(tick,25);
  }
- function generate(c,q){stop();const m={role:'assistant',text:''};c.messages.push(m);pump(c,m,answer(q,c));}
- async function send(q,fromGuide=false){q=q.trim();if(!q||busy||!qikanDSU.signedIn())return false;let c=current()||fresh(fromGuide?context():null);if(fromGuide)c.context=context();if(editing!==null){c.messages.splice(editing);editing=null;}c.messages.push({role:'user',text:q});if(c.messages.length===1)c.title=q.slice(0,28);c.draft='';c.updated=Date.now();save();generate(c,q);requestAnimationFrame(()=>{const sc=view?.querySelector('.ai-scroll');if(sc)sc.scrollTop=sc.scrollHeight;});return true;}
+ function generate(c,q){stop();const m={role:'assistant',text:'',cost:qikanDSU.aiPrice};c.messages.push(m);pump(c,m,answer(q,c));}
+ async function send(q,fromGuide=false){q=q.trim();if(!q||busy||!await qikanDSU.confirmAI(q)||busy)return false;let c=current()||fresh(fromGuide?context():null);if(fromGuide)c.context=context();if(editing!==null){c.messages.splice(editing);editing=null;}c.messages.push({role:'user',text:q});if(c.messages.length===1)c.title=q.slice(0,28);c.draft='';c.updated=Date.now();save();generate(c,q);requestAnimationFrame(()=>{const sc=view?.querySelector('.ai-scroll');if(sc)sc.scrollTop=sc.scrollHeight;});return true;}
  document.addEventListener('submit',event=>{const form=event.target.closest('.ai-composer,.pe-chat-form');if(!form||form.closest('[data-issue-guide]'))return;event.preventDefault();event.stopImmediatePropagation();if(busy){stop();render();return;}const input=form.querySelector('textarea');send(input.value,form.matches('.pe-chat-form')).then(sent=>{if(sent)input.value='';});},true);
  document.addEventListener('input',event=>{if(!event.target.closest('[data-issue-guide]')&&event.target.matches('.ai-composer textarea,.pe-chat-form textarea')){const c=current()||fresh(event.target.closest('.pe-chat-form')?context():null);c.draft=event.target.value;save();event.target.style.height='auto';event.target.style.height=Math.min(event.target.scrollHeight,200)+'px';}});
  document.addEventListener('keydown',event=>{if(!event.target.closest('[data-issue-guide]')&&event.target.matches('.ai-composer textarea,.pe-chat-form textarea')&&event.key==='Enter'&&!event.shiftKey&&!event.isComposing){event.preventDefault();if(!busy){send(event.target.value,!!event.target.closest('.pe-chat-form')).then(sent=>{if(sent)event.target.value='';});}}});
@@ -70,7 +62,7 @@
   if(b.dataset.aiPrompt)send(b.dataset.aiPrompt);
   if(b.hasAttribute('data-ai-copy')){await navigator.clipboard.writeText(current().messages[Number(b.dataset.aiCopy)].text);b.innerHTML='已复制';}
   if(b.hasAttribute('data-ai-edit')){stop();editing=Number(b.dataset.aiEdit);const input=view?.classList.contains('active')?view.querySelector('textarea'):b.closest('.pe-chat').querySelector('textarea');input.value=current().messages[editing].text;input.focus();}
-  if(b.hasAttribute('data-ai-retry')){const c=current(),i=Number(b.dataset.aiRetry),question=c.messages[i-1]?.text;if(!question||busy||!qikanDSU.signedIn())return;stop();c.messages.splice(i);generate(c,question);}
+  if(b.hasAttribute('data-ai-retry')){const c=current(),i=Number(b.dataset.aiRetry),question=c.messages[i-1]?.text;if(!question||busy||!await qikanDSU.confirmAI(question)||busy)return;stop();c.messages.splice(i);generate(c,question);}
   const prompt=event.target.closest('[data-pe-prompt]');if(prompt){event.stopImmediatePropagation();send(prompt.dataset.pePrompt,true);}
  },true);
  if(view&&matchMedia('(max-width:800px)').matches)view.querySelector('.ai-workspace').classList.add('ai-sidebar-collapsed');

@@ -88,7 +88,8 @@
  function refreshIssuePurchase(){
   const purchase=document.querySelector('body > .issue-purchase-entry [data-issue-purchase]');
   if(purchase){
-   const owned=window.clubSession?.contentRows('issue').some(row=>row.id==='dycy202609');
+   const owned=window.qikanDSU.ownsIssue('第一财经',issueEdition);
+   purchase.closest('.issue-purchase-entry').hidden=owned;
    purchase.disabled=Boolean(owned);
    purchase.textContent=owned?'已购买':'购买';
   }
@@ -123,7 +124,7 @@
   document.body.append(document.querySelector('.issue-purchase-entry'));
   const purchase=document.querySelector('[data-issue-purchase]');
   window.qikanDSU.mountPublicationPurchase(purchase,{
-   kind:'issue',id:'dycy202609',
+   kind:'issue',id:'dycy202609',publication:'第一财经',edition:issueEdition,
    title:'购买《第一财经》本期',product:'单期电子版',price:issuePrice,
    issue:'2026 年第 09 期',success:'购买成功',
    onPaid(){

@@ -16,7 +16,7 @@ document.addEventListener('submit',event=>{
  const rows=[...root.querySelectorAll('.pe-article')].map(row=>({
   text:row.textContent, link:row.querySelector('h4 a, a:has(h4)')
  }));
- if(!rows.length&&usesGuideLauncher()){
+ if(!rows.length){
   window.periodicalReference?.groups.flatMap(group=>group.articles).forEach((article,index)=>{
    const link=document.createElement('a');
    link.href='portal.html#/article/'+index+'?context=magazine&resource='+encodeURIComponent('第一财经')+'&full=1';
@@ -38,7 +38,6 @@ document.addEventListener('click',event=>{
  if(!button)return;
  event.preventDefault();
  event.stopImmediatePropagation();
- if(!usesGuideLauncher())return;
  const root=button.closest('.rd-periodical');if(!root)return;
  const collapsed=!root.classList.contains('pe-chat-collapsed');
  readingGuideCollapsed=collapsed;
@@ -77,14 +76,11 @@ function animateGuide(chat,collapsed){
  }state.frame=requestAnimationFrame(tick);
 }
 
-function usesGuideLauncher(){
- return !document.body.classList.contains('issue-preview-page');
-}
 function applyGuidePreference(root){
  root.hidden=false;root.inert=false;
  const chat=root.querySelector('.pe-chat');if(!chat)return;
  const motion=guideMotion.get(chat);if(motion){cancelAnimationFrame(motion.frame);guideMotion.delete(chat);}
- const collapsed=usesGuideLauncher()&&readingGuideCollapsed;
+ const collapsed=readingGuideCollapsed;
  root.classList.toggle('pe-chat-collapsed',collapsed);document.body.classList.toggle('reading-guide-open',!collapsed);
  chat.hidden=collapsed;chat.inert=collapsed;
  chat.style.display=collapsed?'none':'';chat.style.transform='';chat.style.opacity='';chat.style.willChange='';
@@ -96,10 +92,9 @@ function syncGuideSurface(){
  const account=portal&&['me','membership'].includes(document.querySelector('#portal-main')?.dataset.page);
  if(account&&!wasAccount)readingGuideCollapsed=true;
  wasAccount=account;
- const preview=portal&&document.body.classList.contains('issue-preview-page');
- mount.classList.toggle('catalog-reading-guide',portal&&!preview);
- mount.classList.toggle('demo-reading-widget',!portal||preview);
- document.body.classList.toggle('catalog-guide-visible',portal&&!preview);
+ mount.classList.toggle('catalog-reading-guide',portal);
+ mount.classList.toggle('demo-reading-widget',!portal);
+ document.body.classList.toggle('catalog-guide-visible',portal);
  if(document.querySelector('#portal-main .dsu-gate')){
   mount.hidden=true;mount.inert=true;
   document.body.classList.remove('reading-guide-open');

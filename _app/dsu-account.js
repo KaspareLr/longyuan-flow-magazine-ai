@@ -12,6 +12,13 @@
     pro:{name:'年度 Pro',price:3599,quota:5000,months:12},
     'pro-auto':{name:'年度 Pro · 连续包年',price:3299,quota:5000,months:12,auto:true}
   };
+  const yuan=new Intl.NumberFormat('zh-CN',{style:'currency',currency:'CNY'});
+  const purchaseRows=kind=>profile()?(window.clubSession.contentRows?.(kind)||[]):[];
+  function ownsIssue(title,edition){
+    const now=Date.now();
+    return purchaseRows('subscription').some(row=>row.title===title&&Number.isFinite(row.time)&&addMonths(row.time,12)>now)
+      ||purchaseRows('issue').some(row=>row.title===title&&row.edition?.replace(/\s/g,'')===edition?.replace(/\s/g,''));
+  }
   const planFor = subscription => plans[subscription?.code] || plans['month-auto'];
   const membershipURL=new URL('portal.html#/membership',root).href;
   function addMonths(time,count){
@@ -314,6 +321,7 @@
     try{
       await change(state=>{
         const article=button.dataset.dsuArticle;
+        if(ownsIssue(button.dataset.publication,button.dataset.edition))return;
         if(unlocked(state,article))return;
         applyCharge(state,'article',button.dataset.title,articlePrice,article);
         state.records[0].route=location.hash;
@@ -322,6 +330,20 @@
     }
     catch{showInsufficient();return false;}
     finally{button.disabled=false;}
+  }
+  async function confirmAI(question){
+    if(!signedIn())return false;
+    const owner=identity(profile());
+    const available=summary().available;
+    if(available<aiPrice){
+      const proceed=await confirm({title:'AI 问答额度不足',message:`本次问答将消耗 ${aiPrice} DSU，当前可用 ${available} DSU。`,label:'继续',submit:()=>{}});
+      if(proceed)window.magazineCheckout.open({title:'补充问答额度',price:aiPrice,dsu:{available:()=>summary().available,membershipURL,balanceOnly:true}});
+      return false;
+    }
+    return confirm({title:'确认问答消耗',message:`本次问答将消耗 ${aiPrice} DSU，当前可用 ${available} DSU。`,label:'确认提问',submit:()=>change(state=>{
+      if(identity(profile())!==owner)throw Error('账号已切换，请重试。');
+      applyCharge(state,'ai',question,aiPrice);
+    })});
   }
   async function spendAI(question,operation){
     await change(state=>{
@@ -370,7 +392,7 @@
         <div class="dsu-plan-head"><div><h2>${title}</h2><p class="dsu-plan-description">${description}</p></div>${pro?'':billing}</div>
         <div class="dsu-plan-purchase">
           <div class="dsu-plan-price-row">
-            <div><div class="dsu-price-amount"><strong data-dsu-plan-price>${selectedPlan.price}</strong><span>DSU/${cycle}</span></div>
+            <div><div class="dsu-price-amount"><strong data-dsu-plan-price>¥${selectedPlan.price}</strong><span>/${cycle}</span></div>
             <p class="dsu-price-quota">每${cycle}获得 <strong>${item.quota} DSU</strong></p></div>
             <button type="button" class="dsu-switch dsu-plan-renewal" role="switch" aria-label="${title}连续包${cycle}" aria-checked="true" data-dsu-plan-switch="${key}">
               连续包${cycle}<span class="dsu-switch-track" aria-hidden="true"></span>
@@ -433,9 +455,6 @@
   }
   function panel(filter = 'all', view) {
     const state = load(identity(profile()));
-    if (active(state) && !state.usageDemoSeeded) {
-      queueMicrotask(()=>change(populateUsageDemo).catch(()=>{}));
-    }
     const records = state.records.filter(record => filter === 'all' || usageType(record) === (filter==='article'?'purchase':filter));
     const groups = new Map();
     const dayFormat = new Intl.DateTimeFormat('zh-CN',{dateStyle:'long',timeZone:'Asia/Shanghai'});
@@ -446,7 +465,6 @@
       groups.get(day).push(record);
     }
     const ledger = `<section class="dsu-section dsu-ledger" id="dsu-ledger"><header class="dsu-row"><h3>消费流水</h3>
-        ${state.sample&&!state.sampleHistory?'<button type="button" class="dsu-button" data-dsu-history>补充样例流水</button>':''}
         <nav class="dsu-filters" aria-label="消费类型">${[['all','全部'],['article','购买记录'],['ai','AI对话']].map(([id,label]) =>
           `<a class="dsu-button dsu-filter" href="#/me?tab=dsu&amp;view=usage&amp;filter=${id}" ${filter===id?'aria-current="page"':''}>${label}</a>`).join('')}</nav></header>
         ${records.length ? [...groups].map(([day,rows])=>`<section class="dsu-record-day"><h4>${day}</h4>
@@ -462,6 +480,8 @@
     const walletEnabled=state.walletEnabled!==false;
     const spent=walletSpent(state),limit=state.walletLimit;
     const planManagement=member&&view==='plan';
+    const walletUsage=state.records.reduce((total,row)=>total+(row.wallet||0),0);
+    const walletTotal=walletUsage+state.balance;
     const walletManagement=view==='wallet';
     const expiry=member?'本期额度有效至 '+date(plan.expires):'开通会员后可使用套餐额度。';
     return `<div class="dsu-panel dsu-subscriptions dsu-account-overview">
@@ -490,13 +510,16 @@
           <p class="dsu-card-detail">单笔 ${minimum} DSU 起充</p>
         </div>
         <button type="button" class="dsu-button" data-dsu-recharge>购买额度</button>
+        <div class="dsu-account-card-settings">
+          <p class="dsu-card-detail">已消耗 ${walletUsage} / ${walletTotal} DSU</p>
+          <div class="dsu-progress" role="progressbar" aria-label="充值额度消耗" aria-valuemin="0" aria-valuemax="${walletTotal||1}" aria-valuenow="${walletUsage}"><span data-usage="purchase" style="width:${walletTotal?100*walletUsage/walletTotal:0}%"></span></div>
+        </div>
         ${walletManagement?`<div class="dsu-account-card-settings">
          <div class="dsu-row"><p>使用充值余额</p><button type="button" class="dsu-switch" role="switch" aria-label="使用充值余额" aria-checked="${walletEnabled}" data-dsu-wallet><span class="dsu-switch-track" aria-hidden="true"></span></button></div>
          <div class="dsu-row"><p>账户余额 ${state.balance} DSU · 本月消费 ${spent} / ${limit==null?'不限':limit+' DSU'}</p>
            <button type="button" class="dsu-button" data-dsu-limit>设置消费上限</button></div>
         </div>`:''}
       </div></section>
-      ${!plan&&!state.balance&&!state.records.length?'<div><button type="button" class="dsu-button" data-dsu-sample>载入演示数据</button></div>':''}
       ${ledger}</div>`;
   }
 
@@ -515,6 +538,7 @@
       onPaid:()=>change(state=>{
         if(identity(profile())!==owner)throw Error('账号已切换，请重新提交订单。');
         const start=Date.now();
+        (state.payments??=[]).unshift({title:(renewal?'会员续费 · ':'购买会员 · ')+plan.name,amount:plan.price,time:start});
         if(renewal){
           if(!active(state)||planFor(state.subscription)!==plan)throw Error('会员状态已更新，请重新提交订单。');
           state.subscription.expires=addMonths(state.subscription.expires,plan.months);
@@ -535,7 +559,7 @@
       const selected=planSwitch.dataset.dsuPlanSwitch+(auto?'-auto':'');
       const card=planSwitch.closest('.dsu-price-card');
       const purchase=card.querySelector('.dsu-plan-buy');
-      card.querySelector('[data-dsu-plan-price]').textContent=plans[selected].price;
+      card.querySelector('[data-dsu-plan-price]').textContent='¥'+plans[selected].price;
       planSwitch.setAttribute('aria-checked',String(auto));
       purchase.dataset.dsuCheckout=selected;
       return;
@@ -550,23 +574,13 @@
       },{once:true});
       return;
     }
-    const button = event.target.closest('[data-dsu-article],[data-dsu-recharge],[data-dsu-wallet],[data-dsu-limit],[data-dsu-cancel],[data-dsu-sample],[data-dsu-history]');
+    const button = event.target.closest('[data-dsu-article],[data-dsu-recharge],[data-dsu-wallet],[data-dsu-limit],[data-dsu-cancel]');
     if (!button) return;
     if (button.hasAttribute('data-dsu-article')) {
       if (await purchaseArticle(button)) window.dispatchEvent(new CustomEvent('dsu-article-unlocked', {detail:button}));
       return;
     }
     if (!signedIn()) return;
-    if (button.hasAttribute('data-dsu-history')) {
-      await confirm({title:'补充样例流水', message:'加入更早的演示记录，当前周期的余额和用量不受影响。', label:'补充样例流水',
-        submit:() => change(addSampleHistory)});
-      return;
-    }
-    if (button.hasAttribute('data-dsu-sample')) {
-      await confirm({title:'载入演示数据', message:'将为当前空白账户载入会员、余额和消费记录样例。', label:'确认载入演示数据',
-        submit:() => change(loadSample)});
-      return;
-    }
     if (button.hasAttribute('data-dsu-wallet')) {
       await change(state => { state.walletEnabled = state.walletEnabled === false; });
       document.querySelector('[data-dsu-wallet]')?.focus();
@@ -597,27 +611,29 @@
   function openRecharge(onDone){
     const owner=identity(profile());
     window.magazineCheckout.open({
-      title:'充值 DSU',product:'DSU 余额',minimum,success:'充值成功',onDone,
+      title:'充值 DSU',product:'DSU 额度',minimum,success:'充值成功',onDone,
       onPaid:amount=>change(state=>{
         if(identity(profile())!==owner)throw Error('账号已切换，请重新提交订单。');
         state.balance+=amount;
+        (state.payments??=[]).unshift({title:'充值 DSU',amount,time:Date.now()});
       })
     });
   }
 
   function mountPublicationPurchase(trigger,{kind,id,...options}){
-    const owned=()=>profile()&&window.clubSession.contentRows(kind).some(row=>row.id===id);
+    const owned=()=>kind==='issue'?ownsIssue(options.publication,options.edition):purchaseRows(kind).some(row=>row.id===id&&addMonths(row.time,12)>Date.now());
     const originalLabel=trigger.textContent;
     function reflectOwnership(){
       trigger.disabled=Boolean(owned());
       trigger.textContent=trigger.disabled?(kind==='subscription'?'已订购':'已购买'):originalLabel;
     }
     reflectOwnership();
+    window.addEventListener('club-session-change',reflectOwnership);
     function open(){
       const owner=identity(profile());
       if(!owner||!trigger.isConnected)return;
       const publication=kind+':'+id;
-      const hasPurchase=state=>state.records.some(record=>record.publication===publication);
+      const hasPurchase=state=>state.records.some(record=>record.publication===publication&&(kind==='issue'||addMonths(record.time,12)>Date.now()));
       if(owned()){reflectOwnership();return;}
       const annual=kind==='subscription';
       const now=Date.now();
@@ -631,6 +647,7 @@
         onPaid:async amount=>{
           await change(state=>{
             if(identity(profile())!==owner)throw Error('账号已切换，请重新提交订单。');
+            if(owned())throw Error('已拥有该刊阅读权益。');
             if(!hasPurchase(state))applyCharge(state,kind,options.title,amount,undefined,publication);
           });
           options.onPaid?.();
@@ -646,12 +663,31 @@
 
   window.qikanDSU = {
     page(a) { return window.qikanArticleRoutes?.[articleId(a)]; },
-    panel, membership, summary, mountPublicationPurchase,
+    panel, membership, summary, mountPublicationPurchase, ownsIssue, confirmAI,
+    paymentHistory(){
+      const owner=identity(profile());
+      const rows=owner?load(owner).payments||[]:[];
+      return `<h2>消费记录</h2>${rows.length?`<ul class="qikan-cash-history">${rows.map(row=>`<li><div><strong>${esc(row.title)}</strong><small>${date(row.time)}</small></div><b>${yuan.format(row.amount)}</b></li>`).join('')}</ul>`:'<p>暂无消费记录。</p>'}`;
+    },
+    accountSummary(){
+      const owner=identity(profile());
+      if(!owner)return '';
+      const state=load(owner),totals=quotaUsage(state);
+      const plan=active(state)?state.subscription:null;
+      const progress=quotaProgress(totals);
+      return `<div class="dsu-usage-progress qikan-account-quota">
+       <div class="dsu-row"><strong>${plan?esc(planFor(plan).name):'尚未订阅'}</strong><span>${plan?'有效至 '+date(plan.expires):''}</span></div>
+       <div class="dsu-row"><p>已用 <b>${totals.used} / ${totals.quota} DSU</b></p><span>${totals.percent.toFixed(1)}%</span></div>
+       <div class="dsu-progress" aria-hidden="true">${quotaSegments(progress)}</div>
+       <div class="dsu-legend"><span>购买消耗</span><span>AI 对话</span></div>
+       <p>可用 <strong>${remaining(state)+walletAvailable(state)} DSU</strong></p>
+      </div>`;
+    },
     readingUnlocks(){const owner=identity(profile());return owner?load(owner).records.filter(row=>row.type==='article'&&row.article):[];}, spendAI, signedIn, accountURL, membershipURL, articleId, articlePrice, aiPrice,
     canRead(a) {
       const owner=identity(profile()),article=articleId(a);
       if(!owner)return false;
-      return unlocked(load(owner),article);
+      return unlocked(load(owner),article)||ownsIssue(a.resource||a.rid,a.issueLabel||(a.rid==='第一财经'?'2026年09期':''));
     },
     gate(a, preview) {
       return `<div class="dsu-gate">
@@ -660,7 +696,7 @@
           <div class="dsu-reading-divider" aria-hidden="true"><i class="iconfont icon-Lock"></i></div>
           <h2>解锁全文</h2>
           <p>解锁后可以随时回来阅读。</p>
-          <button type="button" class="dsu-button dsu-reading-button" data-dsu-article="${esc(articleId(a))}" data-title="${esc(a.title)}">用 ${articlePrice} DSU 解锁全文</button>
+          <button type="button" class="dsu-button dsu-reading-button" data-dsu-article="${esc(articleId(a))}" data-publication="${esc(a.resource||a.rid)}" data-edition="${esc(a.issueLabel||(a.rid==='第一财经'?'2026年09期':''))}" data-title="${esc(a.title)}">用 ${articlePrice} DSU 解锁全文</button>
         </section>
       </div>`;
     }

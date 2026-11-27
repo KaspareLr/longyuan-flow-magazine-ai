@@ -30,9 +30,8 @@
  function eventDetail(){const e=eventData.find(e=>e.id===routeId)||eventData[0];return `<div class="portal-event-detail"><img src="${e.cover}" alt="${e.title}"><article><span class="club-overline">READING EVENT · ${e.status}</span><h1>${e.title}</h1><p>${e.summary}</p><dl class="portal-facts"><div><dt>${uiIcon('Calendar')}活动时间</dt><dd>${e.date}</dd></div><div><dt>${uiIcon('Location')}活动地点</dt><dd>${e.location}</dd></div><div><dt>${uiIcon('Group')}参与方式</dt><dd>${e.status==='已结束'?'活动已结束，可查看回顾。':'读书会会员可参与，限额 30 人。'}</dd></div><div><dt>${uiIcon('Book')}活动安排</dt><dd>开场导读 · 作品共读 · 自由交流 · 阅读分享</dd></div></dl><button class="button dark" data-register="${e.id}">${e.status==='已结束'?'收藏活动回顾':session.read('event-'+e.id,false)?'已报名 · 查看报名信息':'报名参加'}</button>${e.demo?'':''}</article></div>`+section('ABOUT THE EVENT','在交流中，再读一遍',`<div class="portal-community"><article><h3>带着一个问题来</h3><p>你可以提前选读作品，标记感兴趣的段落。活动中，领读人将带领大家理解文字、交换观察。</p></article><article><h3>带走一份新发现</h3><p>不需要标准答案。试着听听不同的阅读经验，让一本书在交流中，呈现更多可能。</p></article></div>`)}
  function membership(){return qikanDSU.membership(params.get('plan'),params.get('period'));}
  function my(){if(!session.profile)return title('MY READING SPACE','你的阅读，<br><em>值得好好收藏。</em>','登录后管理个人资料、查看会员、收藏内容，把每天的阅读留在这里。')+`<div class="portal-empty"><h2>欢迎加入龙源读书会</h2><p>设置一个昵称，即可体验完整的个人空间。</p><button class="button dark" data-club-login>登录</button></div>`;const p=session.profile,m=session.membership;
- const tabs=[['overview','Book','我的阅读'],['profile','user_s','基本信息'],['dsu','Wallet','会员与 DSU']];
- const metrics=[['阅读天数',new Set(session.read('qikan-reading-history',[]).map(row=>row.day)).size],['我的收藏',session.read('savedArticles',[]).length],['可用 DSU',qikanDSU.summary().available]];
- const stats=`<div class="qikan-account-stats">${metrics.map(([label,value])=>`<div><strong>${value}</strong><span>${label}</span></div>`).join('')}</div>`;
+ const tabs=[['overview','Book','我的阅读'],['profile','user_s','基本信息'],['dsu','Wallet','会员与 DSU'],['payments','Wallet','消费记录']];
+ const stats=qikanDSU.accountSummary();
  const avatar=`<img class="qikan-account-avatar" src="${esc(p.avatar||'assets/default-avatars/author-1.png')}" alt="">`;
  const tabLink=([key,icon,label])=>`<a href="#/me?tab=${key}" ${accountTab===key?'aria-current="page"':''}>${uiIcon(icon)}<span>${label}</span></a>`;
  const side=`<aside class="portal-account-side"><nav aria-label="个人中心">${tabs.map(tabLink).join('')}</nav></aside>`;
@@ -40,11 +39,21 @@
   <a class="qikan-account-identity" href="#/me?tab=profile">${avatar}<span><strong>${esc(p.nickname)}</strong><small>编辑个人资料</small></span>${uiIcon('Arrow_Forward-3')}</a>
   ${stats}
   <a class="qikan-account-member" href="#/me?tab=dsu">${uiIcon('Wallet')}<span><strong>会员与 DSU</strong><small>会员额度、充值余额与消费明细</small></span>${uiIcon('Arrow_Forward-3')}</a>
+  <a class="qikan-account-member" href="#/me?tab=payments">${uiIcon('Wallet')}<span><strong>消费记录</strong></span>${uiIcon('Arrow_Forward-3')}</a>
   <button class="qikan-account-logout" type="button" data-logout>退出登录</button>
  </section>`;
  let panel='';
  if(accountTab==='dsu')panel=qikanDSU.panel(['article','ai'].includes(params.get('filter'))?params.get('filter'):'all',params.get('view'));
- else if(accountTab==='profile')panel=`<h2>基本信息</h2><form class="portal-profile-form" id="profile-form"><div class="qikan-profile-avatar"><span>头像</span>${avatar}</div><label><span class="qikan-field-label">昵称 <small data-profile-count="nickname">${p.nickname.length} / 20</small></span><input name="nickname" value="${esc(p.nickname)}" maxlength="20" required></label><label><span class="qikan-field-label">所在城市 <small data-profile-count="city">${(p.city||'').length} / 30</small></span><input name="city" value="${esc(p.city||'')}" maxlength="30"></label><label class="full">邮箱<input type="email" name="email" autocomplete="email" value="${esc(p.email||'')}" placeholder="reader@example.com"></label><label class="full"><span class="qikan-field-label">个人简介 <small data-profile-count="bio">${(p.bio||'').length} / 160</small></span><textarea name="bio" maxlength="160">${esc(p.bio||'')}</textarea><small>一句话，介绍你的阅读世界。</small></label><label class="full">阅读兴趣<input name="interests" value="${esc((p.interests||[]).join('、'))}" placeholder="文学、生活、历史"></label><button class="button dark full">保存修改</button><p class="portal-form-status full" role="status"></p></form>`;
+ else if(accountTab==='payments')panel=qikanDSU.paymentHistory();
+ else if(accountTab==='profile')panel=`<h2>基本信息</h2><form class="portal-profile-form" id="profile-form"><div class="qikan-profile-avatar"><span>头像</span>${avatar}</div><label><span class="qikan-field-label">昵称 <small data-profile-count="nickname">${p.nickname.length} / 20</small></span><input name="nickname" value="${esc(p.nickname)}" maxlength="20" required></label><label><span class="qikan-field-label">所在城市 <small data-profile-count="city">${(p.city||'').length} / 30</small></span><input name="city" value="${esc(p.city||'')}" maxlength="30"></label><label class="full">邮箱<input type="email" name="email" autocomplete="email" value="${esc(p.email||'')}" placeholder="reader@example.com"></label><label class="full"><span class="qikan-field-label">个人简介 <small data-profile-count="bio">${(p.bio||'').length} / 160</small></span><textarea name="bio" maxlength="160">${esc(p.bio||'')}</textarea><small>一句话，介绍你的阅读世界。</small></label><label class="full">阅读兴趣<input name="interests" value="${esc((p.interests||[]).join('、'))}" placeholder="文学、生活、历史"></label><button class="button dark full">保存修改</button><p class="portal-form-status full" role="status"></p></form>
+ <h2 class="qikan-password-title">修改密码</h2>
+ <form class="portal-profile-form" id="change-password-form">
+  <label class="full">原密码<input type="password" name="currentPassword" autocomplete="current-password" required></label>
+  <label class="full">新密码<input type="password" name="newPassword" autocomplete="new-password" required></label>
+  <label class="full">重复新密码<input type="password" name="repeatPassword" autocomplete="new-password" required></label>
+  <button class="button dark full">保存密码</button>
+  <p class="portal-form-status full" role="status"></p>
+ </form>`;
  else panel=readingOverview(p);
  return `<div class="qikan-account" data-account-tab="${esc(accountTab)}">
   <header class="qikan-account-header">${avatar}<h1>${esc(p.nickname)}</h1>${stats}</header>
@@ -52,7 +61,7 @@
   <div class="portal-account">${side}<section class="portal-account-panel">${panel}</section></div>
  </div>`;
  }
- const readingTabs=[['follow','我的关注'],['saved','我的收藏'],['subscription','我的订购'],['issue','已购期刊'],['article','已购文章']];
+ const readingTabs=[['follow','我的关注'],['saved','我的收藏'],['subscription','全年订购'],['issue','单期订购'],['article','已购文章']];
  const readingIcon=name=>`<img class="qikan-reading-icon" src="assets/figma-identity/reading-${name}.svg" alt="">`;
  function readingOverview(profile){
   const recent=session.read('qikan-reading-history',[])[0];
@@ -239,7 +248,7 @@
   setCurrent(index){routeId=String(index);}
  };
 
- function render(){window.clubBookReader?.unmount();window.clubReadingHome?.unmount();window.clubPeoplePage?.unmount();const [path,query]=location.hash.replace(/^#\/?/,'').split('?');[route,routeId]=path.split('/');params=new URLSearchParams(query);route=route||'book';if(route==='me')accountTab=['membership','dsu'].includes(params.get('tab'))?'dsu':params.get('tab')==='profile'?'profile':'overview';if(!['book','article','me','membership'].includes(route)){const pages={reading:'reading',people:'lecturers',events:'activities',event:'activity',membership:'membership'};if(route==='membership'){location.replace('index.html#/magazine/'+encodeURIComponent('南风窗')+'?claimed=1&section=membership');return;}location.replace('index.html#/magazine/'+encodeURIComponent('南风窗')+'?claimed=1&page='+(pages[route]||'reading')+(routeId?'&id='+encodeURIComponent(routeId):''));return;}main.dataset.page=route;const funcs={reading,people,events,event:eventDetail,membership,me:my,book:bookDetail,article};main.innerHTML=(funcs[route]||reading)();
+ function render(){window.clubBookReader?.unmount();window.clubReadingHome?.unmount();window.clubPeoplePage?.unmount();const [path,query]=location.hash.replace(/^#\/?/,'').split('?');[route,routeId]=path.split('/');params=new URLSearchParams(query);route=route||'book';if(route==='me')accountTab=['membership','dsu'].includes(params.get('tab'))?'dsu':['profile','payments'].includes(params.get('tab'))?params.get('tab'):'overview';if(!['book','article','me','membership'].includes(route)){const pages={reading:'reading',people:'lecturers',events:'activities',event:'activity',membership:'membership'};if(route==='membership'){location.replace('index.html#/magazine/'+encodeURIComponent('南风窗')+'?claimed=1&section=membership');return;}location.replace('index.html#/magazine/'+encodeURIComponent('南风窗')+'?claimed=1&page='+(pages[route]||'reading')+(routeId?'&id='+encodeURIComponent(routeId):''));return;}main.dataset.page=route;const funcs={reading,people,events,event:eventDetail,membership,me:my,book:bookDetail,article};main.innerHTML=(funcs[route]||reading)();
  readingProgress.hidden=route!=='article'||Boolean(main.querySelector('.issue-preview-reader'));
  readingProgress.style.transform='scaleX(0)'; requestAnimationFrame(updateReadingProgress);if(route==='article'){clubIssuePreview.mount(articleInfo(),params);if(!clubIssuePreview.isPreview(articleInfo(),params))clubBookReader.mount(articleInfo());window.clubEditorialReflow?.mount();recordReading(articleInfo());}else{document.body.classList.remove('issue-preview-page','issue-full-page');window.syncReaderGuide?.();}if(route==='people')clubPeoplePage.mount();if(route==='reading')clubReadingHome.mount();if(route==='book')clubBookSidebar.mount();document.title=({reading:'共读',people:'领读人',events:'活动',event:'活动详情',membership:'会员',me:'我的',book:book(routeId).title,article:route==='article'?articleInfo().title:''}[route]||'龙源读书会')+' · 龙源期刊网';document.querySelectorAll('[data-page]').forEach(a=>{if(a.dataset.page===route)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});clubNavigation.setBack(document.querySelector('.portal-back'),['book','article','event','me'].includes(route));document.querySelector('.portal-back').onclick=()=>{clubPageMotion.back(route==='article'&&params.get('full')==='1'?href('article/'+routeId+'?context=magazine&resource='+encodeURIComponent(params.get('resource'))):route==='article'&&params.get('context')==='magazine'?(params.get('resource')==='第一财经'?'magazine-home.html':params.get('resource')==='南风窗'?'magazine-home.html?publication=nanfc':'index.html#/magazine/'+encodeURIComponent(params.get('resource'))):params.get('topic')==='topic-mudsnwbq'?'index.html#/topic/topic-mudsnwbq':route==='article'&&params.get('context')==='book'?href('book/'+params.get('resource')):'index.html#/books')};if(route==='me'&&accountTab==='dsu'&&params.get('view')==='usage'){
   document.querySelector('#dsu-ledger')?.scrollIntoView({block:'start',behavior:'instant'});
@@ -265,7 +274,7 @@
   toast(kind==='article'?'已取消收藏':'已取消关注');
  }
  if(el.hasAttribute('data-logout'))session.logout();
- if(el.hasAttribute('data-plan')){if(!session.profile){session.login();return}const p=data.membership.plans[0].prices[Number(el.dataset.plan)];modal('确认体验'+p.periodLabel+'会员',`<p>你选择了${p.periodLabel}方案 · ${p.priceFen/100} DSU / ${p.durationDays} 天。</p><p>确认后即可开启所选会员权益。</p><button class="button dark" data-confirm-plan="${el.dataset.plan}">确认体验开通</button>`)}
+ if(el.hasAttribute('data-plan')){if(!session.profile){session.login();return}const p=data.membership.plans[0].prices[Number(el.dataset.plan)];modal('确认体验'+p.periodLabel+'会员',`<p>你选择了${p.periodLabel}方案 · ¥${(p.priceFen/100).toFixed(2)} / ${p.durationDays} 天。</p><p>确认后即可开启所选会员权益。</p><button class="button dark" data-confirm-plan="${el.dataset.plan}">确认体验开通</button>`)}
  if(el.hasAttribute('data-confirm-plan')){const p=data.membership.plans[0].prices[Number(el.dataset.confirmPlan)],d=new Date('2026-10-15T12:00:00');d.setDate(d.getDate()+p.durationDays);session.member({label:p.periodLabel,period:p.periodCode,price:p.priceFen/100});const m=session.membership;m.expires=d.toISOString().slice(0,10);session.write('membership',m);document.querySelector('#portal-dialog').close();toast('会员体验已开启');accountTab='membership';location.hash='#/me?tab=membership'}
  if(el.hasAttribute('data-trial')){if(!session.profile){session.login();return}if(session.membership){accountTab='membership';location.hash='#/me?tab=membership';return}const d=new Date('2026-10-15T12:00:00');d.setDate(d.getDate()+7);session.member({label:'7 天体验',price:0});const m=session.membership;m.expires=d.toISOString().slice(0,10);session.write('membership',m);accountTab='membership';location.hash='#/me?tab=membership';toast('已领取 7 天体验会员')}
  if(el.dataset.register){if(!session.profile){session.login();return}const ev=eventData.find(x=>x.id===el.dataset.register);if(ev.status==='已结束'){toast('活动回顾已收藏');session.write('event-saved-'+ev.id,true);return}if(session.read('event-'+ev.id,false)){modal('报名信息',`<p>${ev.title}</p><p>参与人：${esc(session.profile.nickname)}</p><p>${ev.date} · ${ev.location}</p><p>状态：已报名</p>`);return}session.write('event-'+ev.id,true);render();toast('报名成功，可在“我的”查看')}
@@ -298,6 +307,14 @@
   if(counter)counter.textContent=field.value.length+' / '+field.maxLength;
  });
  document.addEventListener('submit',e=>{
+ if(e.target.id==='change-password-form'){
+  e.preventDefault();
+  const form=e.target,status=form.querySelector('[role=status]');
+  if(form.newPassword.value!==form.repeatPassword.value){status.textContent='两次输入的新密码不一致。';return;}
+  session.write('password-changed:'+session.profile.dsuId,Date.now());
+  form.reset();
+  status.textContent='密码修改已保存。';
+ }
  if(e.target.id==='profile-form'){e.preventDefault();const f=e.target;session.update({...session.profile,dsuId:session.profile.dsuId||session.profile.email?.trim().toLowerCase()||session.profile.nickname.trim().toLowerCase(),nickname:f.nickname.value.trim(),city:f.city.value.trim(),email:f.email.value,bio:f.bio.value.trim(),interests:f.interests.value.split(/[、,，]/).map(x=>x.trim()).filter(Boolean)});document.querySelector('.portal-form-status').textContent='已保存，你的资料已更新。'}
  if(e.target.id==='redeem-form'){e.preventDefault();if(!session.profile){session.login();return}if(e.target.code.value.trim().toUpperCase()!=='READ2026'){toast('兑换码不正确，请检查后重试');return}session.member({label:'年度兑换',price:0});accountTab='membership';location.hash='#/me?tab=membership';toast('年度会员体验已兑换')}
  });

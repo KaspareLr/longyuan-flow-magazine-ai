@@ -31,7 +31,6 @@ body.issue-full-page .portal-reader-content{padding-right:64px}
 body.issue-full-page .portal-prose figure>img{display:block;width:auto;max-width:100%;height:auto;max-height:none;margin-inline:auto}
 /* Full-height guide; the message list scrolls and the composer remains visible. */
 body.portal-body .demo-reading-widget .pe-chat{top:0!important;right:0!important;bottom:0!important;height:100dvh!important;max-height:100dvh!important;border-radius:0!important;border-top:0;border-bottom:0;border-right:0;display:flex!important;transform:none!important;opacity:1!important}
-body.portal-body.issue-preview-page .demo-reading-widget .pe-chat-toggle,body.portal-body.issue-preview-page .demo-reading-widget .pe-chat-reopen{display:none!important}
 body.portal-body .demo-reading-widget .pe-guide-heading{padding-right:16px}
 body.portal-body .demo-reading-widget .pe-chat-messages{min-height:0;flex:1;overflow:auto}
 body.portal-body .demo-reading-widget .pe-chat-form-wrap{flex:none;padding-bottom:max(12px,env(safe-area-inset-bottom))}
@@ -172,4 +171,4 @@ body.issue-preview-page > .club-site-footer { padding-bottom:calc(96px + env(saf
   .issue-purchase-price { width:auto;padding-inline:4px 10px;font-size:14px; }
   .issue-purchase-entry .button { padding-inline:16px; }
 }
-body:not(.issue-preview-page) > .issue-purchase-entry { display:none; }
+body:not(.issue-preview-page) > .issue-purchase-entry,.issue-purchase-entry[hidden] { display:none; }

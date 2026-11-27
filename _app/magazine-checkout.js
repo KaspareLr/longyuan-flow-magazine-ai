@@ -19,7 +19,7 @@
   if(dsu)dialog.classList.add('qikan-dsu-checkout');
   dialog.setAttribute('aria-labelledby','qikan-checkout-title');
   let amount=price??minimum;
-  const formatPayment=value=>minimum?yuan.format(value):format(value);
+  const formatPayment=value=>qr?yuan.format(value):format(value);
   let paid=false, processing=false, expires=0, timer;
   const paymentCode=method=>`<img src="${new URL('https://kasparelr.github.io/agentui-shared-images/objects/17/17e9295410354db62acca0d17bb01af04b3184d4d7c04e1167d4a3a49152df18.png',assets)}" alt="${method.label}二维码">`;
   dialog.innerHTML=`
@@ -72,7 +72,7 @@
     '<div class="mh-payment-success" aria-hidden="true">✓</div>'}
     <h3 tabindex="-1">${escape(success)}</h3>
     <p data-payment-receipt>${compact?'<span data-paid-provider></span><strong data-paid-amount></strong>':''}</p>
-    ${membership?'<button type="button" class="qikan-checkout-button is-primary mh-membership-return" data-payment-action="done">返回</button>':compact?'':'<div class="dsu-dialog-actions mh-payment-actions"><button type="button" class="qikan-checkout-button is-primary" data-payment-action="done">完成</button></div>'}
+    ${compact?'<button type="button" class="qikan-checkout-button is-primary mh-membership-return" data-payment-action="done">返回</button>':'<div class="dsu-dialog-actions mh-payment-actions"><button type="button" class="qikan-checkout-button is-primary" data-payment-action="done">完成</button></div>'}
    </section>`;
   const form=dialog.querySelector('[data-payment-step=choose]');
   const total=dialog.querySelector('[data-order-total]');
