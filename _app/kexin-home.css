@@ -1,3 +1,5 @@
+body:has(#view-kexin.active) { background: #f5f7fa; }
+
 #view-kexin.kx-home {
   width: min(1440px, calc(100% - 48px));
   max-width: none;
