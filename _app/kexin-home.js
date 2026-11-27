@@ -1,13 +1,13 @@
 (() => {
   const view = document.querySelector('#view-kexin');
   const scenes = [
-    ['投资研究', '用数据检验市场判断', '结合财报、公告和公开数据，核对投资观点。', [
+    ['投资研究', '一个判断，\n如何被数据支撑？', '结合财报、公告和公开数据，核对投资观点。', [
       ['新能源车销量上涨、利润率下降，是竞争力增强还是价格战加剧？', '对照销量结构、盈利指标和行业价格。', '财报、行业报告、市场数据'],
       ['存款利率下调后，哪些数据能验证资金流向理财和债基？', '比较资金流向、产品回报和风险等级。', '央行数据、基金季报、银行公告'],
       ['长期回测是否支持高股息策略？', '区分策略收益、估值变化和交易拥挤。', '学术论文、指数数据、市场研究'],
       ['算力投资增长，产业链哪些环节可能受益？', '核对资本开支、订单和供应瓶颈。', '公司公告、产业链报告、招投标数据']
     ]],
-    ['政策解读', '追踪政策落地的影响', '对照政策原文、统计数据和实施案例。', [
+    ['政策解读', '一项政策，\n如何改变现实？', '对照政策原文、统计数据和实施案例。', [
       ['低空经济扶持政策把资源投向了哪里？', '按技术、设施和招商梳理支持方向。', '政策文件、官方数据、产业规划'],
       ['如何评价数据要素试点对治理和产业的影响？', '梳理政策演进，比较可量化的成效。', '政策文件、官方数据、学术论文'],
       ['哪些指标能看出购房预期发生了变化？', '结合成交、信贷和调查结果交叉验证。', '政策文件、官方数据、市场调查'],
@@ -35,20 +35,27 @@
 
   const service = 'https://kexin.wenkoo.com.cn/chat/new';
   const form = view.querySelector('form');
-  const linkDialog = view.querySelector('[data-kexin-link-dialog]');
   const input = form.elements.q;
+  const status = view.querySelector('[data-kexin-status]');
+  const send = form.querySelector('[type=submit]');
+  const panel = view.querySelector('[data-kexin-panel]');
+  const arrow = '<span class="kx-arrow" aria-hidden="true">→</span>';
   const chips = (values) => values.map(value => `<span>${value}</span>`).join('');
   const sceneButtons = [...view.querySelectorAll('[data-kexin-scene]')];
 
   function renderScene(index) {
-    sceneButtons.forEach((button, i) => button.setAttribute('aria-pressed', String(i === index)));
+    sceneButtons.forEach((button, i) => {
+      button.setAttribute('aria-selected', String(i === index));
+      button.tabIndex = i === index ? 0 : -1;
+    });
+    panel.setAttribute('aria-labelledby', sceneButtons[index].id);
     const [, title, subtitle, questions] = scenes[index];
     const sources = [...new Set(questions.flatMap(question => question[2].split('、')))];
-    view.querySelector('[data-kexin-panel]').innerHTML = `
+    panel.innerHTML = `
       <div class="kx-scene-intro">
-        <div><h3>${title}</h3><p>${subtitle}</p></div>
+        <div><h3>${title}</h3><span class="kx-scene-rule" aria-hidden="true"></span><p>${subtitle}</p></div>
         <div class="kx-scene-sources">
-          <p class="kx-source-label">参考来源 · ${sources.length} 类</p>
+          <p class="kx-source-label">这个场景会核对的来源（${sources.length} 类）</p>
           <div class="kx-chips">${chips(sources)}</div>
         </div>
       </div>
@@ -56,41 +63,55 @@
         <article class="kx-question">
           <h4>${question}</h4><p>${desc}</p>
           <div class="kx-question-foot"><div class="kx-chips">${chips(sources.split('、'))}</div>
-            <button class="btn btn-outline" type="button" data-kexin-question="${i}" aria-label="用可信分析：${question}">用可信分析 <i class="iconfont icon-Arrow_Forward" aria-hidden="true"></i></button>
+            <button class="btn btn-outline" type="button" data-kexin-question="${i}" aria-label="用可信分析：${question}">用可信分析 ${arrow}</button>
           </div>
         </article>`).join('')}</div>`;
     view.querySelectorAll('[data-kexin-question]').forEach((button, i) => {
       button.addEventListener('click', () => {
         input.value = questions[i][0];
+        syncInput();
         form.requestSubmit();
       });
     });
   }
 
-  sceneButtons.forEach((button, index) => button.addEventListener('click', () => renderScene(index)));
-  view.querySelector('[data-kexin-link]').addEventListener('click', () => linkDialog.showModal());
-  linkDialog.querySelector('[data-kexin-link-cancel]').addEventListener('click', () => linkDialog.close());
-  linkDialog.querySelector('form').addEventListener('submit', () => {
-    const link = linkDialog.querySelector('input');
-    const next = [input.value.trim(), link.value.trim()].filter(Boolean).join('\n');
-    if (next.length <= input.maxLength) {
-      input.value = next;
-      link.value = '';
-    } else {
-      view.querySelector('[data-kexin-status]').textContent = '加上链接后超过输入字数上限，请缩短问题。';
-    }
+  sceneButtons.forEach((button, index) => {
+    button.id = `kexin-scene-${index}`;
+    button.setAttribute('role', 'tab');
+    button.setAttribute('aria-controls', panel.id);
+    button.innerHTML = `<strong>${scenes[index][0]}</strong><span>查看问题 ${arrow}</span>`;
+    button.addEventListener('click', () => renderScene(index));
+    button.addEventListener('keydown', event => {
+      const last = sceneButtons.length - 1;
+      const next = {ArrowLeft: index === 0 ? last : index - 1, ArrowRight: index === last ? 0 : index + 1, Home: 0, End: last}[event.key];
+      if (next === undefined) return;
+      event.preventDefault();
+      renderScene(next);
+      sceneButtons[next].focus();
+    });
+  });
+  function syncInput() {
+    send.disabled = !input.value.trim();
+    status.textContent = '';
+  }
+  input.addEventListener('input', syncInput);
+  input.addEventListener('keydown', event => {
+    if (event.key !== 'Enter' || event.shiftKey || event.isComposing) return;
+    event.preventDefault();
+    if (!send.disabled) form.requestSubmit();
   });
   form.addEventListener('submit', event => {
     event.preventDefault();
     const question = input.value.trim();
-    if (!question) {
-      input.focus();
+    if (!question) return;
+    if (!form.elements.webSearch.checked) {
+      status.textContent = '请开启联网搜索，或前往可信官网选择知识库、上传附件。';
       return;
     }
     const query = new URLSearchParams({
-      q: form.elements.periodicals.checked ? `${question}\n请优先查找期刊文章，并注明出处。` : question,
-      mode: 'DEEP_SEARCH',
-      view: 'dialogue',
+      q: question,
+      mode: form.elements.mode.value,
+      view: form.elements.view.value,
       knowledgeMode: 'NONE',
       kb: '',
       webSearch: '1'
@@ -98,4 +119,5 @@
     location.href = `${service}?${query}`;
   });
   renderScene(0);
+  syncInput();
 })();
