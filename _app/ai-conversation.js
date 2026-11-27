@@ -18,11 +18,14 @@
   const sufficient=available>=qikanDSU.aiPrice;
   return history+`${quote.retry===null?`<article class="ai-message ai-user"><div class="ai-message-body">${esc(quote.question)}</div></article>`:''}
    <div class="ai-cost-prompt">
-    <p>${sufficient?'':'DSU 余额不足。'}本次问答将消耗 ${qikanDSU.aiPrice} DSU，当前可用 ${available} DSU。</p>
-    ${quote.error?`<p role="alert">${esc(quote.error)}</p>`:''}
+    <div class="ai-cost-copy">
+     <p>${sufficient?'':'DSU 余额不足，'}本次问答将消耗 ${qikanDSU.aiPrice} DSU</p>
+     <p>当前可用 ${available} DSU</p>
+     ${quote.error?`<p role="alert">${esc(quote.error)}</p>`:''}
+    </div>
     <div class="ai-cost-actions">
      <button type="button" data-ai-cost-cancel ${quote.charging?'disabled':''}>取消</button>
-     ${sufficient?`<button type="button" data-ai-cost-confirm ${quote.charging?'disabled':''}>确认提问</button>`:`<a href="${esc(qikanDSU.membershipURL)}">购买</a>`}
+     ${sufficient?`<button type="button" data-ai-cost-confirm ${quote.charging?'disabled':''}>确认</button>`:`<a href="${esc(qikanDSU.membershipURL)}">购买</a>`}
     </div>
    </div>`;
  }
