@@ -403,6 +403,14 @@
         <ul class="dsu-plan-features">${uses.map(([name,detail])=>`<li><img src="${included}" alt="" width="20" height="20"><div><strong>${name}</strong><small>${detail}</small></div></li>`).join('')}</ul>
       </article>`;
     };
+    const faq=[
+      ['如何开具发票？','当前是演示环境，支付为模拟操作，无法开具发票。会员购买和充值的演示订单可在个人中心的「消费记录」查看。'],
+      ['如何升级会员套餐？','可在本页选择新的会员套餐。演示中支付成功后，新套餐立即生效，当前已消耗的会员额度计入新套餐。'],
+      ['DSU 用完了，如何购买额外额度？',`点击上方的「购买额度」即可充值，单笔 ${minimum} DSU 起充。消费时优先使用会员额度，剩余部分从可用的充值余额扣除。`],
+      ['会员权益有效期是多久？','月度会员自开通起有效 1 个月，普通年费会员和 Pro 会员有效 1 年。连续订阅会在到期后进入下一周期，本期未用完的会员额度到期失效。'],
+      ['在哪里查看额度与消耗明细？','打开个人中心的「会员与 DSU」，可以查看会员额度、可用的充值余额，以及购买和问答的消耗明细。'],
+      ['怎么取消自动续费？','在个人中心的「会员与 DSU」打开当前套餐，选择「取消订阅」。取消后，本期剩余额度仍可用至到期。']
+    ];
     return `<section class="dsu-pricing dsu-pricing-comparison">
       <header><h1>龙源期刊网会员</h1><p>用 DSU 阅读文章、选购期刊和使用 AI 问答。</p></header>
       <div class="dsu-membership-grid">${card(base,'普通会员','适合日常阅读和提问')}${card('pro','Pro会员','更高的年度额度，适合频繁阅读和问答')}</div>
@@ -412,6 +420,13 @@
           <p>单笔 ${minimum} DSU 起充</p>
         </div>${buyQuota}
       </footer>
+      <section class="dsu-pricing-faq" aria-labelledby="dsu-faq-heading">
+        <h2 id="dsu-faq-heading">常见问题</h2>
+        <div class="dsu-faq-list">${faq.map(([question,answer])=>`<details>
+          <summary>${esc(question)}</summary>
+          <p>${esc(answer)}</p>
+        </details>`).join('')}</div>
+      </section>
     </section>`;
   }
   const purchaseTypes=new Set(['article','issue','subscription','purchase']);
