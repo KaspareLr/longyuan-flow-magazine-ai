@@ -19,7 +19,7 @@
    <h2>来源示例</h2>
    <ol>${articles.map((article,index)=>{
     const href='portal.html#/article/'+index+'?'+new URLSearchParams({context:'magazine',resource:'南风窗'});
-    return `<li><a href="${esc(href)}"><span class="ai-source-index">${index+1}</span><span><strong>${esc(article.title)}</strong><small>南风窗 · 2026年09期</small></span>${icon('Arrow_Forward-3')}</a></li>`;
+    return `<li><a href="${esc(href)}"><strong>${esc(article.title)}</strong><small>南风窗 2026年09期</small></a></li>`;
    }).join('')}</ol>
   </section>`;
  }
