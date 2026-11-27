@@ -255,26 +255,8 @@ body.issue-full-page:has(.dsu-gate) > .demo-reading-widget,.frontpage-shared-top
 .dsu-pricing-faq { max-width:800px; margin:48px auto 0; color:#131921; }
 .dsu-pricing-faq h2 { margin:0 0 20px; text-align:center; font-size:clamp(22px,3vw,28px); line-height:1.3; }
 .dsu-faq-list { border:1px solid #e4e7ed; border-radius:20px; background:#fff; }
-.dsu-faq-list details + details { border-top:1px solid #e4e7ed; }
-.dsu-faq-list summary {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:16px;
-  min-height:52px;
-  padding:12px 20px;
-  box-sizing:border-box;
-  border-radius: inherit;
-  list-style:none;
-  font-size:15px;
-  font-weight:700;
-  line-height:24px;
-  cursor:pointer;
-}
-.dsu-faq-list summary::-webkit-details-marker { display:none; }
-.dsu-faq-list summary::after { content:""; flex:0 0 7px; height:7px; border:solid #606266; border-width:0 2px 2px 0; transform:translateY(-2px) rotate(45deg); }
-.dsu-faq-list details[open] summary::after { transform:translateY(2px) rotate(225deg); }
-.dsu-faq-list summary:focus-visible { outline:2px solid #2766bd; outline-offset:-4px; }
+.dsu-faq-list article + article { border-top:1px solid #e4e7ed; }
+.dsu-faq-list h3 { margin:0; padding:14px 20px; font-size:15px; font-weight:700; line-height:24px; }
 .dsu-faq-list p { margin:0; padding:0 20px 16px; color:#606266; font-size:14px; line-height:24px; }
 @media(max-width:650px){.dsu-pricing{padding:28px 16px 52px}.dsu-pricing .dsu-membership-grid{grid-template-columns:1fr}}
 
