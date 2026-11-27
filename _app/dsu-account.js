@@ -422,10 +422,10 @@
       </footer>
       <section class="dsu-pricing-faq" aria-labelledby="dsu-faq-heading">
         <h2 id="dsu-faq-heading">常见问题</h2>
-        <div class="dsu-faq-list">${faq.map(([question,answer])=>`<article>
-          <h3>${esc(question)}</h3>
+        <div class="dsu-faq-list">${faq.map(([question,answer])=>`<details>
+          <summary>${esc(question)}<i class="iconfont icon-Arrow_Forward-3 dsu-faq-arrow" aria-hidden="true"></i></summary>
           <p>${esc(answer)}</p>
-        </article>`).join('')}</div>
+        </details>`).join('')}</div>
       </section>
     </section>`;
   }
