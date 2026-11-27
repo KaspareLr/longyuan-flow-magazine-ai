@@ -62,13 +62,12 @@ body:has(#view-search.active){overflow:hidden;background:#fff}body:has(#view-sea
   background:#ffffffb3;
   box-shadow:0 2px 6px #0000001a;
   color:#131921;
-  font-size:12px;
-  font-weight:700;
-  line-height:16px;
+  font:700 12px/16px Figtree,"PingFang SC",sans-serif;
 }
 .ai-cost-copy { display:grid; gap:2px; flex:1; min-width:0; overflow-wrap:anywhere; }
-.ai-cost-copy p { margin:0; }
-.ai-cost-copy p:nth-child(2) { color:#909399; }
+.ai-cost-prompt .ai-cost-copy > span { margin:0; font:inherit; }
+.ai-cost-prompt .ai-cost-title { color:#131921; }
+.ai-cost-prompt .ai-cost-balance { color:#909399; }
 .ai-cost-actions { display:flex; flex:none; align-items:center; gap:8px; }
 .ai-cost-prompt .ai-cost-actions :is(button,a) {
   display:inline-flex;

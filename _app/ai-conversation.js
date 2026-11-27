@@ -19,9 +19,9 @@
   return history+`${quote.retry===null?`<article class="ai-message ai-user"><div class="ai-message-body">${esc(quote.question)}</div></article>`:''}
    <div class="ai-cost-prompt">
     <div class="ai-cost-copy">
-     <p>本次问答将消耗 ${qikanDSU.aiPrice} DSU</p>
-     <p>${sufficient?`当前可用 ${available} DSU`:'当前可用额度不足，请充值'}</p>
-     ${quote.error?`<p role="alert">${esc(quote.error)}</p>`:''}
+     <span class="ai-cost-title">本次问答将消耗 ${qikanDSU.aiPrice} DSU</span>
+     <span class="ai-cost-balance">${sufficient?`当前可用 ${available} DSU`:'当前可用额度不足，请充值'}</span>
+     ${quote.error?`<span role="alert">${esc(quote.error)}</span>`:''}
     </div>
     <div class="ai-cost-actions">
      <button type="button" data-ai-cost-cancel ${quote.charging?'disabled':''}>取消</button>
