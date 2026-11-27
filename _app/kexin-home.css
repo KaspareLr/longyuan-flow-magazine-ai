@@ -153,11 +153,7 @@ body:has(#view-kexin.active) { background: #fff; }
   background:#fff;
   color:#131921;
 }
-@media (hover:hover) {
-  .kx-question .kx-question-action { opacity:0; }
-  .kx-question:is(:hover,:focus-within) .kx-question-action { opacity:1; }
-}
-.kx-question-action:hover { box-shadow:0 2px 6px #0000001a; }
+.kx-question:is(:hover,:focus-within) { box-shadow:0 2px 6px #0000001a; }
 .kx-question-action .kx-arrow { font-size:24px; line-height:1; }
 @media (min-width:768px) {
   .kx-questions { grid-template-columns:repeat(2,minmax(0,1fr)); }
