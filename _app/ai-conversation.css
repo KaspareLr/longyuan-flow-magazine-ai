@@ -49,3 +49,31 @@ body:has(#view-search.active){overflow:hidden;background:#fff}body:has(#view-sea
 .ai-history-item:hover,.ai-history-item:focus-within{background:#ececec}
 .ai-history-item.selected:hover,.ai-history-item.selected:focus-within{background:#eaeaea}
 .ai-workspace .ai-history-item>button:hover{background:transparent}
+
+.ai-cost-prompt {
+  margin:12px 0 20px;
+  padding:12px 14px;
+  border:1px solid #e0e4ea;
+  border-radius:14px;
+  color:#535b66;
+  font-size:13px;
+  line-height:1.5;
+}
+.ai-cost-prompt p { margin:0; }
+.ai-cost-prompt p + p { margin-top:6px; }
+.ai-cost-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+.ai-cost-actions :is(button,a) {
+  display:inline-flex;
+  align-items:center;
+  min-height:32px;
+  padding:0 12px;
+  border:0;
+  border-radius:16px;
+  background:#eef1f5;
+  color:#131921;
+  font:inherit;
+  font-weight:600;
+  text-decoration:none;
+  cursor:pointer;
+}
+.ai-cost-actions :is(a,[data-ai-cost-confirm]) { background:#131921; color:#fff; }

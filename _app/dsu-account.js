@@ -465,13 +465,13 @@
       groups.get(day).push(record);
     }
     const ledger = `<section class="dsu-section dsu-ledger" id="dsu-ledger"><header class="dsu-row"><h3>消费流水</h3>
-        <nav class="dsu-filters" aria-label="消费类型">${[['all','全部'],['article','购买记录'],['ai','AI对话']].map(([id,label]) =>
+        <nav class="dsu-filters" aria-label="消费类型">${[['all','全部'],['article','购买记录'],['ai','问答消耗']].map(([id,label]) =>
           `<a class="dsu-button dsu-filter" href="#/me?tab=dsu&amp;view=usage&amp;filter=${id}" ${filter===id?'aria-current="page"':''}>${label}</a>`).join('')}</nav></header>
         ${records.length ? [...groups].map(([day,rows])=>`<section class="dsu-record-day"><h4>${day}</h4>
           <ul class="dsu-records">${rows.map(record=>{
           const source = (record.example?'样例 · ':'')+[record.quota && '会员额度 '+record.quota,record.wallet && '充值余额 '+record.wallet].filter(Boolean).join(' + ')+' DSU';
           return `<li title="${esc(source)}"><time datetime="${new Date(record.time).toISOString()}">${timeFormat.format(record.time)}</time>
-          <div class="dsu-record-copy"><span class="dsu-record-type">${({article:'解锁文章',issue:'购买单期',subscription:'订阅期刊',purchase:'购买',ai:'AI 对话'})[record.type]||'DSU'}</span><strong>${esc(record.description)}</strong></div>
+          <div class="dsu-record-copy"><span class="dsu-record-type">${({article:'解锁文章',issue:'购买单期',subscription:'订阅期刊',purchase:'购买',ai:'问答消耗'})[record.type]||'DSU'}</span><strong>${esc(record.description)}</strong></div>
           <b>−${record.amount} DSU</b><small class="dsu-record-source">${esc(source)}</small></li>`;
           }).join('')}</ul></section>`).join(''):'<p>暂无此类消费记录。</p>'}</section>`;
     const member=active(state),plan=state.subscription,totals=quotaUsage(state);
@@ -501,7 +501,7 @@
         <div class="dsu-usage-progress">
         <div class="dsu-row"><p>已用 <b>${used} / ${quota} DSU</b></p><span class="dsu-tag">${percent.toFixed(1)}%</span></div>
         <div class="dsu-progress" style="--usage-total:${progress.total}%" aria-hidden="true">${quotaSegments(progress)}</div>
-        <div class="dsu-legend"><span title="${totals.purchase} DSU">购买消耗</span><span title="${totals.ai} DSU">AI 对话</span></div>
+        <div class="dsu-legend"><span title="${totals.purchase} DSU">购买消耗</span><span title="${totals.ai} DSU">问答消耗</span></div>
         ${missing?'<p class="dsu-usage-history-note">部分历史流水缺失。</p>':''}</div>
       </section>
       <section class="dsu-section dsu-wallet"><h3>充值额度</h3><div class="dsu-wallet-card dsu-account-card">
@@ -664,6 +664,7 @@
   window.qikanDSU = {
     page(a) { return window.qikanArticleRoutes?.[articleId(a)]; },
     panel, membership, summary, mountPublicationPurchase, ownsIssue, confirmAI,
+    chargeAI: question=>change(state=>applyCharge(state,'ai',question,aiPrice)),
     paymentHistory(){
       const owner=identity(profile());
       const rows=owner?load(owner).payments||[]:[];
@@ -671,17 +672,12 @@
     },
     accountSummary(){
       const owner=identity(profile());
-      if(!owner)return '';
-      const state=load(owner),totals=quotaUsage(state);
-      const plan=active(state)?state.subscription:null;
-      const progress=quotaProgress(totals);
-      return `<div class="dsu-usage-progress qikan-account-quota">
-       <div class="dsu-row"><strong>${plan?esc(planFor(plan).name):'尚未订阅'}</strong><span>${plan?'有效至 '+date(plan.expires):''}</span></div>
-       <div class="dsu-row"><p>已用 <b>${totals.used} / ${totals.quota} DSU</b></p><span>${totals.percent.toFixed(1)}%</span></div>
-       <div class="dsu-progress" aria-hidden="true">${quotaSegments(progress)}</div>
-       <div class="dsu-legend"><span>购买消耗</span><span>AI 对话</span></div>
-       <p>可用 <strong>${remaining(state)+walletAvailable(state)} DSU</strong></p>
-      </div>`;
+      const usage=summary();
+      const state=owner?load(owner):null;
+      const plan=state&&active(state)?state.subscription:null;
+      const totals=plan?quotaUsage(state):null;
+      return {plan:plan?planFor(plan).name:'尚未订阅',expires:plan?new Intl.DateTimeFormat('sv-SE',{dateStyle:'short',timeZone:'Asia/Shanghai'}).format(plan.expires):'',
+        available:usage.available,purchase:totals?.purchase??usage.articles,answers:totals?.ai??usage.ai};
     },
     readingUnlocks(){const owner=identity(profile());return owner?load(owner).records.filter(row=>row.type==='article'&&row.article):[];}, spendAI, signedIn, accountURL, membershipURL, articleId, articlePrice, aiPrice,
     canRead(a) {
@@ -800,7 +796,7 @@
       <div class="dsu-menu-usage">
        <div class="dsu-menu-usage-line"><p>已用 <b>${used} / ${quota} DSU</b></p><span>${percent.toFixed(1)}%</span></div>
        <div class="dsu-menu-progress" style="--usage-total:${progress.total}%" aria-hidden="true">${quotaSegments(progress)}</div>
-       <div class="dsu-menu-legend"><span>购买消耗</span><span>AI 对话</span></div>${missing?'<p class="dsu-usage-history-note">部分历史流水缺失。</p>':''}
+       <div class="dsu-menu-legend"><span>购买消耗</span><span>问答消耗</span></div>${missing?'<p class="dsu-usage-history-note">部分历史流水缺失。</p>':''}
       </div>
       <div class="dsu-menu-links">${links.map(([tab,label])=>`<a href="${esc(new URL('portal.html#/me?tab='+tab,root))}">${label}<img src="${esc(arrow)}" alt=""></a>`).join('')}</div>
       <div class="dsu-menu-links dsu-menu-plan-link"><a href="${esc(membershipURL)}">会员套餐<img src="${esc(flash)}" alt=""></a></div>
