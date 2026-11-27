@@ -39,7 +39,15 @@
  const view=document.querySelector('#view-search');
  if(view&&!state.historyPreviewInitialized){const examples=[['如何保持深度阅读？','可以先从十分钟不被打断的阅读开始。选择一篇感兴趣的文章，带着一个问题读完，再用自己的话概括主要观点。'],['城市更新如何影响日常生活？','不妨从熟悉的街道观察：步行是否更方便，是否有可以停留的空间，原有的小店与邻里关系是否被保留下来。这些细节让城市更新与日常生活联系起来。']];for(const [q,a] of examples){if(state.items.filter(x=>x.messages.length).length>=2)break;if(state.items.some(x=>x.title===q))continue;state.items.push({id:(crypto.randomUUID?.() ?? Array.from(crypto.getRandomValues(new Uint32Array(4)), value=>value.toString(16).padStart(8,'0')).join('')),title:q,messages:[{role:'user',text:q},{role:'assistant',text:a}],draft:'',context:null,updated:Date.now()});}state.historyPreviewInitialized=true;state.active=null;save();}
 
- if(view)view.innerHTML=`<div class="ai-workspace"><aside class="ai-history"><header><strong>龙源 AI</strong><button data-ai-sidebar aria-label="收起历史记录" title="收起历史记录">${icon('Slider')}</button></header><button class="ai-new" data-ai-new>新对话</button><span class="ai-history-label">对话记录</span><div class="ai-history-list"></div><footer>让每个问题，通向更深的阅读。</footer></aside><main class="ai-main"><header class="ai-main-header"><button data-ai-sidebar aria-label="展开历史记录" title="展开历史记录">${icon('Slider')}</button><button data-ai-restore hidden title="恢复阅读向导" aria-label="恢复阅读向导">${icon('ZoomIN-2')}</button></header><div class="ai-scroll"><div class="ai-thread" role="log" aria-label="对话记录"></div></div><div class="ai-composer-area"><a class="ai-context" hidden></a><div class="ai-composer-quote" aria-live="polite"></div><form class="ai-composer guide-unified-composer"><textarea rows="1" aria-label="发送消息" placeholder="说说你想读什么，或问一个问题…" maxlength="4000"></textarea><div class="ai-composer-tools"><label class="guide-unified-attach" tabindex="0" role="button" title="添加内容" aria-label="添加内容">${icon('Link')}<input type="file" hidden></label><button type="submit" class="ai-send" aria-label="发送消息">${icon('Arrow_Top')}</button></div></form><p class="ai-composer-hint">结合原文阅读，让理解更进一步。</p></div></main></div>`;
+ if(view)view.innerHTML=`<div class="ai-workspace"><aside class="ai-history"><header><strong>可信 AI</strong><button data-ai-sidebar aria-label="收起历史记录" title="收起历史记录">${icon('Slider')}</button></header><button class="ai-new" data-ai-new>新对话</button><span class="ai-history-label">对话记录</span><div class="ai-history-list"></div><footer>让每个问题，通向更深的阅读。</footer></aside><main class="ai-main"><header class="ai-main-header"><button data-ai-sidebar aria-label="展开历史记录" title="展开历史记录">${icon('Slider')}</button><button data-ai-restore hidden title="恢复阅读向导" aria-label="恢复阅读向导">${icon('ZoomIN-2')}</button></header><div class="ai-scroll"><div class="ai-thread" role="log" aria-label="对话记录"></div></div><div class="ai-composer-area"><a class="ai-context" hidden></a><div class="ai-composer-quote" aria-live="polite"></div><form class="ai-composer guide-unified-composer"><textarea rows="1" aria-label="发送消息" placeholder="说说你想读什么，或问一个问题…" maxlength="4000"></textarea><div class="ai-composer-tools"><label class="guide-unified-attach" tabindex="0" role="button" title="添加内容" aria-label="添加内容">${icon('Link')}<input type="file" hidden></label><button type="submit" class="ai-send" aria-label="发送消息">${icon('Arrow_Top')}</button></div></form><p class="ai-composer-hint">结合原文阅读，让理解更进一步。</p></div></main></div>`;
+ const historyOpener=view?.querySelector('.ai-main-header > [data-ai-sidebar]');
+ if(historyOpener){
+  const header=document.querySelector('body > .topbar');
+  if(header){
+   historyOpener.classList.add('ai-history-opener');
+   header.append(historyOpener);
+  }
+ }
  function render(){
   const c=current();if(view){const list=view.querySelector('.ai-history-list');list.innerHTML=state.items.filter(x=>x.messages.length).map(x=>`<div class="ai-history-item ${x.id===state.active?'selected':''}"><button data-ai-select="${x.id}" title="${esc(x.title)}">${esc(x.title)}</button><button data-ai-delete="${x.id}" title="删除对话" aria-label="删除对话">${icon('Delete2')}</button></div>`).join('')||'<p class="ai-history-empty">暂无对话记录</p>';
    const thread=view.querySelector('.ai-thread');thread.innerHTML=c&&(c.messages.length||quote?.conversation===c.id)?messageHTML(c,false):welcomeHTML(true);
@@ -127,7 +135,10 @@
   if(b.hasAttribute('data-ai-new')){fresh();editing=null;render();view?.querySelector('textarea').focus();}
   if(b.dataset.aiSelect){stop();state.active=b.dataset.aiSelect;editing=null;save();render();}
   if(b.dataset.aiDelete){stop();state.items=state.items.filter(x=>x.id!==b.dataset.aiDelete);if(state.active===b.dataset.aiDelete)state.active=state.items[0]?.id||null;save();render();}
-  if(b.hasAttribute('data-ai-sidebar'))view?.querySelector('.ai-workspace').classList.toggle('ai-sidebar-collapsed');
+  if(b.hasAttribute('data-ai-sidebar')){
+   const collapsed=view?.querySelector('.ai-workspace').classList.toggle('ai-sidebar-collapsed');
+   (collapsed?historyOpener:view?.querySelector('.ai-history [data-ai-sidebar]'))?.focus({preventScroll:true});
+  }
   if(b.hasAttribute('data-ai-restore')){const returnUrl=guideReturn();if(returnUrl){sessionStorage.setItem('club-demo-reading-guide-collapsed','false');sessionStorage.setItem('longyuan-reading-guide-collapsed','false');sessionStorage.removeItem(guideReturnKey);location.href=returnUrl;}}
   if(b.dataset.aiPrompt)showQuote(b.dataset.aiPrompt);
   if(b.hasAttribute('data-ai-copy')){await navigator.clipboard.writeText(current().messages[Number(b.dataset.aiCopy)].text);b.innerHTML='已复制';}

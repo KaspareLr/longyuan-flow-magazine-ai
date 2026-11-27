@@ -104,3 +104,28 @@ body:has(#view-search.active){overflow:hidden;background:#fff}body:has(#view-sea
 
 .ai-composer-quote { width:min(100%,360px); margin-inline:auto; }
 .ai-composer-quote > .ai-cost-prompt { margin:0 0 10px; }
+
+body > .topbar > .ai-history-opener {
+  display:none;
+  position:absolute;
+  top:16px;
+  left:12px;
+  z-index:1;
+  width:36px;
+  height:36px;
+  padding:6px;
+  border:0;
+  border-radius:8px;
+  background:#ffffffd9;
+  color:#131921;
+  pointer-events:auto;
+}
+body:has(#view-search.active .ai-sidebar-collapsed) > .topbar > .ai-history-opener {
+  display:grid;
+  place-items:center;
+}
+.ai-history-opener .iconfont { font-size:24px; line-height:1; }
+.ai-history-opener:focus-visible { outline:2px solid #2766bd; outline-offset:2px; }
+@media (max-width:800px) {
+  body > .topbar > .ai-history-opener { top:146px; }
+}
