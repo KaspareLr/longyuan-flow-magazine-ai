@@ -231,3 +231,19 @@ body:has(.qikan-account) { background:#fff; }
 .qikan-account .portal-profile-form .qikan-avatar-upload { position:relative; display:block; width:64px; height:64px; border-radius:50%; cursor:pointer; }
 .qikan-account .portal-profile-form .qikan-avatar-upload input { position:absolute; inset:0; width:100%; height:100%; margin:0; opacity:0; cursor:pointer; }
 .qikan-avatar-upload:focus-within { outline:2px solid #2766bd; outline-offset:2px; }
+
+.qikan-avatar-upload-overlay {
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  border-radius:inherit;
+  background:#0009;
+  color:#fff;
+  opacity:0;
+  pointer-events:none;
+}
+.qikan-avatar-upload:is(:hover,:active,:focus-within) .qikan-avatar-upload-overlay { opacity:1; }
+@media (prefers-reduced-motion:no-preference) {
+  .qikan-avatar-upload-overlay { transition:opacity 150ms ease; }
+}
